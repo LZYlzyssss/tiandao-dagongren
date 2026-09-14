@@ -26,17 +26,24 @@
     <div class="top-stats" id="topStats"></div>
   </header>
 
-  <!-- 主体三栏 -->
-  <main id="layout">
-    <!-- 左：工单架 -->
-    <aside class="col col-left" id="colLeft"></aside>
+  <!-- 主舞台：各分页与下凡/战斗流程都渲染到这里 -->
+  <main id="pageStage" class="stage"></main>
 
-    <!-- 中：场景 -->
-    <section class="col col-center" id="colCenter"></section>
-
-    <!-- 右：神格盘 + 阴兵营 -->
-    <aside class="col col-right" id="colRight"></aside>
-  </main>
+  <!-- 底部标签导航 -->
+  <nav id="tabbar">
+    <button class="tab" data-tab="desk">
+      <span class="tab-ico">牍</span><span class="tab-txt">案牍</span><i class="tab-dot" id="dotDesk"></i>
+    </button>
+    <button class="tab" data-tab="cult">
+      <span class="tab-ico">悟</span><span class="tab-txt">修行</span>
+    </button>
+    <button class="tab" data-tab="yamen">
+      <span class="tab-ico">衙</span><span class="tab-txt">神衙</span>
+    </button>
+    <button class="tab" data-tab="me">
+      <span class="tab-ico">吾</span><span class="tab-txt">我的</span>
+    </button>
+  </nav>
 
   <!-- 弹窗层 -->
   <div id="modalLayer"></div>

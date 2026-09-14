@@ -1,4 +1,4 @@
-/* ================= 天道打工人 · 界面层 ================= */
+/* ================= 天道打工人 · 界面层（分页版） ================= */
 const $ = id => document.getElementById(id);
 const h = (tag, cls, html)=>{ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
 const imgURL = (prompt,size)=>`https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${size||'square'}`;
@@ -10,6 +10,7 @@ const YAMEN_BG = imgURL('Chinese ink wash landscape painting of a lonely ancient
 
 const UI = {
   view:'office',     // office | mission | battle | settle
+  tab:'desk',        // desk(案牍) | cult(修行) | yamen(神衙) | me(我的)
   rt:null,           // 下凡运行时 {order, mid, node, ctx, lastResult}
   _momentResolve:null,
 
@@ -22,10 +23,30 @@ const UI = {
   render(){
     if(!Game.s) return;
     this.renderTop();
-    this.renderLeft();
-    this.renderRight();
-    if(this.view==='office') this.renderOffice();
-    /* mission/battle/settle 视图由各自流程维护 */
+    const flowing=this.view!=='office';
+    $('tabbar').classList.toggle('hidden', flowing);
+    if(flowing) return;   /* mission / battle / settle 视图由各自流程维护 */
+    this.renderTabbar();
+    const stage=$('pageStage'); stage.innerHTML='';
+    if(this.tab==='desk') this.renderDesk(stage);
+    else if(this.tab==='cult') this.renderCult(stage);
+    else if(this.tab==='yamen') this.renderYamen(stage);
+    else this.renderMe(stage);
+    stage.scrollTop=0;
+  },
+
+  switchTab(tab){
+    if(this.view!=='office') return;
+    this.tab=tab; this.render();
+  },
+
+  renderTabbar(){
+    document.querySelectorAll('#tabbar .tab').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tab===this.tab);
+    });
+    /* 有官遣单且不在案牍页时，案牍标签亮红点 */
+    const forced=Game.s.shelf.some(o=>MISSIONS.find(m=>m.id===o.mid).forced);
+    $('dotDesk').style.display=(forced && this.tab!=='desk')?'block':'none';
   },
 
   renderTop(){
@@ -46,23 +67,27 @@ const UI = {
       </div>`;
   },
 
-  /* ================= 左栏：工单架 ================= */
-  renderLeft(){
-    const c=$('colLeft'); c.innerHTML='';
+  /* ================= 页一：案牍（工单架） ================= */
+  renderDesk(c){
+    const s=Game.s, target=monthTarget(s.month);
+    const kpi=h('div','panel kpi-panel');
+    kpi.innerHTML=`
+      <h2>案头工单 <span class="sub">三十日一考 · 阎魔王亲阅</span></h2>
+      <div class="kpi-row">
+        <div><span class="kpi-k">本月功过</span><b style="color:var(--${s.merit>=target?'jade':'cinnabar'})">${s.merit}/${target}</b></div>
+        <div><span class="kpi-k">本月还剩</span><b>${MONTH_DAYS - s.day + 1} 日</b></div>
+        <div><span class="kpi-k">在架工单</span><b>${s.shelf.length} 张</b></div>
+        <div><span class="kpi-k">记过</span><b style="color:var(--${s.strikes?'cinnabar':'ink-faint'})">${s.strikes}/2</b></div>
+      </div>
+      ${s.strikes>0?'<div class="clash-warn" style="margin-top:8px">你已被记过，本月再不合格就要被贬作孤魂野鬼。</div>':''}`;
+    c.appendChild(kpi);
+
     const p=h('div','panel');
     p.innerHTML=`<h2>工单架 <span class="sub">神仙们的脏活累活</span></h2>`;
-    if(Game.s.busy){
-      const m=MISSIONS.find(x=>x.id===this.rt.mid), god=GODS[m.god];
-      p.appendChild(h('div','order',`
-        <div class="o-god">${god.name} · ${god.title} · 委托执行中</div>
-        <div class="o-title">${m.name}</div>
-        <div class="o-scroll" style="margin-top:6px">你正在两界之间办差，办完自会回衙。</div>`));
-      c.appendChild(p); return;
+    if(!s.shelf.length){
+      p.appendChild(h('div','shelf-empty','案头空空如也。<br>去「神衙」闭目调息度过今日，明日兴许就有新工单了。'));
     }
-    if(!Game.s.shelf.length){
-      p.appendChild(h('div','shelf-empty','案头空空如也。<br>明日兴许就有新工单了。'));
-    }
-    Game.s.shelf.forEach((o,idx)=>{
+    s.shelf.forEach((o,idx)=>{
       const m=MISSIONS.find(x=>x.id===o.mid), god=GODS[m.god];
       const card=h('div','order'+(m.forced?' forced':''));
       card.innerHTML=`
@@ -89,7 +114,7 @@ const UI = {
       acts.appendChild(go);
       if(!m.forced){
         const b=h('button','btn btn-sm','加价');
-        b.disabled=o.bargain||Game.s.favor<=0;
+        b.disabled=o.bargain||s.favor<=0;
         b.title='耗 1 点人情，香火钱报酬 +50%';
         b.onclick=()=>Game.bargain(idx);
         acts.appendChild(b);
@@ -102,46 +127,9 @@ const UI = {
     c.appendChild(p);
   },
 
-  /* ================= 中栏：神衙 ================= */
-  renderOffice(){
-    const s=Game.s;
-    const c=$('colCenter'); c.innerHTML='';
-    const wrap=h('div','yamen');
-    wrap.style.backgroundImage=`url("${YAMEN_BG}")`;
-    const target=monthTarget(s.month);
-    wrap.innerHTML=`
-      <h2>两界交界·破神衙</h2>
-      <div class="ya-desc">
-        衙门口的灯笼常年不灭，照得见活人，也照得见鬼。案头堆着三界各路神仙的委托，
-        香炉里插着你自己掏钱买的香。<br>
-        本月功过 <b style="color:var(--${s.merit>=target?'jade':'cinnabar'})">${s.merit}/${target}</b>，
-        三十日一考，由阎魔王亲阅。${s.strikes>0?`<span style="color:var(--cinnabar)">你已被记过 ${s.strikes} 次，再不合格就要被贬作孤魂野鬼。</span>`:''}
-      </div>`;
-    const grid=h('div','ya-grid');
-    const mk=(t,d,btn,on)=>{
-      const cd=h('div','ya-card',`<div class="yc-t">${t}</div><div class="yc-d">${d}</div>`);
-      const b=h('button','btn btn-sm',btn); b.onclick=on; cd.appendChild(b); grid.appendChild(cd);
-    };
-    const shrineMaxed=s.fac.shrine>=FACILITIES.shrine.levels.length;
-    mk('修神龛',shrineMaxed?'觉醒率已达最高 +30%':`升级后觉醒率 +${FACILITIES.shrine.levels[s.fac.shrine].wakeBonus*100}%（当前 ${s.fac.shrine} 级）`,'升级神龛',()=>this.openShop('fac'));
-    const deskMaxed=s.fac.desk>=FACILITIES.desk.levels.length;
-    const incMaxed=s.fac.incense>=FACILITIES.incense.levels.length;
-    const banMaxed=s.fac.banner>=FACILITIES.banner.levels.length;
-    mk('扩案几',deskMaxed?'工单架容量已达最高':`升级后工单架容量 +1（当前 ${s.fac.desk} 级）`,'升级案几',()=>this.openShop('fac'));
-    mk('添香炉',incMaxed?'神力上限已达最高':`升级后神力上限 +30（当前 ${s.fac.incense} 级）`,'升级香炉',()=>this.openShop('fac'));
-    mk('竖招妖幡',banMaxed?'阴兵编制已达最高':`升级后阴兵编制 +1（当前 ${s.fac.banner} 级）`,'升级招妖幡',()=>this.openShop('fac'));
-    mk('法宝铺','判官笔、锁魂链、太乙拂尘','选购法宝',()=>this.openShop('item'));
-    mk('休整一日','神躯神力尽复，但白日渐逝','闭目调息',()=>Game.rest());
-    wrap.appendChild(grid);
-    c.appendChild(wrap);
-  },
-
-  /* ================= 右栏：神格盘 / 阴兵营 ================= */
-  renderRight(){
-    const s=Game.s, c=$('colRight'); c.innerHTML='';
-    const st=Stats.cur();
-
-    /* ---- 神格盘 ---- */
+  /* ================= 页二：修行（神格盘 / 融合） ================= */
+  renderCult(c){
+    const s=Game.s, st=Stats.cur();
     const p=h('div','panel');
     p.innerHTML=`<h2>神格盘 <span class="sub">槽位 ${s.equipped.length}/${Stats.slots()}</span></h2>`;
     if(st.clash) p.appendChild(h('div','clash-warn','道争：天启系与幽冥系神格同嵌，神力上限 −20%。鱼与熊掌，自己掂量。'));
@@ -153,7 +141,7 @@ const UI = {
       const sl=h('div','slot'+(id?' filled':''), id?GODHOODS[id].icon:'＋');
       if(id){
         const g=GODHOODS[id], rec=s.gh[id];
-        sl.title=`${g.name}（${PATHS[g.path].name}）${rec.sleep>0?` 沉睡中 ${rec.sleep} 日`:''}`;
+        sl.title=`${g.name}（${PATHS[g.path].name}系）${rec.sleep>0?` 沉睡中 ${rec.sleep} 日`:''}`;
         const dot=h('span','p-dot dot-'+g.path); sl.appendChild(dot);
         if(rec.sleep>0) sl.classList.add('sleeping');
         sl.onclick=()=>Game.toggleEquip(id);
@@ -161,10 +149,11 @@ const UI = {
       slots.appendChild(sl);
     }
     p.appendChild(slots);
+    p.appendChild(h('div','section-tip','点击已镶嵌的神格可取下；下方神格点「镶嵌」入盘。沉睡中的神格无法催动。'));
 
     const list=h('div','gh-list');
     const owned=Object.keys(s.gh);
-    if(!owned.length) p.appendChild(h('div','section-tip','尚无神格。去给神仙们办差，神格就是你的工钱。'));
+    if(!owned.length) p.appendChild(h('div','section-tip','尚无神格。去「案牍」接工单给神仙们办差，神格就是你的工钱。'));
     owned.forEach(id=>{
       const g=GODHOODS[id], rec=s.gh[id];
       const eq=s.equipped.includes(id);
@@ -175,7 +164,7 @@ const UI = {
       else stateHtml=`<div class="gh-dorm">未觉醒（感悟 ${Math.round(rec.insight*100)}%）</div>`;
       item.innerHTML=`
         <div class="gh-t"><span class="path-dot dot-${g.path}"></span>${g.name}
-          <span style="font-size:11px;color:var(--ink-faint)">${g.fusion?'【融合】':PATHS[g.path].name+' · '+(g.god?GODS[g.god].name:'天道自生')}</span></div>
+          <span style="font-size:11px;color:var(--ink-faint)">${g.fusion?'【融合】':PATHS[g.path].name+'系 · '+(g.god?GODS[g.god].name:'天道自生')}</span></div>
         <div class="gh-s">${g.desc}<br>${stateHtml}</div>`;
       const row=h('div','o-actions'); row.style.marginTop='5px';
       const eb=h('button','btn btn-sm', eq?'取下':'镶嵌');
@@ -191,6 +180,8 @@ const UI = {
     p.appendChild(list);
 
     /* 融合 */
+    const fp=h('div','panel');
+    fp.innerHTML=`<h2>神格融合 <span class="sub">两枚觉醒神格合而为一</span></h2>`;
     FUSIONS.forEach(f=>{
       const out=GODHOODS[f.out], ins=f.in.map(x=>GODHOODS[x].name).join(' + ');
       const allAwake=f.in.every(x=>Game.awakened(x));
@@ -203,65 +194,182 @@ const UI = {
       const b=h('button','btn btn-sm fuse-btn',label);
       b.disabled=!ready;
       b.onclick=()=>Game.fuse(f);
-      p.appendChild(b);
+      fp.appendChild(b);
     });
     c.appendChild(p);
+    c.appendChild(fp);
+  },
 
-    /* ---- 阴兵营 ---- */
-    const sp=h('div','panel');
-    const cap=1+(s.fac.banner>0?FACILITIES.banner.levels.slice(0,s.fac.banner).reduce((a,l)=>a+(l.cap||0),0):0);
-    sp.innerHTML=`<h2>阴兵营 <span class="sub">编制 ${s.soldiers.length}/${cap}</span></h2>`;
-    if(!s.soldiers.length) sp.appendChild(h('div','section-tip','光杆司令一个。招妖幡下可以募点阴兵差遣。'));
-    s.soldiers.forEach(id=>{
-      const so=SOLDIERS[id];
-      sp.appendChild(h('div','soldier-row',
-        `<span><b>${so.icon} ${so.name}</b><div class="sd">${so.desc}</div></span>`));
+  /* ================= 页三：神衙（营造 / 杂货铺 / 募兵 / 休整） ================= */
+  renderYamen(c){
+    const s=Game.s;
+    const hero=h('div','yamen');
+    hero.style.backgroundImage=`url("${YAMEN_BG}")`;
+    hero.innerHTML=`
+      <h2>两界交界·破神衙</h2>
+      <div class="ya-desc">
+        衙门口的灯笼常年不灭，照得见活人，也照得见鬼。<br>
+        营造设施、置办法宝、募点阴兵，都是给自己的打工路添几分底气。
+      </div>`;
+    c.appendChild(hero);
+
+    /* ---- 营造 ---- */
+    const fp=h('div','panel');
+    fp.innerHTML=`<h2>神衙营造 <span class="sub">香火钱换硬实力</span></h2>`;
+    Object.entries(FACILITIES).forEach(([key,f])=>{
+      const lv=s.fac[key], maxed=lv>=f.levels.length;
+      const next=maxed?null:f.levels[lv];
+      const r=h('div','shop-row',
+        `<div><div class="sr-t">${f.icon} ${f.name} <span class="lv-tag">${lv} 级</span></div>
+         <div class="sr-d">${f.desc}${next?'<br>下一级：'+facEff(next)+' · 花费 '+next.cost+' 文':' · 已至最高级'}</div></div>`);
+      if(next){ const b=h('button','btn btn-primary btn-sm','营造'); b.onclick=()=>Game.upgradeFac(key); r.appendChild(b); }
+      else r.appendChild(h('span','tag tag-merit','已满级'));
+      fp.appendChild(r);
     });
+    c.appendChild(fp);
+
+    /* ---- 杂货铺 ---- */
+    const ip=h('div','panel');
+    ip.innerHTML=`<h2>阴阳杂货铺 <span class="sub">掌柜是个骑青牛的老道</span></h2>
+      <div class="section-tip">老道说他卖的都是“体制内淘汰下来的好东西”。法宝唯一，购后恒持。</div>`;
+    Object.entries(ITEMS).forEach(([id,it])=>{
+      const owned=!!s.items[id];
+      const r=h('div','shop-row',
+        `<div><div class="sr-t">${it.icon} ${it.name}</div><div class="sr-d">${it.desc}</div></div>
+         <span class="price">${it.price} 文</span>`);
+      const b=h('button','btn btn-sm', owned?'已持有':'请购');
+      b.disabled=owned;
+      b.onclick=()=>Game.buyItem(id);
+      r.appendChild(b); ip.appendChild(r);
+    });
+    c.appendChild(ip);
+
+    /* ---- 募兵 ---- */
+    const cap=1+(s.fac.banner>0?FACILITIES.banner.levels.slice(0,s.fac.banner).reduce((a,l)=>a+(l.cap||0),0):0);
+    const sp=h('div','panel');
+    sp.innerHTML=`<h2>招妖幡下 <span class="sub">在役阴兵 ${s.soldiers.length}/${cap}</span></h2>`;
+    if(s.soldiers.length){
+      const roster=h('div','roster');
+      s.soldiers.forEach(id=>{
+        const so=SOLDIERS[id];
+        roster.appendChild(h('span','roster-chip',`${so.icon} ${so.name}`));
+      });
+      sp.appendChild(roster);
+    }else{
+      sp.appendChild(h('div','section-tip','光杆司令一个。募点阴兵，战场上能替你偷袭挡刀。'));
+    }
     Object.entries(SOLDIERS).forEach(([id,so])=>{
       const r=h('div','shop-row',
         `<div><div class="sr-t">${so.icon} ${so.name}</div><div class="sr-d">${so.desc}</div></div>
          <span class="price">${so.price} 文</span>`);
       const b=h('button','btn btn-primary btn-sm','招募');
-      b.onclick=()=>Game.recruit(id); r.appendChild(b); sp.appendChild(r);
+      b.disabled=s.soldiers.length>=cap;
+      b.onclick=()=>Game.recruit(id);
+      r.appendChild(b); sp.appendChild(r);
     });
+    if(s.soldiers.length>=cap) sp.appendChild(h('div','section-tip','编制已满，升级招妖幡可扩充。'));
     c.appendChild(sp);
+
+    /* ---- 休整 ---- */
+    const rp=h('div','panel rest-panel');
+    rp.innerHTML=`<h2>闭目调息</h2>
+      <div class="sr-d" style="margin:4px 0 10px">休整一日，神躯神力尽复。白日渐逝，一日便翻过去。</div>`;
+    const b=h('button','btn btn-primary','休整一日');
+    b.onclick=()=>Game.rest();
+    rp.appendChild(b);
+    c.appendChild(rp);
   },
 
-  /* ================= 弹窗 ================= */
-  openShop(kind){
-    const s=Game.s, ml=$('modalLayer'); ml.innerHTML='';
-    const ov=h('div','overlay');
-    const box=h('div','paper m-box');
-    if(kind==='fac'){
-      box.innerHTML=`<button class="m-close">✕</button><h3>神衙营造</h3>`;
-      Object.entries(FACILITIES).forEach(([key,f])=>{
-        const lv=s.fac[key], maxed=lv>=f.levels.length;
-        const next=maxed?null:f.levels[lv];
-        const r=h('div','shop-row',
-          `<div><div class="sr-t">${f.icon} ${f.name} <span style="font-size:12px;color:var(--cinnabar)">${lv} 级</span></div>
-           <div class="sr-d">${f.desc}${next?'<br>下一级：'+facEff(next):' · 已至最高级'}</div></div>
-           ${next?`<span class="price">${next.cost} 文</span>`:''}`);
-        if(next){ const b=h('button','btn btn-primary btn-sm','营造'); b.onclick=()=>{Game.upgradeFac(key);this.openShop('fac');}; r.appendChild(b); }
-        else r.appendChild(h('span','tag tag-merit','已满级'));
-        box.appendChild(r);
+  /* ================= 页四：我的（角色卷宗） ================= */
+  renderMe(c){
+    const s=Game.s, st=Stats.cur(), rk=RANKS[s.rank];
+
+    /* 身份 */
+    const idp=h('div','panel me-head');
+    idp.innerHTML=`
+      <h2>身份卷宗</h2>
+      <div class="me-seal">衙</div>
+      <div class="me-id">
+        <div class="me-rank">${rk.name}</div>
+        <div class="sr-d">第 ${s.month} 月 ${s.day} 日 ｜ 修为 <b>${s.cult}</b> ｜ 香火钱 <b style="color:var(--gold)">${s.money} 文</b> ｜ 人情 <b>${s.favor}</b></div>
+      </div>`;
+    c.appendChild(idp);
+
+    /* 战力 */
+    const bp=h('div','panel');
+    bp.innerHTML=`<h2>神躯战册 <span class="sub">当前出战数值</span></h2>`;
+    const grid=h('div','stat-grid');
+    const cell=(k,v)=>`<div class="stat-cell"><span class="kpi-k">${k}</span><b>${v}</b></div>`;
+    grid.innerHTML=
+      cell('神躯', `${Math.round(s.hp)}/${st.maxHp}`)+
+      cell('神力上限', st.maxMp)+
+      cell('攻击', st.atk)+
+      cell('防御', st.def)+
+      cell('暴击率', Math.round(st.crit*100)+'%')+
+      cell('吸血', Math.round(st.lifesteal*100)+'%');
+    bp.appendChild(grid);
+    if(st.clash) bp.appendChild(h('div','clash-warn','道争发动中：神力上限 −20%。'));
+    if(st.resonance) bp.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}系，攻击 +10%。`));
+    const fx=[];
+    if(st.stunProc) fx.push(`锁魂链：命中 ${Math.round(st.stunProc*100)}% 概率震慑一回合`);
+    if(st.healStart) fx.push(`太乙拂尘：每场开战恢复 ${Math.round(st.healStart*100)}% 生命`);
+    fx.push(...st.passives.map(p=>`${GODHOODS[p.gh].name}·${p.label}`));
+    if(fx.length){
+      const ul=h('div','fx-list');
+      ul.innerHTML=fx.map(x=>`<div>◆ ${x}</div>`).join('');
+      bp.appendChild(ul);
+    }
+    c.appendChild(bp);
+
+    /* 镶嵌神格速览 */
+    const gp=h('div','panel');
+    gp.innerHTML=`<h2>在身神格 <span class="sub">${s.equipped.length}/${Stats.slots()} 槽</span></h2>`;
+    if(s.equipped.length){
+      const row=h('div','gh-mini-row');
+      s.equipped.forEach(id=>{
+        const g=GODHOODS[id], rec=s.gh[id];
+        const chip=h('div','gh-mini'+(rec.sleep>0?' sleeping':''),
+          `<b>${g.icon} ${g.name}</b><span>${PATHS[g.path].name}系 · ${rec.awakened?'已觉醒':'未觉醒'}${rec.sleep>0?` · 沉睡${rec.sleep}日`:''}</span>`);
+        chip.onclick=()=>{ this.tab='cult'; this.render(); };
+        row.appendChild(chip);
+      });
+      gp.appendChild(row);
+      gp.appendChild(h('div','section-tip','点神格可跳往「修行」页调整。'));
+    }else{
+      gp.appendChild(h('div','section-tip','尚无神格在身。去「案牍」接工单吧。'));
+    }
+    c.appendChild(gp);
+
+    /* 法宝 */
+    const ip=h('div','panel');
+    ip.innerHTML=`<h2>随身法宝</h2>`;
+    const ownedItems=Object.keys(s.items);
+    if(ownedItems.length){
+      ownedItems.forEach(id=>{
+        const it=ITEMS[id];
+        ip.appendChild(h('div','shop-row',
+          `<div><div class="sr-t">${it.icon} ${it.name}</div><div class="sr-d">${it.desc}</div></div>
+           <span class="tag tag-merit">在身</span>`));
       });
     }else{
-      box.innerHTML=`<button class="m-close">✕</button><h3>阴阳杂货铺</h3>
-        <div class="section-tip">掌柜是个骑青牛的老道，说他卖的都是“体制内淘汰下来的好东西”。</div>`;
-      Object.entries(ITEMS).forEach(([id,it])=>{
-        const owned=s.items[id];
-        const r=h('div','shop-row',
-          `<div><div class="sr-t">${it.icon} ${it.name}</div><div class="sr-d">${it.desc}</div></div>
-           <span class="price">${it.price} 文</span>`);
-        const b=h('button','btn btn-sm', owned?'已持有':'请购');
-        b.disabled=owned;
-        b.onclick=()=>{Game.buyItem(id);this.openShop('item');};
-        r.appendChild(b); box.appendChild(r);
-      });
+      ip.appendChild(h('div','section-tip','尚无法宝。去「神衙」的阴阳杂货铺置办。'));
     }
-    box.querySelector('.m-close').onclick=()=>ml.innerHTML='';
-    ov.onclick=e=>{ if(e.target===ov) ml.innerHTML=''; };
-    ov.appendChild(box); ml.appendChild(ov);
+    c.appendChild(ip);
+
+    /* 阴兵 */
+    const sp=h('div','panel');
+    sp.innerHTML=`<h2>麾下阴兵</h2>`;
+    if(s.soldiers.length){
+      s.soldiers.forEach(id=>{
+        const so=SOLDIERS[id];
+        sp.appendChild(h('div','shop-row',
+          `<div><div class="sr-t">${so.icon} ${so.name}</div><div class="sr-d">${so.desc}</div></div>
+           <span class="tag tag-merit">在役</span>`));
+      });
+    }else{
+      sp.appendChild(h('div','section-tip','尚无阴兵。去「神衙」招妖幡下招募。'));
+    }
+    c.appendChild(sp);
   },
 
   /* ================= 下凡事件链 ================= */
@@ -270,7 +378,7 @@ const UI = {
     this.rt={ order:o, mid:o.mid, node:0, ctx:{atkBuff:0,shield:0,enemyAtk:0,enemyVuln:false}, result:null };
     Game.s.busy=true; Game.save();
     this.view='mission';
-    this.renderLeft(); this.renderRight();
+    this.render();
     this.renderMissionNode();
   },
 
@@ -278,7 +386,7 @@ const UI = {
 
   renderMissionNode(){
     const m=this.mission(), node=m.nodes[this.rt.node], god=GODS[m.god];
-    const c=$('colCenter'); c.innerHTML='';
+    const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','panel');
     const dots=m.nodes.map((n,i)=>`<i class="${i<this.rt.node?'done':i===this.rt.node?'cur':''}"></i>`).join('');
     wrap.innerHTML=`
@@ -286,7 +394,7 @@ const UI = {
         ${godAvatar(m.god,46)}
         <div style="flex:1">
           <div style="font-size:16px;font-weight:bold;letter-spacing:1px">${m.name}</div>
-          <div style="font-size:12px;color:var(--ink-faint)">${god.name} · ${god.title} 委托</div>
+          <div style="font-size:12px;color:var(--ink-faint)">${god.name} · ${god.title} 委托 · 两界办差中</div>
         </div>
         <div class="node-dots">${dots}</div>
       </div>`;
@@ -365,7 +473,7 @@ const UI = {
       this.endFail('你借遁光逃回神衙，委托黄了，神仙什么都不会给你。');
     }else{
       const {lostMoney,reviewed}=Game.deathPenalty();
-      this.view='office';
+      this.view='office'; this.tab='desk';
       if(!reviewed){
         this.openNotice('神躯溃散',
           `你被抬回神衙时只剩半缕残魂。罚没香火钱 ${lostMoney} 文，功过 −15。<br>醒来时已是新的一天，案头工单换了一批。`);
@@ -375,7 +483,7 @@ const UI = {
   },
 
   endFail(msg){
-    this.view='office'; Game.s.busy=false;
+    this.view='office'; this.tab='desk'; Game.s.busy=false;
     const reviewed=Game.advanceDay();
     if(!reviewed) this.openNotice('委托失败', msg);
     this.render();
@@ -393,7 +501,8 @@ const UI = {
     this.view='settle';
     Game.save();
 
-    const c=$('colCenter'); c.innerHTML='';
+    const c=$('pageStage'); c.innerHTML='';
+    $('tabbar').classList.add('hidden');
     const wrap=h('div','panel settle');
     wrap.innerHTML=`<h3>差使办妥 · 回衙复命</h3>
       <div style="width:80px;height:80px;margin:6px auto 4px">${godAvatar(m.god,80)}</div>
@@ -411,18 +520,18 @@ const UI = {
       wrap.appendChild(pop);
     }else if(gh.isNew){
       wrap.appendChild(h('div','section-tip',
-        `神格入体却暂时沉寂。可在右侧神格盘花费香火钱「参悟」，提高觉醒机会。`));
+        `神格入体却暂时沉寂。可在「修行」页花费香火钱「参悟」，提高觉醒机会。`));
     }
     if(gh.insight) wrap.appendChild(h('div','section-tip',`感悟累积至 ${Math.round(gh.insight*100)}%，再得同格神格将更易觉醒。`));
     const b=h('button','btn btn-primary btn-lg','回神衙');
     b.onclick=()=>{
-      this.view='office';
+      this.view='office'; this.tab='desk';
       Game.advanceDay();   // 可能触发月末考核（内部弹窗）
       this.render();
     };
     wrap.appendChild(b);
     c.appendChild(wrap);
-    this.renderTop(); this.renderLeft(); this.renderRight();
+    this.renderTop();
   },
 
   openNotice(title,html){
@@ -441,7 +550,7 @@ const UI = {
     const ov=h('div','overlay'), box=h('div','paper review-card');
     if(strikes>=2){
       box.innerHTML=`
-        <div class="big-seal" style="background:#3d3d3d">黜</div>
+        <div class="big-seal" style="background:#3d3020">黜</div>
         <h2>贬为孤魂</h2>
         <div style="line-height:2.1;font-size:15px">
           连续两月考核不称职，阎王爷把你的劳务契撕了。<br>
@@ -449,7 +558,7 @@ const UI = {
           <span style="color:var(--ink-faint)">—— 全剧终 ——</span>
         </div>`;
       const b=h('button','btn btn-primary btn-lg','重新投胎，再考一次');
-      b.onclick=()=>{ Game.clear(); Game.newGame(); ml.innerHTML=''; UI.view='office'; UI.render(); };
+      b.onclick=()=>{ Game.clear(); Game.newGame(); ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); };
       box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
       return;
     }
@@ -463,13 +572,13 @@ const UI = {
         ${promoted?`<div style="color:var(--cinnabar);font-size:18px"><b>敕封：${RANKS[Game.s.rank].name}！</b><br>神格镶嵌槽 +1，可承接更大的神仙私活。</div>`:''}
       </div>`;
     const b=h('button','btn btn-primary btn-lg','翻开新一月的黄历');
-    b.onclick=()=>{ ml.innerHTML=''; UI.view='office'; UI.render(); };
+    b.onclick=()=>{ ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); };
     box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
   },
 
   /* ================= 战斗界面 ================= */
   renderBattle(B){
-    const c=$('colCenter'); c.innerHTML='';
+    const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','battle-wrap');
     wrap.innerHTML=`<div class="battle-field" id="battleField">
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
@@ -606,3 +715,9 @@ function facEff(n){
   return n.wakeBonus?`觉醒率 +${n.wakeBonus*100}%`:n.shelf?'工单架 +1':n.mana?'神力上限 +'+n.mana:n.cap?'阴兵编制 +1':'';
 }
 function bloss2txt(p){ return p?` <span style="color:var(--cinnabar)">感应${p}%</span>`:''; }
+
+/* ================= 底部标签切换 ================= */
+document.addEventListener('click', e=>{
+  const btn=e.target.closest && e.target.closest('#tabbar .tab');
+  if(btn) UI.switchTab(btn.dataset.tab);
+});
