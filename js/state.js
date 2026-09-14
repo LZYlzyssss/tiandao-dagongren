@@ -18,6 +18,7 @@ const Game = {
       shelf:[],         // [{mid, bargain}]
       busy:false,       // 下凡中
       fusionBless:{},   // out -> 0..1 失败祝福
+      tut:{done:false, stage:'start'},  // 新手引导进度
       log:[],
     };
     Stats.recalc();
@@ -50,6 +51,8 @@ const Game = {
       });
       delete s.items;
     }
+    /* 老玩家存档默认不弹新手引导（可在案牍页手动重看） */
+    if(!s.tut) s.tut={done:true, stage:'done'};
   },
   clear(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} },
 
@@ -116,6 +119,7 @@ const Game = {
     Stats.recalc();
     if(this.s.hp > Stats.cur().maxHp) this.s.hp = Stats.cur().maxHp;
     this.save(); UI.render();
+    if(typeof Guide!=='undefined') Guide.act('toggleEquip', id);
   },
 
   /** 融合 */

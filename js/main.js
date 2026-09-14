@@ -23,13 +23,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
     </div>`;
     intro.querySelector('.paper').appendChild((()=>{
       const cont=h('button','btn btn-primary btn-lg','回神衙当值');
-      cont.onclick=()=>{ intro.classList.add('hidden'); UI.render(); };
+      cont.onclick=()=>{ intro.classList.add('hidden'); UI.render(); if(typeof Guide!=='undefined') Guide.autoStart(); };
       return cont;
     })());
     intro.querySelector('.paper').appendChild((()=>{
       const nw=h('button','btn btn-ghost btn-lg','撕碎劳务契重开');
       nw.style.marginLeft='12px';
-      nw.onclick=()=>{ Game.clear(); Game.newGame(); intro.classList.add('hidden'); UI.view='office'; UI.render(); };
+      nw.onclick=()=>{ Game.clear(); Game.newGame(); intro.classList.add('hidden'); UI.view='office'; UI.render(); if(typeof Guide!=='undefined') Guide.begin(); };
       return nw;
     })());
   }
@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       UI.view='office';
       UI.render();
       UI.toast('画押已成，从此你就是天庭的人了（外包）');
+      if(typeof Guide!=='undefined') Guide.begin();
     }
   });
 

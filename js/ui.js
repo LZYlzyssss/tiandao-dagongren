@@ -35,11 +35,13 @@ const UI = {
     else if(this.tab==='equip') this.renderEquip(stage);
     else this.renderMe(stage);
     stage.scrollTop=0;
+    if(typeof Guide!=='undefined') Guide.afterRender();
   },
 
   switchTab(tab){
     if(this.view!=='office') return;
     this.tab=tab; this.render();
+    if(typeof Guide!=='undefined') Guide.act('tab', tab);
   },
 
   renderTabbar(){
@@ -74,7 +76,8 @@ const UI = {
     const s=Game.s, target=monthTarget(s.month);
     const kpi=h('div','panel kpi-panel');
     kpi.innerHTML=`
-      <h2>案头工单 <span class="sub">三十日一考 · 阎魔王亲阅</span></h2>
+      <h2>案头工单 <span class="sub">三十日一考 · 阎魔王亲阅</span>
+        ${s.tut&&s.tut.done?'<button class="tut-replay">重看指引</button>':''}</h2>
       <div class="kpi-row">
         <div><span class="kpi-k">本月功过</span><b style="color:var(--${s.merit>=target?'jade':'cinnabar'})">${s.merit}/${target}</b></div>
         <div><span class="kpi-k">本月还剩</span><b>${MONTH_DAYS - s.day + 1} 日</b></div>
@@ -82,6 +85,8 @@ const UI = {
         <div><span class="kpi-k">记过</span><b style="color:var(--${s.strikes?'cinnabar':'ink-faint'})">${s.strikes}/2</b></div>
       </div>
       ${s.strikes>0?'<div class="clash-warn" style="margin-top:8px">你已被记过，本月再不合格就要被贬作孤魂野鬼。</div>':''}`;
+    const rb=kpi.querySelector('.tut-replay');
+    if(rb && typeof Guide!=='undefined') rb.onclick=()=>Guide.begin(true);
     c.appendChild(kpi);
 
     const p=h('div','panel');
@@ -504,6 +509,7 @@ const UI = {
     this.view='mission';
     this.render();
     this.renderMissionNode();
+    if(typeof Guide!=='undefined') Guide.act('startMission');
   },
 
   mission(){ return MISSIONS.find(x=>x.id===this.rt.mid); },
@@ -544,13 +550,14 @@ const UI = {
       if(this.rt.result){
         const rl=h('div','result-line','▸ '+this.rt.result);
         wrap.appendChild(rl);
-        const next=h('button','btn btn-primary','继续前行');
+        const next=h('button','btn btn-primary btn-mish-next','继续前行');
         next.style.marginTop='10px';
         next.onclick=()=>this.nextNode();
         wrap.appendChild(next);
       }
     }
     c.appendChild(wrap);
+    if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
       const sc=h('div','scroll-card',`<span class="ink-mark">▍</span>前方杀气翻涌——<b style="color:var(--cinnabar)">${ENEMIES[node.enemy].name}</b> 拦住去路！`);
       wrap.appendChild(sc);
@@ -575,12 +582,14 @@ const UI = {
     if(r.money){ Game.s.money+=r.money; }
     this.rt.result=r.log||'你继续前行。';
     Game.save(); this.renderTop(); this.renderMissionNode();
+    if(typeof Guide!=='undefined') Guide.act('chooseEvent');
   },
 
   nextNode(){
     this.rt.node++; this.rt.result=null;
     if(this.rt.node>=this.mission().nodes.length){ this.settle(); return; }
     this.renderMissionNode();
+    if(typeof Guide!=='undefined') Guide.act('nextNode');
   },
 
   async runBattleNode(node){
@@ -594,13 +603,16 @@ const UI = {
       if(this.rt.node>=this.mission().nodes.length){ this.settle(); return; }
       this.renderMissionNode();
     }else if(res==='flee'){
+      if(typeof Guide!=='undefined') Guide.act('missionFail');
       this.endFail('你借遁光逃回神衙，委托黄了，神仙什么都不会给你。');
     }else{
+      if(typeof Guide!=='undefined') Guide.act('missionFail');
       const {lostMoney,reviewed}=Game.deathPenalty();
       this.view='office'; this.tab='desk';
       if(!reviewed){
         this.openNotice('神躯溃散',
-          `你被抬回神衙时只剩半缕残魂。罚没香火钱 ${lostMoney} 文，功过 −15。<br>醒来时已是新的一天，案头工单换了一批。`);
+          `你被抬回神衙时只剩半缕残魂。罚没香火钱 ${lostMoney} 文，功过 −15。<br>醒来时已是新的一天，案头工单换了一批。`,
+          ()=>{ if(typeof Guide!=='undefined') Guide.act('noticeClosed'); });
       }
       this.render();
     }
@@ -609,7 +621,10 @@ const UI = {
   endFail(msg){
     this.view='office'; this.tab='desk'; Game.s.busy=false;
     const reviewed=Game.advanceDay();
-    if(!reviewed) this.openNotice('委托失败', msg);
+    if(!reviewed){
+      this.openNotice('委托失败', msg,
+        ()=>{ if(typeof Guide!=='undefined') Guide.act('noticeClosed'); });
+    }
     this.render();
   },
 
@@ -652,19 +667,21 @@ const UI = {
       this.view='office'; this.tab='desk';
       Game.advanceDay();   // 可能触发月末考核（内部弹窗）
       this.render();
+      if(typeof Guide!=='undefined') Guide.act('backOffice');
     };
     wrap.appendChild(b);
     c.appendChild(wrap);
     this.renderTop();
+    if(typeof Guide!=='undefined') Guide.act('settle');
   },
 
-  openNotice(title,html){
+  openNotice(title,html,onClose){
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay'), box=h('div','paper m-box');
     box.innerHTML=`<h3>${title}</h3><div style="font-size:15px;line-height:2">${html}</div>`;
     const b=h('button','btn btn-primary','知道了');
     b.style.marginTop='12px';
-    b.onclick=()=>ml.innerHTML='';
+    b.onclick=()=>{ ml.innerHTML=''; onClose&&onClose(); };
     box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
   },
 
@@ -687,6 +704,7 @@ const UI = {
 
   /* ================= 月末考核 ================= */
   showReview(pass,promoted,target,strikes){
+    if(typeof Guide!=='undefined') Guide.act('review');
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay'), box=h('div','paper review-card');
     if(strikes>=2){
@@ -699,7 +717,7 @@ const UI = {
           <span style="color:var(--ink-faint)">—— 全剧终 ——</span>
         </div>`;
       const b=h('button','btn btn-primary btn-lg','重新投胎，再考一次');
-      b.onclick=()=>{ Game.clear(); Game.newGame(); ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); };
+      b.onclick=()=>{ Game.clear(); Game.newGame(); ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); if(typeof Guide!=='undefined') Guide.begin(); };
       box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
       return;
     }
@@ -713,7 +731,7 @@ const UI = {
         ${promoted?`<div style="color:var(--cinnabar);font-size:18px"><b>敕封：${RANKS[Game.s.rank].name}！</b><br>神格镶嵌槽 +1，可承接更大的神仙私活。</div>`:''}
       </div>`;
     const b=h('button','btn btn-primary btn-lg','翻开新一月的黄历');
-    b.onclick=()=>{ ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); };
+    b.onclick=()=>{ ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); if(typeof Guide!=='undefined') Guide.act('reviewed'); };
     box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
   },
 
@@ -741,6 +759,7 @@ const UI = {
       <div id="momentSlot"></div>`;
     c.appendChild(wrap);
     this.updateBattle(B);
+    if(typeof Guide!=='undefined') Guide.act('battle');
   },
 
   updateBattle(B){
@@ -794,9 +813,11 @@ const UI = {
           <button class="btn btn-ghost" id="mFlee">遁走（保命，委托失败）</button>
         </div><div id="mSub"></div>`;
       slot.innerHTML=''; slot.appendChild(m);
+      if(typeof Guide!=='undefined') Guide.act('momentOpen');
+      const gdone=v=>{ slot.innerHTML=''; if(typeof Guide!=='undefined') Guide.act('momentDone'); resolve(v); };
 
-      $('mWait').onclick=()=>{ slot.innerHTML=''; resolve({act:'wait'}); };
-      $('mFlee').onclick=()=>{ slot.innerHTML=''; resolve({act:'flee'}); };
+      $('mWait').onclick=()=>gdone({act:'wait'});
+      $('mFlee').onclick=()=>gdone({act:'flee'});
       $('mCast').onclick=()=>{
         const sub=$('mSub'); sub.innerHTML='<div class="skill-list"></div>';
         const list=sub.firstChild;
