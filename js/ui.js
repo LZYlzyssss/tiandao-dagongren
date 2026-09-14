@@ -96,27 +96,37 @@ const UI = {
     }
     s.shelf.forEach((o,idx)=>{
       const m=MISSIONS.find(x=>x.id===o.mid), god=GODS[m.god];
+      const isLong=!!m.long;
+      const actTotal=m.acts?m.acts.length:0;
+      const actCur=Math.min(o.act||0, actTotal-1);
       const card=h('div','order'+(m.forced?' forced':''));
       card.innerHTML=`
         <div style="display:flex;gap:10px;align-items:flex-start">
-          ${godAvatar(m.god,40)}
+          <span class="god-link" data-god="${m.god}" title="点击查看神明档案">${godAvatar(m.god,40)}</span>
           <div class="o-body" style="flex:1;min-width:0">
             <div class="o-head">
               <span class="o-title">${m.name}</span>
               <span>${'★'.repeat(m.danger)}<span style="color:var(--line)">${'★'.repeat(5-m.danger)}</span></span>
             </div>
-            <div class="o-god">${god.name} · ${god.title} ${o.bargain?'<span style="color:var(--cinnabar)">【已加价 +50%】</span>':''}</div>
+            <div class="o-god">${god.name} · ${god.title}
+              <span class="tier-tag tier-${(god.tier||'E').toLowerCase()}">${god.tier||'E'}</span>
+              ${o.bargain?'<span style="color:var(--cinnabar)">【已加价 +50%】</span>':''}
+              ${isLong?`<span style="color:var(--gold)">【长单·${actCur+1}/${actTotal}幕】</span>`:''}
+              ${m.main?'<span style="color:var(--cinnabar)">【主线】</span>':''}
+            </div>
             <div class="o-scroll">${m.scroll}</div>
             <div class="o-meta">
-              <span class="tag tag-gh">神格·${GODHOODS[m.gh].name}</span>
+              ${m.gh?`<span class="tag tag-gh">神格·${GODHOODS[m.gh].name}</span>`:'<span class="tag">无神格</span>'}
               <span class="tag tag-money">${Math.round(m.money*(o.bargain?1.5:1))} 文</span>
               <span class="tag tag-merit">功过 ${m.merit}</span>
               ${m.forced?'<span class="tag tag-forced">官遣</span>':''}
             </div>
           </div>
         </div>`;
+      const glink=card.querySelector('.god-link');
+      glink.onclick=()=>this.openGodModal(m.god);
       const acts=h('div','o-actions'); acts.style.marginTop='8px';
-      const go=h('button','btn btn-primary btn-sm','接案下凡');
+      const go=h('button','btn btn-primary btn-sm', isLong&&actCur>0?'续办下凡':'接案下凡');
       go.onclick=()=>this.startMission(idx);
       acts.appendChild(go);
       if(!m.forced){
@@ -281,10 +291,11 @@ const UI = {
       <div class="sr-d">老道说他卖的都是「体制内淘汰下来的好东西」。
       法宝各只一件，购入后收入<b>背包</b>，须到「装备」页<b>穿戴</b>才生效；
       兵刃、护身、奇物<b>每栏只可佩一件</b>。
-      闲置的法宝老道也肯回收——只出<b>半价</b>，钱款两讫，概不退换。</div>`;
+      「礼单」上的物件买了送神明——在工单架点<b>神明头像</b>开档案送礼，好感到位，关键时刻有人搭手。
+      闲置的物件老道也肯回收——只出<b>半价</b>，钱款两讫，概不退换。</div>`;
     c.appendChild(intro);
 
-    ['weapon','armor','trinket'].forEach(slot=>{
+    ['weapon','armor','trinket','gift'].forEach(slot=>{
       const info=SLOT_INFO[slot];
       const p=h('div','panel');
       p.innerHTML=`<h2><span class="slot-ico">${info.icon}</span> ${info.name}
@@ -374,9 +385,9 @@ const UI = {
     wp.appendChild(slots);
     c.appendChild(wp);
 
-    /* 背包（未穿戴） */
+    /* 背包（未穿戴；礼物不出现在行囊，送礼走神明档案） */
     const bp=h('div','panel');
-    const spare=Object.keys(s.bag).filter(id=>s.wear[ITEMS[id].slot]!==id);
+    const spare=Object.keys(s.bag).filter(id=>ITEMS[id] && ITEMS[id].slot!=='gift' && s.wear[ITEMS[id].slot]!==id);
     bp.innerHTML=`<h2>行囊 <span class="sub">在库 ${spare.length} 件 · 已购 ${Object.keys(s.bag).length} 件</span></h2>
       <div class="section-tip">同栏换新装时，旧法宝自动收回行囊，不会丢失。</div>`;
     if(!spare.length){
@@ -499,13 +510,40 @@ const UI = {
       sp.appendChild(h('div','section-tip','尚无阴兵。去「神衙」招妖幡下招募。'));
     }
     c.appendChild(sp);
+
+    /* 神明人脉 */
+    const rp=h('div','panel');
+    const metN=Object.keys(s.godsRel).filter(g=>s.godsRel[g].met && GODS[g]).length;
+    rp.innerHTML=`<h2>神明人脉 <span class="sub">已识 ${metN} 位 · 点头像可送礼</span></h2>
+      <div class="section-tip">交情至「相熟」，战斗关键时刻可呼叫其援助。送礼偏好：挚爱 +18 / 喜欢 +8 / 无感 +4 / 忌讳 +1，每日一礼。</div>`;
+    Object.entries(GODS).forEach(([g,gd])=>{
+      const rel=s.godsRel[g], met=rel&&rel.met;
+      const unlocked=Game.isGodUnlocked(g);
+      const lv=met?Game.favorLevel(rel.favor):0;
+      const row=h('div','shop-row contact-row'+(met?'':' locked'));
+      row.innerHTML=`
+        <div class="item-ic" style="font-size:18px">${met?gd.icon:'?'}</div>
+        <div class="item-body">
+          <div class="sr-t">${gd.name} <span class="tier-tag tier-${(gd.tier||'e').toLowerCase()}">${gd.tier||'E'}</span>
+            ${met?`<span style="color:var(--cinnabar);font-size:12px"> ${Game.favorName(lv)} · ${rel.favor}</span>`:''}</div>
+          <div class="sr-d">${met?gd.title
+            :(!unlocked?(function(){const u=gd.unlock;return u&&u.rank!==undefined?`晋升「${RANKS[u.rank].name}」后可结识`:u&&u.chapter!==undefined?`主线第 ${u.chapter} 章后可结识`:'机缘未至';})()
+            :'闻名未识——接下其工单便算打上交道')}</div>
+        </div>
+        ${met?'<span class="tag tag-merit">已结识</span>':unlocked?'<span class="tag">未识</span>':'<span class="tag">未解锁</span>'}`;
+      if(met) row.onclick=()=>this.openGodModal(g);
+      rp.appendChild(row);
+    });
+    c.appendChild(rp);
   },
 
   /* ================= 下凡事件链 ================= */
   startMission(idx){
     const o=Game.s.shelf[idx];
     this.rt={ order:o, mid:o.mid, node:0, ctx:{atkBuff:0,shield:0,enemyAtk:0,enemyVuln:false}, result:null };
-    Game.s.busy=true; Game.save();
+    Game.s.busy=true;
+    Game.meetGod(this.mission().god);   // 接单即结识
+    Game.save();
     this.view='mission';
     this.render();
     this.renderMissionNode();
@@ -513,17 +551,25 @@ const UI = {
   },
 
   mission(){ return MISSIONS.find(x=>x.id===this.rt.mid); },
+  /** 当前应渲染的节点序列：短单=nodes，长单=当前幕 nodes */
+  curNodes(){
+    const m=this.mission(), o=this.rt.order;
+    if(m.long) return m.acts[Math.min(o.act||0, m.acts.length-1)].nodes;
+    return m.nodes;
+  },
 
   renderMissionNode(){
-    const m=this.mission(), node=m.nodes[this.rt.node], god=GODS[m.god];
+    const m=this.mission(), nodes=this.curNodes(), node=nodes[this.rt.node], god=GODS[m.god];
+    const o=this.rt.order;
     const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','panel');
-    const dots=m.nodes.map((n,i)=>`<i class="${i<this.rt.node?'done':i===this.rt.node?'cur':''}"></i>`).join('');
+    const dots=nodes.map((n,i)=>`<i class="${i<this.rt.node?'done':i===this.rt.node?'cur':''}"></i>`).join('');
+    const actTitle=m.long?`<span style="color:var(--gold)"> · ${m.acts[Math.min(o.act||0,m.acts.length-1)].title}</span>`:'';
     wrap.innerHTML=`
       <div class="mish-god">
         ${godAvatar(m.god,46)}
         <div style="flex:1">
-          <div style="font-size:16px;font-weight:bold;letter-spacing:1px">${m.name}</div>
+          <div style="font-size:16px;font-weight:bold;letter-spacing:1px">${m.name}${actTitle}</div>
           <div style="font-size:12px;color:var(--ink-faint)">${god.name} · ${god.title} 委托 · 两界办差中</div>
         </div>
         <div class="node-dots">${dots}</div>
@@ -567,7 +613,7 @@ const UI = {
   },
 
   chooseEvent(i){
-    const node=this.mission().nodes[this.rt.node];
+    const node=this.curNodes()[this.rt.node];
     const co=node.choices[i], r=co.r||{};
     const st=Stats.cur();
     if(r.hp){
@@ -587,7 +633,7 @@ const UI = {
 
   nextNode(){
     this.rt.node++; this.rt.result=null;
-    if(this.rt.node>=this.mission().nodes.length){ this.settle(); return; }
+    if(this.rt.node>=this.curNodes().length){ this.settle(); return; }
     this.renderMissionNode();
     if(typeof Guide!=='undefined') Guide.act('nextNode');
   },
@@ -600,7 +646,7 @@ const UI = {
       this.view='mission'; this.renderTop();
       /* 战斗结束后直接进入下一节点（玩家点继续） */
       this.rt.node++;
-      if(this.rt.node>=this.mission().nodes.length){ this.settle(); return; }
+      if(this.rt.node>=this.curNodes().length){ this.settle(); return; }
       this.renderMissionNode();
     }else if(res==='flee'){
       if(typeof Guide!=='undefined') Guide.act('missionFail');
@@ -631,9 +677,36 @@ const UI = {
   /* ================= 结算 ================= */
   settle(){
     const s=Game.s, m=this.mission(), o=this.rt.order;
+
+    /* 长单：未到末幕 → 幕推进并跨天，明日续办 */
+    if(m.long && (o.act||0) < m.acts.length-1){
+      o.act=(o.act||0)+1;
+      s.busy=false;
+      const actDone=m.acts[o.act-1];
+      const reviewed=Game.advanceDay();
+      Game.save();
+      this.view='office'; this.tab='desk';
+      if(!reviewed){
+        this.openNotice('长单·告一段落',
+          `「${m.name}」<b>${actDone.title}</b>办完，人困神乏。<br>${GODS[m.god].name}传话："余下的事明日再办，案头单子给你留着。"<br>
+           <span style="color:var(--ink-faint);font-size:13px">明日到工单架点「续办下凡」继续（第 ${o.act+1}/${m.acts.length} 幕）。</span>`,
+          ()=>{ if(typeof Guide!=='undefined') Guide.act('noticeClosed'); });
+      }
+      this.render();
+      return;
+    }
+
     const money=Math.round(m.money*(o.bargain?1.5:1));
     s.money+=money; s.merit+=m.merit; s.favor+=1;
+    Game.addFavor(m.god, 4+m.danger*2);   // 办差自然增进交情
     const gh=Game.grantGodhood(m.id);
+    /* 主线章单完成：记旗标、推进章节 */
+    let mainMsg='';
+    if(m.main){
+      s.flags['main_'+m.id]=1;
+      if(s.chapter<=(m.chapter||1)) s.chapter=(m.chapter||1)+1;
+      mainMsg=`<div style="color:var(--cinnabar);margin-top:6px"><b>—— 主线 · 第 ${m.chapter} 章完 ——</b></div>`;
+    }
     /* 移除已完成工单 */
     s.shelf=s.shelf.filter(x=>x!==o);
     s.busy=false;
@@ -643,14 +716,16 @@ const UI = {
     const c=$('pageStage'); c.innerHTML='';
     $('tabbar').classList.add('hidden');
     const wrap=h('div','panel settle');
-    wrap.innerHTML=`<h3>差使办妥 · 回衙复命</h3>
+    wrap.innerHTML=`<h3>${m.long?'长单完结 · 回衙复命':'差使办妥 · 回衙复命'}</h3>
       <div style="width:80px;height:80px;margin:6px auto 4px">${godAvatar(m.god,80)}</div>
-      <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name} 亲赐神格</div>
+      <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name}${gh.noGh?' 一揖到地':' 亲赐神格'}</div>
       <div class="reward-line">
         香火钱 <b style="color:var(--gold)">+${money} 文</b><br>
-        功过 <b style="color:var(--jade)">+${m.merit}</b> ｜ 人情 <b>+1</b><br>
-        ${GODS[m.god].name}切下一块神格掷给你：<b>${gh.name}</b>（修为 +${gh.cultGain}）
-      </div>`;
+        功过 <b style="color:var(--jade)">+${m.merit}</b> ｜ 人情 <b>+1</b> ｜ 与${GODS[m.god].name}交情 <b>+${4+m.danger*2}</b><br>
+        ${gh.noGh
+          ? `低阶神拿不出神格作谢，这份人情他记下了。`
+          : `${GODS[m.god].name}切下一块神格掷给你：<b>${gh.name}</b>（修为 +${gh.cultGain}）`}
+      </div>${mainMsg}`;
     if(gh.awakened){
       const pop=h('div','wake-pop',
         `<h4>神格觉醒！</h4><div>「${gh.name}」在你神躯中轰然亮起——<br>
@@ -700,6 +775,78 @@ const UI = {
     cancel.onclick=close;
     box.appendChild(ok); box.appendChild(cancel);
     ov.appendChild(box); ml.appendChild(ov);
+  },
+
+  /* ================= 神明档案（好感 / 送礼） ================= */
+  openGodModal(g){
+    const gd=GODS[g]; if(!gd) return;
+    const s=Game.s, rel=s.godsRel[g]||{met:0,favor:0};
+    const lv=Game.favorLevel(rel.favor);
+    const cur=FAVOR_LEVELS[lv], next=FAVOR_LEVELS[lv+1];
+    const unlocked=Game.isGodUnlocked(g);
+    const aidOk=rel.met && lv>=1;
+    /* 解锁条件文案 */
+    let unlockTxt='';
+    if(!unlocked && gd.unlock){
+      const u=gd.unlock;
+      unlockTxt = u.rank!==undefined ? `晋升至「${RANKS[u.rank].name}」后方可结识`
+                : u.chapter!==undefined ? `主线推进至第 ${u.chapter} 章后方可结识`
+                : u.by!==undefined ? `需 ${GODS[u.by].name} 引荐`
+                : '机缘未至';
+    }
+    /* 背包里的礼物 */
+    const gifts=Object.keys(s.bag).filter(id=>ITEMS[id] && ITEMS[id].slot==='gift');
+    const today=s.month*100+s.day;
+    const giftToday=rel.giftDay===today;
+    const pr=gd.gifts||{};
+    const prefTag=id=> (pr.loved||[]).indexOf(id)>=0 ? '<span style="color:var(--cinnabar)">挚爱</span>'
+                    : (pr.liked||[]).indexOf(id)>=0 ? '<span style="color:var(--jade)">喜欢</span>'
+                    : (pr.disliked||[]).indexOf(id)>=0 ? '<span style="color:var(--ink-faint)">忌讳</span>'
+                    : '<span style="color:var(--ink-faint)">无感</span>';
+
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay'), box=h('div','paper m-box god-modal');
+    box.innerHTML=`
+      <div class="gm-head">
+        ${godAvatar(g,64)}
+        <div class="gm-name">
+          <div style="font-size:18px;font-weight:bold">${gd.name} <span class="tier-tag tier-${(gd.tier||'e').toLowerCase()}">${gd.tier||'E'}</span></div>
+          <div style="font-size:12px;color:var(--ink-faint)">${gd.title}</div>
+        </div>
+      </div>
+      ${rel.met
+        ? `<div class="favor-block">
+             <div class="favor-lv">交情：<b style="color:var(--cinnabar)">${cur.name}</b>
+               ${next?`<span style="color:var(--ink-faint);font-size:12px">（再 ${next.v-rel.favor} 点进阶「${next.name}」）</span>`:'<span style="color:var(--ink-faint);font-size:12px">（已至顶）</span>'}</div>
+             <div class="favor-bar"><i style="width:${Math.min(100,rel.favor)}%"></i></div>
+             <div style="font-size:12px;color:var(--ink-faint)">好感 ${rel.favor}/100 · 每日一礼，办差亦增进交情</div>
+           </div>
+           ${aidOk?`<div class="aid-hint">◆ 好感相熟以上：战斗关键时刻可呼叫「<b>${gd.aid.name}</b>」——${gd.aid.desc}</div>`
+                  :`<div class="aid-hint" style="color:var(--ink-faint)">◆ 交情至「相熟」，战斗关键时刻可呼叫其援助</div>`}
+           <div class="gm-gifts"><b>行囊中的礼物</b>${giftToday?'<span style="color:var(--ink-faint);font-size:12px"> · 今日已送过，明日再来</span>':''}</div>
+           <div class="gift-list"></div>
+           ${gifts.length?'':'<div class="section-tip">行囊中没有礼物。去「商铺 · 礼单」购些心意。</div>'}`
+        : `<div class="section-tip">${unlockTxt||'尚未结识此神。接下其工单，便算打上了交道。'}</div>`}`;
+    const gl=box.querySelector('.gift-list');
+    if(gl){
+      gifts.forEach(id=>{
+        const it=ITEMS[id];
+        const r=h('div','shop-row gift-row',
+          `<div class="item-ic">${it.icon}</div>
+           <div class="item-body">
+             <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span> ${prefTag(id)}</div>
+             <div class="sr-d">${it.desc}</div>
+           </div>`);
+        const b=h('button','btn btn-primary btn-sm','送出');
+        b.disabled=giftToday;
+        b.onclick=()=>{ ml.innerHTML=''; Game.sendGift(g,id); this.openGodModal(g); };
+        r.appendChild(b); gl.appendChild(r);
+      });
+    }
+    const cb=h('button','btn btn-ghost','合上档案');
+    cb.style.marginTop='12px';
+    cb.onclick=()=>{ ml.innerHTML=''; };
+    box.appendChild(cb); ov.appendChild(box); ml.appendChild(ov);
   },
 
   /* ================= 月末考核 ================= */
@@ -805,9 +952,15 @@ const UI = {
       this._momentResolve=resolve;
       const slot=$('momentSlot'); if(!slot){ resolve({act:'flee'}); return; }
       const m=h('div','moment');
+      /* 神明援助：好感 Lv2（相熟）+，每场一次 */
+      const gm=this.mission?this.mission():null;
+      const gkey=gm?gm.god:null;
+      const fav=gkey?Game.favorOf(gkey):0;
+      const canAid=gkey && !B.aidUsed && Game.favorLevel(fav)>=1;
       m.innerHTML=`<h3>关键时刻 · 你当如何？</h3>
         <div class="m-actions">
           <button class="btn btn-indigo" id="mCast">祭法宝（催动神格神通）</button>
+          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name}）</button>`:''}
           <button class="btn" id="mBurn">拼命（透支神格，沉睡三日）</button>
           <button class="btn" id="mWait">凝神接战（见招拆招）</button>
           <button class="btn btn-ghost" id="mFlee">遁走（保命，委托失败）</button>
@@ -818,6 +971,7 @@ const UI = {
 
       $('mWait').onclick=()=>gdone({act:'wait'});
       $('mFlee').onclick=()=>gdone({act:'flee'});
+      if($('mAid')) $('mAid').onclick=()=>gdone({act:'aid'});
       $('mCast').onclick=()=>{
         const sub=$('mSub'); sub.innerHTML='<div class="skill-list"></div>';
         const list=sub.firstChild;

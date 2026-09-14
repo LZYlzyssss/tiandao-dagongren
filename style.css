@@ -849,3 +849,44 @@ body::before{
   background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,.4) 50%, transparent 60%);
   animation:sweep 2s ease-out infinite;
 }
+
+/* ---- 13. 神明人脉 · 好感 · 送礼（一期骨架） ---- */
+.god-link{cursor:pointer;border-radius:50%;transition:transform .15s}
+.god-link:hover{transform:scale(1.08)}
+
+.tier-tag{
+  display:inline-block;font-size:10px;line-height:1;padding:2px 6px;border-radius:6px;
+  font-weight:bold;letter-spacing:1px;vertical-align:1px;color:#f7ead2;
+}
+.tier-e{background:#8a8578}
+.tier-d{background:#4a6f8e}
+.tier-c{background:#477a5a}
+.tier-b{background:#7a4f8e}
+.tier-a{background:#c03c2e}
+
+.god-modal{max-width:92vw;max-height:80vh;overflow-y:auto}
+.gm-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gm-name{flex:1;min-width:0}
+
+.favor-block{margin:6px 0 8px}
+.favor-lv{font-size:14px;margin-bottom:5px}
+.favor-bar{
+  height:10px;border-radius:6px;background:rgba(43,38,32,.12);
+  overflow:hidden;border:1px solid rgba(43,38,32,.2);
+}
+.favor-bar i{
+  display:block;height:100%;border-radius:6px;
+  background:linear-gradient(90deg,#c9962f,#c03c2e);
+  transition:width .4s ease;
+}
+.aid-hint{
+  font-size:13px;line-height:1.8;padding:6px 10px;margin:6px 0;
+  background:rgba(201,150,47,.1);border-left:3px solid var(--gold);border-radius:4px;
+}
+.gm-gifts{font-size:14px;margin:10px 0 6px}
+.gift-list{display:flex;flex-direction:column;gap:6px}
+.gift-row .price{min-width:0}
+
+.contact-row{cursor:pointer}
+.contact-row.locked{opacity:.55;cursor:default}
+.contact-row:not(.locked):hover{background:rgba(43,38,32,.05)}

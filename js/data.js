@@ -13,13 +13,53 @@ const PATH_CLASH = [['revelation','nether']];
 /* 同道共鸣：同途两枚及以上 */
 const RESONANCE_NEED = 2;
 
-/* ---------- 神明（甲方） ---------- */
+/* ---------- 神明（甲方） ----------
+ tier: E见习小神 / D基层正神 / C有名号的神 / B一方大员 / A天庭顶级
+ unlock: 解锁条件 {rank:品阶序号} / {chapter:章节} / {by:某神引荐} / null 初始可遇
+ aid: 好感 Lv2+ 战斗中可呼叫的神明援助（每场一次）
+ gifts: 送礼偏好 loved挚爱+18 / liked喜欢+8 / disliked忌讳+1，其余+4
+*/
 const GODS = {
-  sun:   { name:'孙悟空', title:'斗战胜佛', icon:'佛', img:'Chinese ink wash painting of Sun Wukong the Monkey King holding golden staff, dramatic sumi-e brush strokes, cinnabar red accents, rice paper texture, portrait' },
-  micah: { name:'米迦勒', title:'天使长',     icon:'光', img:'Chinese ink wash painting of archangel Michael with holy wings and flaming sword, sumi-e style with indigo blue and gold color accents, rice paper texture, portrait' },
-  nezha: { name:'哪吒',   title:'三坛海会大神', icon:'吒', img:'Chinese ink wash painting of child deity Nezha with fire wheels and red armillary sash, sumi-e brush style, vermilion and gold accents, rice paper texture, portrait' },
-  yan:   { name:'阎魔王', title:'地府之主·你的顶头上司', icon:'阎', img:'Chinese ink wash painting of King Yama judge of the underworld in dark robes with judge brush and record book, stern, sumi-e style, dark purple and cinnabar accents, portrait' },
+  tudi:   { name:'土地公', title:'一方土地·地保', icon:'土', tier:'E', unlock:null,
+    img:'Chinese ink wash painting of a kind old earth god with white beard holding a gnarled wooden staff, warm smile, sumi-e style with ochre and moss green accents, rice paper texture, portrait',
+    aid:{ name:'土地借道', type:'heal', heal:0.25,
+      desc:'唤土地公引地脉灵气，回复 25% 生命。' },
+    gifts:{ loved:['wugu'], liked:['xiangzhu','taomu'], disliked:['hulu'] } },
+  chenghuang:{ name:'城隍爷', title:'本境城隍', icon:'城', tier:'D', unlock:{rank:1},
+    img:'Chinese ink wash painting of a dignified city god magistrate in formal robes holding a jade tablet, sumi-e style with deep indigo and vermilion accents, rice paper texture, portrait',
+    aid:{ name:'城隍签押', type:'shield', shield:0.25,
+      desc:'城隍朱笔签押，获得 25% 生命上限的护盾。' },
+    gifts:{ loved:['xiangzhu'], liked:['wugu','taomu'], disliked:['hulu'] } },
+  nezha: { name:'哪吒',   title:'三坛海会大神', icon:'吒', tier:'C', unlock:{rank:2},
+    img:'Chinese ink wash painting of child deity Nezha with fire wheels and red armillary sash, sumi-e brush style, vermilion and gold accents, rice paper texture, portrait',
+    aid:{ name:'风火轮助', type:'burn', rounds:3, pct:0.4,
+      desc:'哪吒借你风火轮一转，点燃敌人 3 回合（每回合受 40% 你攻击的伤害）。' },
+    gifts:{ loved:['hulu'], liked:['panta','taomu'], disliked:['mozhen'] } },
+  yan:   { name:'阎魔王', title:'地府之主·你的顶头上司', icon:'阎', tier:'B', unlock:null,
+    img:'Chinese ink wash painting of King Yama judge of the underworld in dark robes with judge brush and record book, stern, sumi-e style, dark purple and cinnabar accents, portrait',
+    aid:{ name:'朱笔勾魂', type:'percent', pct:0.25, stun:1,
+      desc:'阎王爷遥遥朱笔一点，勾去敌人 25% 最大生命并震骇 1 回合。' },
+    gifts:{ loved:['mozhen'], liked:['xiangzhu','puti'], disliked:['hulu'] } },
+  sun:   { name:'孙悟空', title:'斗战胜佛', icon:'佛', tier:'A', unlock:{rank:2},
+    img:'Chinese ink wash painting of Sun Wukong the Monkey King holding golden staff, dramatic sumi-e brush strokes, cinnabar red accents, rice paper texture, portrait',
+    aid:{ name:'金箍棒影', type:'nuke', mult:2.5,
+      desc:'大圣随手一棒压阵，造成 250% 你攻击的伤害。' },
+    gifts:{ loved:['panta'], liked:['hulu','puti'], disliked:['mozhen'] } },
+  micah: { name:'米迦勒', title:'天使长',     icon:'光', tier:'A', unlock:{rank:3},
+    img:'Chinese ink wash painting of archangel Michael with holy wings and flaming sword, sumi-e style with indigo blue and gold color accents, rice paper texture, portrait',
+    aid:{ name:'圣光垂照', type:'healShield', heal:0.35, shield:0.2,
+      desc:'天使长垂下一缕圣光，回复 35% 生命并获得 20% 护盾。' },
+    gifts:{ loved:['puti'], liked:['panta','taomu'], disliked:['hulu'] } },
 };
+
+/* 好感等级：favor 阈值 → 称谓 */
+const FAVOR_LEVELS = [
+  { v:0,  name:'相识' },
+  { v:20, name:'相熟' },
+  { v:40, name:'信重' },
+  { v:60, name:'莫逆' },
+  { v:80, name:'生死之交' },
+];
 
 /* ---------- 神格 ----------
  stat: 镶嵌即得（无论觉醒）
@@ -119,6 +159,7 @@ const SLOT_INFO = {
   weapon:  { name:'兵刃', icon:'刃', desc:'主攻伐，提升攻击与暴击' },
   armor:   { name:'护身', icon:'护', desc:'主守御，提升生命、防御与减伤' },
   trinket: { name:'奇物', icon:'奇', desc:'旁门妙用，回血、锁魂、吸血、点火' },
+  gift:    { name:'礼单', icon:'礼', desc:'送与神明结善缘，每位神明每日只受一礼' },
 };
 /* 旧货回收：老道只按原价的一半收（向下取整） */
 const SELL_RATE = 0.5;
@@ -136,6 +177,14 @@ const ITEMS = {
   suo:    { name:'锁魂链', slot:'trinket', grade:'凡品', price:320, icon:'链', desc:'攻击命中时 18% 概率锁魂，令敌 1 回合不能行动。', proc:{stun:0.18} },
   hu:     { name:'聚魂葫芦', slot:'trinket', grade:'灵品', price:560, icon:'葫', desc:'攻击附带 8% 吸血。', stat:{lifesteal:0.08} },
   yin:    { name:'神火印', slot:'trinket', grade:'宝品', price:900, icon:'印', desc:'命中时 30% 概率以火星点燃敌人，2 回合内每回合受你攻击 30% 的灼烧伤害。', proc:{burnOnHit:0.3} },
+  /* 礼物（slot: gift，送与神明增进好感，各神偏好见 GODS.gifts） */
+  taomu:   { name:'桃木如意', slot:'gift', grade:'凡品', price:150, icon:'桃', desc:'老桃木雕的小如意，平实讨喜，各路神明都不至于嫌弃。' },
+  wugu:    { name:'五谷福袋', slot:'gift', grade:'凡品', price:200, icon:'谷', desc:'新粟新稻缝成的福袋，土地公见了走不动道。' },
+  xiangzhu:{ name:'龙涎香烛', slot:'gift', grade:'凡品', price:180, icon:'烛', desc:'一燃便满殿生香，衙门里的神明都吃这一套。' },
+  mozhen:  { name:'徽墨「铁斋」', slot:'gift', grade:'灵品', price:300, icon:'墨', desc:'一两徽墨一两银。朱笔判官们案头最缺的就是这个。' },
+  panta:   { name:'蟠桃（次品）', slot:'gift', grade:'灵品', price:320, icon:'果', desc:'瑶池挑剩的次品，但猴子才不管品相。' },
+  hulu:    { name:'杏仁酒葫芦', slot:'gift', grade:'灵品', price:340, icon:'酒', desc:'装着杏花酿的小葫芦，严肃的神明多半摇头，爱酒的神仙两眼放光。' },
+  puti:    { name:'金菩提', slot:'gift', grade:'宝品', price:600, icon:'菩', desc:'菩提树顶摘的金果，佛门至宝，天使长见了也要侧目。' },
 };
 
 /* ---------- 阴兵 ---------- */
@@ -173,6 +222,11 @@ const MONTH_DAYS = 30;
  event.choice.requires: {path} / {godhood} / 无条件
  r 字段：hp(立即扣血，负数) / heal / atkBuff(本单攻击加成) / shield(开局护盾，占生命上限比)
         enemyAtk(敌方攻击修正) / enemyVuln(敌方易伤) / money / log
+ 类型标记：
+   forced  官遣单，不得驳回，跨日保留
+   gh:null 该单无神格可赐（低阶神私活），只有钱/功过/好感
+   long    长单：acts[] 多幕跨天推进，shelf 项记 act 进度，全部幕完成才结算
+   main    主线章单：chapter 章节门槛，完成后推进 Game.s.chapter 并记 flags
 */
 const MISSIONS = [
 {
@@ -331,6 +385,140 @@ const MISSIONS = [
         { t:'稳住它，问话拖延', r:{heal:15, log:'你与它绕着柱子周旋，趁机调匀了呼吸。'} },
       ]},
     { type:'battle', enemy:'guiwang' },
+  ]
+},
+/* ================= 低阶神短单（无神格，攒钱攒功过攒好感） ================= */
+{
+  id:'m9', god:'tudi', danger:2, forced:false,
+  name:'野狐占庙案', gh:null, merit:10, money:50,
+  scroll:'村头土地庙被一只成了精的野狐占了，挂着"胡三太爷"的幌子受香火。土地公被挤在庙外槐树下，捻着胡子直叹气："小神位卑，斗它不过，你替我走一遭？"',
+  nodes:[
+    { type:'event', text:'土地庙门口挂了新幌，狐狸精端坐供桌之上，尾巴藏都懒得藏。香客们磕头磕得正起劲。',
+      choices:[
+        { t:'亮出神衙文书，宣读驱邪令', r:{log:'文书一亮，香客哗然，野狐的"神迹"先折了三分。'} },
+        { t:'佯装香客上香，近身再拿', r:{hp:-10, log:'离得近了才发现，这狐狸修为不俗，一爪挠得你袖子开线。'} },
+        { t:'请土地公断了庙里的香火引', requires:{path:'nether'}, r:{atkBuff:0.25, log:'地脉一断，野狐借不到地气，焦躁地在梁上乱窜。'} },
+      ]},
+    { type:'battle', enemy:'ghost' },
+    { type:'event', text:'野狐现了原形，原来是被庙里最后一位老庙祝的执念拖住，走不了也走不脱。',
+      choices:[
+        { t:'超度老庙祝的执念', r:{heal:20, log:'执念散作一缕青烟，庙里忽然清净，你的神躯也暖了几分。'} },
+        { t:'收了野狐的妖丹抵罚', r:{money:40, log:'妖丹入手温润，土地公在旁边看得直咂嘴，没敢吭声。'} },
+      ]},
+    { type:'battle', enemy:'ligui', scale:0.9 },
+  ]
+},
+{
+  id:'m10', god:'tudi', danger:3, forced:false,
+  name:'田埂拘魂令', gh:null, merit:14, money:80,
+  scroll:'城郊三十里农田颗粒无收，夜里总有白影蹲在田埂上数稻穗。土地公说那是前朝饿死的佃农魂，没人烧过一顿饱饭纸钱，怨气打了结。"你去劝劝，劝不动……就按规矩办。"',
+  nodes:[
+    { type:'event', text:'月色下，白影们排成一列数稻穗，数一穗叹一声，声声都往人骨头缝里钻。',
+      choices:[
+        { t:'烧一车纸钱，先安其心', r:{heal:15, log:'火光里白影们的脊背渐渐直了些，怨气松了一半。'} },
+        { t:'开坛讲律，讲明超度章程', requires:{path:'nether'}, r:{atkBuff:0.3, log:'幽冥律令一出，群魂肃然列队，比生人还守规矩。'} },
+        { t:'直接摆开拘魂阵', r:{hp:-12, log:'群魂受惊四散，阵里阵外乱作一团，你也挨了几记阴风。'} },
+      ]},
+    { type:'battle', enemy:'ghost', scale:1.1 },
+    { type:'event', text:'领头的老佃农魂攥着一穗秕谷不肯撒手："这是俺佃了三十年才等到的一场好收成。"',
+      choices:[
+        { t:'把那穗谷亲手替他收进仓', r:{heal:20, log:'谷粒入仓那一刻，老魂咧嘴一笑，散成了满天萤火。'} },
+        { t:'依律强行勾魂入册', r:{atkBuff:0.2, log:'律令无情，你出手干脆利落，心头却压了点什么。'} },
+      ]},
+    { type:'battle', enemy:'ligui' },
+  ]
+},
+{
+  id:'m11', god:'chenghuang', danger:2, forced:false,
+  name:'庙会丢魂案', gh:null, merit:12, money:60,
+  scroll:'三月三庙会人山人海，踩丢、挤丢、吓丢的生魂共七缕，混在人流里找不到回来的路。城隍爷把名录往你怀里一塞："三日为限，找不齐，明年庙会你这外包也别想摆摊。"',
+  nodes:[
+    { type:'event', text:'庙会上灯棚连着戏台，你在人缝里瞧见一缕生魂正被糖画摊子勾得挪不动步。',
+      choices:[
+        { t:'化作货郎，以糖人引魂', r:{heal:12, log:'生魂捧着糖人咯咯直笑，乖乖跟你回了名录上。'} },
+        { t:'张起招魂幡，就地拘拿', r:{hp:-8, log:'幡一招，生魂是来了，看热闹的活人也围了一大圈。'} },
+      ]},
+    { type:'battle', enemy:'ghost', scale:1.05 },
+    { type:'event', text:'还差一缕。戏台底下阴气最重，有游魂冒充生魂想混出城去投胎。',
+      choices:[
+        { t:'逐个验看名录印信', r:{log:'你拿着名录一一比对，揪出了三个冒名的，真魂还在戏台底下。'} },
+        { t:'以城隍印直召生魂', requires:{path:'revelation'}, r:{atkBuff:0.25, log:'天启之光落下，冒牌货当场现形，真魂循光而归。'} },
+      ]},
+    { type:'battle', enemy:'ligui', scale:0.95 },
+  ]
+},
+{
+  id:'m12', god:'chenghuang', danger:3, forced:false,
+  name:'淫祠邪祀案', gh:null, merit:16, money:90,
+  scroll:'城西夜里冒出一座没有名字的野祠，香火极旺，祈什么应什么——应的全是邪愿。城隍查了半月，只查出祠里塑的像"不是神"。"是何物装神，你去替我看清楚。"',
+  nodes:[
+    { type:'event', text:'野祠藏在一片新坟地里，求签的队排到了坟圈子外。签筒里的竹签，全是人指骨磨的。',
+      choices:[
+        { t:'混进队伍摇一签', r:{hp:-8, log:'签文入手冰凉，一支"上上签"顺着掌心吸你的神力，你甩手才挣脱。'} },
+        { t:'夜里放火烧祠，逼它现形', r:{atkBuff:0.25, log:'火起时，祠中黑影尖啸着窜出——装不了神了。'} },
+      ]},
+    { type:'battle', enemy:'ligui' },
+    { type:'event', text:'黑影被逼进坟地深处，坟头全朝着同一个方向磕拜——它在借坟养煞。',
+      choices:[
+        { t:'踏平坟头，断其香火根', r:{shield:0.25, log:'坟头踏平，煞气反噬被你硬生生扛下，周身浮起一层幽光。'} },
+        { t:'将计就计，引它攻击再反杀', r:{atkBuff:0.3, log:'你故意露出破绽，黑影扑来的一瞬，你的兵刃已经等在那里。'} },
+      ]},
+    { type:'battle', enemy:'ligui', scale:1.1 },
+  ]
+},
+/* ================= 长单（多幕跨天） ================= */
+{
+  id:'L1', god:'yan', danger:4, forced:false, long:true,
+  name:'枉死城整肃令', gh:'juhun', merit:40, money:260,
+  scroll:'【长单·三幕】生死簿风波未平，枉死城的名册、狱卒、城墙样样有窟窿。阎王爷拍下一枚令印："三个月，本王要枉死城样样清爽。办得好，这里头有你一份前程。"',
+  acts:[
+    { title:'第一幕·清点',
+      nodes:[
+        { type:'event', text:'名册房积灰三尺，册子虫蛀的虫蛀、缺页的缺页。鬼差们抱着胳膊看热闹："新来的，往年没人敢接这活。"',
+          choices:[
+            { t:'照册逐一唱名，缺一记一', r:{log:'唱名声在名册房回荡了一整日，短了四十七个号，你都记在了朱单上。'} },
+            { t:'以幽冥律令唤册中残魂自述', requires:{path:'nether'}, r:{atkBuff:0.2, log:'残魂循律令而回，口述与册页互证，进度快了一倍。'} },
+            { t:'抓阄抽查，先糊弄交差', r:{hp:-10, log:'抽到的三册恰好全是问题册，鬼差们憋笑憋出了内伤，你也挨了上峰一顿训。'} },
+          ]},
+        { type:'battle', enemy:'ghost', scale:1.2 },
+      ]},
+    { title:'第二幕·整狱',
+      nodes:[
+        { type:'event', text:'名册短了四十七个号，狱里却多押着一个"活人"。夜审开始，班头们个个喊冤，烛火忽明忽暗。',
+          choices:[
+            { t:'分开审，先撬最慌的那个', r:{log:'最慌的班头竹筒倒豆子：那"活人"是花了大价钱进来的。'} },
+            { t:'提审那个"活人"', r:{hp:-10, log:'押房里阴风扑面，那"活人"抬起头——半张脸是人的，半张脸不是。'} },
+          ]},
+        { type:'battle', enemy:'ligui', scale:1.1 },
+      ]},
+    { title:'第三幕·封门',
+      nodes:[
+        { type:'event', text:'真相大白：有人在做阴间的买卖——交够了钱，阳寿未尽也能"提前入住"枉死城避劫。口子就在城西水门。',
+          choices:[
+            { t:'封死水门，按律重办', r:{atkBuff:0.25, log:'水门落闸，买卖断绝。城外的"客人们"恼羞成怒。'} },
+            { t:'留门作饵，钓出幕后主家', r:{hp:-12, log:'你在水门蹲了两夜，阴风浸骨，总算摸清了来路。'} },
+          ]},
+        { type:'battle', enemy:'guiwang', scale:1.1 },
+      ]},
+  ]
+},
+/* ================= 主线章单（chapter 门槛，完成推进章节） ================= */
+{
+  id:'c1', god:'yan', danger:3, forced:false, main:true, chapter:1,
+  name:'两界文书房试炼', gh:null, merit:20, money:120,
+  scroll:'【主线·章一】阎王爷丢给你一沓两界往来文书："从今日起，两界交割的文书都过你的手。先试试手——这批里有三份是伪造的，挑出来。"',
+  nodes:[
+    { type:'event', text:'文书堆得比你还高。地府的朱印端正凝重，天庭的敕印飞扬潦草，各有各的章法。',
+      choices:[
+        { t:'先比对印泥的成色年份', r:{log:'两份"天庭敕令"用的印泥是今年新调的，可落款却是三年前。'} },
+        { t:'以幽冥感应直辨文书气息', requires:{path:'nether'}, r:{atkBuff:0.25, heal:15, log:'死人生前执念、活人诉讼怨气，一摸便知——三份伪作无所遁形。'} },
+      ]},
+    { type:'battle', enemy:'ghost', scale:1.1 },
+    { type:'event', text:'伪作背后是个伪造文书的小团伙，为首者见事败，竟撕了文书想毁证灭迹。',
+      choices:[
+        { t:'抢下残页，人证物证俱全', r:{money:40, log:'残页拼回原状，阎王批了勘验津贴。'} },
+        { t:'当场拘人再说', r:{atkBuff:0.2, log:'人赃并获，干净利落。'} },
+      ]},
   ]
 },
 ];

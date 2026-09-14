@@ -1,5 +1,6 @@
 /* ================= 天道打工人 · 状态与规则 ================= */
-const SAVE_KEY = 'tiandao_dagongren_v1';
+const SAVE_KEY = 'tiandao_dagongren_v2';      /* v2：神明人脉/好感/flag/章节/长单 */
+const OLD_SAVE_KEY = 'tiandao_dagongren_v1';  /* v1 旧档保留不删，首次进入一次性迁移到 v2 */
 
 const Game = {
   s: null,
@@ -11,14 +12,17 @@ const Game = {
       hp:100, strikes:0,
       gh:{},            // id -> {awakened:bool, insight:0..1, sleep:days}
       equipped:[],      // 已镶嵌神格 id
-      bag:{},           // 已购法宝 id -> true
+      bag:{},           // 已购物品 id -> true（含礼物）
       wear:{weapon:null, armor:null, trinket:null}, // 三栏位穿戴
       soldiers:[],      // ['xiaojiang',...]
       fac:{ shrine:0, desk:0, incense:0, banner:0 },
-      shelf:[],         // [{mid, bargain}]
+      shelf:[],         // [{mid, bargain, type?, act?}]
       busy:false,       // 下凡中
       fusionBless:{},   // out -> 0..1 失败祝福
       tut:{done:false, stage:'start'},  // 新手引导进度
+      godsRel:{ yan:{met:1, favor:0} }, // 神明人脉：顶头上司开局已识 {met,favor,giftDay?}
+      flags:{},         // 剧情/玩法旗标
+      chapter:1,        // 主线章节
       log:[],
     };
     Stats.recalc();
@@ -30,14 +34,21 @@ const Game = {
   save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(this.s)); }catch(e){} },
   load(){
     try{
-      const raw = localStorage.getItem(SAVE_KEY);
+      let raw = localStorage.getItem(SAVE_KEY);
+      let migrated = false;
+      if(!raw){
+        /* v1 旧档一次性迁移：复制到 v2，v1 原档保留不动 */
+        const old = localStorage.getItem(OLD_SAVE_KEY);
+        if(old){ raw = old; migrated = true; }
+      }
       if(!raw) return false;
       this.s = JSON.parse(raw);
       this.migrate();
+      if(migrated) this.save();
       return true;
     }catch(e){ return false; }
   },
-  /** 旧存档兼容：items(买到即生效) → bag + wear 三栏位 */
+  /** 旧存档兼容：items(买到即生效) → bag + wear 三栏位；v2 新字段兜底 */
   migrate(){
     const s=this.s;
     if(s.bag===undefined) s.bag={};
@@ -47,22 +58,77 @@ const Game = {
         if(!ITEMS[id]) return;
         s.bag[id]=true;
         const sl=ITEMS[id].slot;
-        if(!s.wear[sl]) s.wear[sl]=id;   // 旧档已拥有的法宝自动穿戴上
+        if(sl && sl!=='gift' && !s.wear[sl]) s.wear[sl]=id;   // 旧档已拥有的法宝自动穿戴上
       });
       delete s.items;
     }
     /* 老玩家存档默认不弹新手引导（可在案牍页手动重看） */
     if(!s.tut) s.tut={done:true, stage:'done'};
+    /* v2：神明人脉（顶头上司默认已识），旗标与章节 */
+    if(!s.godsRel) s.godsRel={};
+    if(!s.godsRel.yan) s.godsRel.yan={met:1, favor:0};
+    else if(!s.godsRel.yan.met) s.godsRel.yan.met=1;
+    if(!s.flags) s.flags={};
+    if(s.chapter===undefined) s.chapter=1;
+    /* 长单进度兜底 */
+    (s.shelf||[]).forEach(o=>{ if(o.act===undefined) o.act=0; });
   },
   clear(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} },
+
+  /* ---------- 神明人脉：结识 / 好感 / 解锁 / 送礼 ---------- */
+  /** 结识神明（接下其工单即算打上交道） */
+  meetGod(g){
+    const rel=this.s.godsRel[g];
+    if(rel && rel.met) return;
+    this.s.godsRel[g]={ met:1, favor: rel?rel.favor:0 };
+  },
+  favorOf(g){ const r=this.s.godsRel[g]; return r?r.favor:0; },
+  favorLevel(f){ let l=0; for(let i=0;i<FAVOR_LEVELS.length;i++){ if(f>=FAVOR_LEVELS[i].v) l=i; } return l; },
+  favorName(l){ return FAVOR_LEVELS[l]?FAVOR_LEVELS[l].name:'相识'; },
+  /** 好感变化；跨阈值时提示 */
+  addFavor(g,n){
+    const r=this.s.godsRel[g]||(this.s.godsRel[g]={met:1,favor:0});
+    const oldLv=this.favorLevel(r.favor);
+    r.favor=Math.min(100, r.favor+n);
+    const newLv=this.favorLevel(r.favor);
+    if(newLv>oldLv && typeof UI!=='undefined'){
+      UI.toast(`「${GODS[g].name}」与你的交情升至【${FAVOR_LEVELS[newLv].name}】！`);
+    }
+  },
+  /** 神明解锁判定 */
+  isGodUnlocked(g){
+    const gd=GODS[g]; if(!gd) return false;
+    const u=gd.unlock; if(!u) return true;
+    if(u.rank!==undefined && this.s.rank<u.rank) return false;
+    if(u.chapter!==undefined && this.s.chapter<u.chapter) return false;
+    if(u.by!==undefined){ const r=this.s.godsRel[u.by]; if(!r || !r.met) return false; }
+    return true;
+  },
+  /** 送礼：每日每神一礼；偏好决定好感增减 */
+  sendGift(g,id){
+    const s=this.s, rel=s.godsRel[g]||(s.godsRel[g]={met:1,favor:0});
+    const today=s.month*100+s.day;
+    if(rel.giftDay===today){ UI.toast('今日已送过礼，频繁登门反倒惹人嫌'); return; }
+    if(!s.bag[id]) return;
+    const it=ITEMS[id], pr=(GODS[g]&&GODS[g].gifts)||{};
+    let fav=4, tag='收下了，神色淡淡';
+    if((pr.loved||[]).indexOf(id)>=0){ fav=18; tag='眼前一亮，抚掌大笑！'; }
+    else if((pr.liked||[]).indexOf(id)>=0){ fav=8; tag='眉眼含笑，颇以为然'; }
+    else if((pr.disliked||[]).indexOf(id)>=0){ fav=1; tag='神色微微一僵，勉强收下'; }
+    delete s.bag[id]; rel.giftDay=today;
+    this.addFavor(g,fav);
+    UI.toast(`「${GODS[g].name}」${tag}（好感 +${fav}）`);
+    this.save(); UI.render();
+  },
 
   /* ---------- 神格 ---------- */
   hasGh(id){ return !!this.s.gh[id]; },
   awakened(id){ return !!(this.s.gh[id] && this.s.gh[id].awakened); },
 
-  /** 完成委托：获得神格碎片。返回结算信息 */
+  /** 完成委托：获得神格碎片。gh:null 的工单无神格可赐 */
   grantGodhood(mid){
     const m = MISSIONS.find(x=>x.id===mid);
+    if(!m.gh) return { noGh:true };
     const id = m.gh, g = GODHOODS[id];
     const res = { id, name:g.name, isNew:false, awakened:false, cultGain:0 };
     if(!this.s.gh[id]){
@@ -343,24 +409,49 @@ const Stats = {
 
 /* ================= 工单架 ================= */
 const Shelf = {
+  /** 某工单当前是否可出现在架上（神明解锁 + 主线章节门槛） */
+  available(m){
+    const s=Game.s;
+    if(m.forced) return true;
+    if(m.main && s.flags['main_'+m.id]) return false;   // 已完结主线不再上架
+    if(!Game.isGodUnlocked(m.god)) return false;
+    if(m.main && s.chapter < (m.chapter||1)) return false;
+    return true;
+  },
   refresh(){
-    /* 官遣单若尚未接取，跨日保留 */
-    const kept = (Game.s.shelf||[]).filter(o=>{
-      const m = MISSIONS.find(x=>x.id===o.mid);
-      return m && m.forced;
+    const s=Game.s;
+    /* 官遣单与进行中的长单跨日保留 */
+    const kept=(s.shelf||[]).filter(o=>{
+      const m=MISSIONS.find(x=>x.id===o.mid);
+      if(!m) return false;
+      if(m.forced) return true;
+      if((o.type==='long'||m.long) && (o.act||0) < (m.acts?m.acts.length:0)) return true;
+      return false;
     });
-    const count = 3 + (Game.s.fac.desk>0 ? FACILITIES.desk.levels.slice(0,Game.s.fac.desk).reduce((a,l)=>a+(l.shelf||0),0) : 0);
-    const pool = MISSIONS.filter(m=>!m.forced);
-    const copy = pool.slice();
+    /* 主线章单必上架（未完结的） */
+    MISSIONS.filter(m=>m.main && this.available(m))
+      .forEach(m=>{ if(!kept.some(o=>o.mid===m.id)) kept.push({ mid:m.id, bargain:false }); });
+    const count = 3 + (s.fac.desk>0 ? FACILITIES.desk.levels.slice(0,s.fac.desk).reduce((a,l)=>a+(l.shelf||0),0) : 0);
+    /* 短单池：解锁过滤 + 去掉已在架上的（主线单独必放，不参与随机） */
+    const copy = MISSIONS.filter(m=>!m.forced && !m.long && !m.main && this.available(m))
+      .filter(m=>!kept.some(o=>o.mid===m.id));
     while(kept.length + copy.length > count && copy.length){ copy.splice(Math.floor(Math.random()*copy.length),1); }
     while(kept.length < count && copy.length){
       const i = Math.floor(Math.random()*copy.length);
       kept.push({ mid:copy.splice(i,1)[0].id, bargain:false });
     }
+    /* 长单：月初必放一张可用长单，月中若架上无长单则 25% 概率补一张 */
+    if(!kept.some(o=>{ const m=MISSIONS.find(x=>x.id===o.mid); return m && m.long; })){
+      const longs = MISSIONS.filter(m=>m.long && this.available(m))
+        .filter(m=>!kept.some(o=>o.mid===m.id));
+      if(longs.length && (s.day===1 || (kept.length<count && Math.random()<0.25))){
+        kept.push({ mid:longs[Math.floor(Math.random()*longs.length)].id, bargain:false, type:'long', act:0 });
+      }
+    }
     /* 每月初一，官遣单必到 */
-    if(Game.s.day===1 && !kept.some(o=>MISSIONS.find(m=>m.id===o.mid).forced)){
+    if(s.day===1 && !kept.some(o=>{ const m=MISSIONS.find(x=>x.id===o.mid); return m && m.forced; })){
       kept.unshift({ mid:'m8', bargain:false });
     }
-    Game.s.shelf = kept;
+    s.shelf = kept;
   },
 };

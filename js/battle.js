@@ -58,6 +58,7 @@ const Battle = {
       p,e, round:0, log:[], momentsUsed:0,
       momentLeft:true, finished:false, waiting:null,
       playerDown:false,
+      aidUsed:false,   // 神明援助：每场一次
     };
 
     const addLog = (html, cls)=>{
@@ -198,6 +199,49 @@ const Battle = {
       await sleep(300);
     };
 
+    /* ---- 神明援助（好感 Lv2+，每场一次） ---- */
+    const castAid = async (gkey)=>{
+      const gd=GODS[gkey], a=gd.aid;
+      B.aidUsed=true;
+      UI.flash('player','cast');
+      addLog(`危难之际，你遥唤「${gd.name}」——<b>${a.name}</b>！`,'lg-sys');
+      await sleep(250);
+      switch(a.type){
+        case 'nuke':{
+          const dmg=Math.max(1,Math.round(p.atk*a.mult*rnd(0.95,1.05)-e.def*0.45));
+          e.hp=Math.max(0,e.hp-dmg); UI.floatFoe(`-${dmg}`,'#c03c2e');
+          addLog(`${gd.name}远程压阵，造成 <b>${dmg}</b> 点伤害。`,'lg-good'); break;
+        }
+        case 'percent':{
+          const dmg=Math.round(e.maxHp*a.pct);
+          e.hp=Math.max(0,e.hp-dmg); if(a.stun) e.stun=Math.max(e.stun,a.stun);
+          UI.floatFoe(`-${dmg}`,'#7a5a8c');
+          addLog(`朱笔勾魂，造成 <b>${dmg}</b> 点真实伤害${a.stun?'并震骇敌人':''}。`,'lg-good'); break;
+        }
+        case 'heal':{
+          const hp=Math.round(p.maxHp*a.heal);
+          p.hp=clamp(p.hp+hp,0,p.maxHp); UI.floatPlayer(`+${hp}`,'#477a5a');
+          addLog(`地脉灵气涌入神躯，回复 <b>${hp}</b> 点生命。`,'lg-good'); break;
+        }
+        case 'shield':{
+          const sh=Math.round(p.maxHp*a.shield); p.shield+=sh;
+          UI.floatPlayer(`护盾+${sh}`,'#2e6f8e');
+          addLog(`签押护身，获得 <b>${sh}</b> 点护盾。`,'lg-sys'); break;
+        }
+        case 'healShield':{
+          const hp=Math.round(p.maxHp*a.heal), sh=Math.round(p.maxHp*a.shield);
+          p.hp=clamp(p.hp+hp,0,p.maxHp); p.shield+=sh;
+          UI.floatPlayer(`+${hp}`,'#477a5a'); UI.floatPlayer(`护盾+${sh}`,'#2e6f8e');
+          addLog(`圣光垂照，回复 <b>${hp}</b> 点生命并获得 <b>${sh}</b> 点护盾。`,'lg-good'); break;
+        }
+        case 'burn':{
+          e.burn=a.rounds; e.burnDmg=Math.round(p.atk*a.pct);
+          addLog(`风火轮擦着敌身掠过，「${e.name}」被点燃（每回合 ${e.burnDmg}，${a.rounds} 回合）！`,'lg-good'); break;
+        }
+      }
+      await sleep(300);
+    };
+
     /* ---- 关键时刻 ---- */
     const moments = [ {at:0.6,used:false}, {at:0.3,used:false} ];
     const tryMoment = async ()=>{
@@ -210,6 +254,10 @@ const Battle = {
           if(choice.act==='flee'){ B.fled=true; return true; }
           if(choice.act==='cast'){ await castSkill(choice.id); }
           if(choice.act==='burn'){ await burnGodhood(choice.id); }
+          if(choice.act==='aid'){
+            const m=UI.mission?UI.mission():null;
+            await castAid(m?m.god:'yan');
+          }
           if(p.shieldRounds>0){ /* 护盾计时在回合末处理 */ }
         }
       }
