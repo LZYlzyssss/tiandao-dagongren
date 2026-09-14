@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天道打工人</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='14' fill='%23c03c2e'/><text x='50' y='72' font-size='62' text-anchor='middle' fill='%23f7ead2' font-family='serif'>衙</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="inkLayer"></div>
+<div id="mistLayer"></div>
+<div id="app">
+
+  <!-- 顶栏 -->
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-seal">衙</span>
+      <div>
+        <h1>天道打工人</h1>
+        <small>阴阳两界劳务契 · 无编制</small>
+      </div>
+    </div>
+    <div class="top-stats" id="topStats"></div>
+  </header>
+
+  <!-- 主体三栏 -->
+  <main id="layout">
+    <!-- 左：工单架 -->
+    <aside class="col col-left" id="colLeft"></aside>
+
+    <!-- 中：场景 -->
+    <section class="col col-center" id="colCenter"></section>
+
+    <!-- 右：神格盘 + 阴兵营 -->
+    <aside class="col col-right" id="colRight"></aside>
+  </main>
+
+  <!-- 弹窗层 -->
+  <div id="modalLayer"></div>
+  <!-- 轻提示 -->
+  <div id="toastLayer"></div>
+
+  <!-- 开场 -->
+  <div id="intro" class="overlay">
+    <div class="paper intro-card">
+      <h1 class="title-brush">天道打工人</h1>
+      <p class="intro-sub">—— 一个外包阴神的升职(？)之路 ——</p>
+      <div class="intro-text">
+        <p>天庭机构臃肿，预算紧缩。正式神仙只管显灵，不管干活。</p>
+        <p>你在地府考公落榜，签了一份「阴阳两界劳务契」，被发配到两界交界处的破神衙，做了<b>无编制的九品阴神</b>。</p>
+        <p>斗战胜佛的私活、天使长的光羽案、阎魔王的强制派单……神仙们付不起工钱，只能切一块<b>神格</b>与你。</p>
+        <p>神格入体，或觉醒大神通，或道争相冲。三十日一考，KPI 不合格，便要贬作孤魂野鬼。</p>
+      </div>
+      <button class="btn btn-primary btn-lg" data-action="newGame">签字画押，入职神衙</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/fx.js"></script>
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
