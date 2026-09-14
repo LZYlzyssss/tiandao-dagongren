@@ -226,6 +226,9 @@ body::before{
 .btn-indigo{background:var(--indigo);border-color:#23556e;color:#eef6fb}
 .btn-indigo:hover{background:#255d78}
 .btn-ghost{background:transparent}
+.btn-sell{background:transparent;color:var(--cinnabar);border-color:var(--cinnabar)}
+.btn-sell:hover{background:rgba(192,60,46,.1)}
+.btn-primary.btn-sell{background:var(--cinnabar);color:#f9efd8}
 .btn-sm{padding:3px 10px;font-size:12px;flex:none}
 .btn-lg{padding:12px 30px;font-size:18px;margin-top:10px}
 
@@ -458,6 +461,7 @@ body::before{
 .wear-card .sr-d{text-align:left}
 .gear-jump{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px;transition:background .15s}
 .gear-jump:hover{background:rgba(192,60,46,.06)}
+.sell-price{color:var(--cinnabar)}
 
 /* 开场 */
 #intro .intro-card{width:600px;text-align:center}

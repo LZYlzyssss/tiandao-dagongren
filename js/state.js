@@ -168,6 +168,19 @@ const Game = {
     if(this.s.hp > Stats.cur().maxHp) this.s.hp = Stats.cur().maxHp;
     this.save(); UI.render(); UI.toast(`已取下「${ITEMS[id].name}」`);
   },
+  /** 出售闲置法宝：仅背包中未穿戴的可卖，半价回收，概不赎回 */
+  sellItem(id){
+    const s=this.s;
+    if(!s.bag[id]) return;
+    const it=ITEMS[id];
+    if(s.wear[it.slot]===id){ UI.toast('佩中的法宝不能出手，请先取下'); return; }
+    const gain=Math.floor(it.price*SELL_RATE);
+    delete s.bag[id];
+    s.money += gain;
+    Stats.recalc();
+    this.save(); UI.render();
+    UI.toast(`老道掂了掂，丢下 ${gain} 文，把「${it.name}」收走了`);
+  },
   recruit(id){
     const cap = 1 + (this.s.fac.banner>0 ? FACILITIES.banner.levels.slice(0,this.s.fac.banner).reduce((a,l)=>a+(l.cap||0),0) : 0);
     if(this.s.soldiers.length >= cap){ UI.toast('阴兵编制已满，升级招妖幡可扩充'); return; }

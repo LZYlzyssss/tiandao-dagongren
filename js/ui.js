@@ -275,7 +275,8 @@ const UI = {
       <h2>阴阳百宝铺 <span class="sub">骑青牛的老道坐堂</span></h2>
       <div class="sr-d">老道说他卖的都是「体制内淘汰下来的好东西」。
       法宝各只一件，购入后收入<b>背包</b>，须到「装备」页<b>穿戴</b>才生效；
-      兵刃、护身、奇物<b>每栏只可佩一件</b>。</div>`;
+      兵刃、护身、奇物<b>每栏只可佩一件</b>。
+      闲置的法宝老道也肯回收——只出<b>半价</b>，钱款两讫，概不退换。</div>`;
     c.appendChild(intro);
 
     ['weapon','armor','trinket'].forEach(slot=>{
@@ -303,6 +304,35 @@ const UI = {
       });
       c.appendChild(p);
     });
+
+    /* ---- 旧货回收（只列背包中未穿戴的闲置法宝） ---- */
+    const rp=h('div','panel');
+    rp.innerHTML=`<h2>旧货回收 <span class="sub">半价收旧，概不赎回</span></h2>`;
+    const spare=Object.keys(s.bag).filter(id=>s.wear[ITEMS[id].slot]!==id);
+    if(!spare.length){
+      rp.appendChild(h('div','shelf-empty','老道在铺子里打着哈欠——你行囊里没有闲置法宝。<br>佩中的法宝须先到「装备」页取下，才能出手。'));
+    }else{
+      rp.appendChild(h('div','section-tip','以下法宝正在行囊里闲置，可按原价 50% 出手。'));
+      spare.forEach(id=>{
+        const it=ITEMS[id], gain=Math.floor(it.price*SELL_RATE);
+        const r=h('div','shop-row item-row',
+          `<div class="item-ic">${it.icon}</div>
+           <div class="item-body">
+             <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
+               <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
+             <div class="sr-d">原价 ${it.price} 文 · 老道只肯出 <b class="sell-price">${gain} 文</b></div>
+           </div>`);
+        const b=h('button','btn btn-sm btn-sell','出手');
+        b.onclick=()=>this.openConfirm('旧货回收',
+          `当真要把「${it.name}」卖给老道？<br>
+           原价 <b>${it.price} 文</b>，回收只得 <b style="color:var(--gold)">${gain} 文</b>。<br>
+           <span style="color:var(--ink-faint);font-size:13px">钱款两讫，概不赎回。</span>`,
+          ()=>Game.sellItem(id), '半价出手');
+        r.appendChild(b);
+        rp.appendChild(r);
+      });
+    }
+    c.appendChild(rp);
   },
 
   /* ================= 页五：装备（三栏位 + 背包） ================= */
@@ -636,6 +666,23 @@ const UI = {
     b.style.marginTop='12px';
     b.onclick=()=>ml.innerHTML='';
     box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
+  },
+
+  /** 二次确认弹窗：onOk 在点确认后执行 */
+  openConfirm(title,html,onOk,okText='确认'){
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay'), box=h('div','paper m-box');
+    box.innerHTML=`<h3>${title}</h3><div style="font-size:15px;line-height:2">${html}</div>`;
+    const close=()=>{ ml.innerHTML=''; };
+    const ok=h('button','btn btn-primary btn-sell',okText);
+    ok.style.marginTop='14px';
+    ok.onclick=()=>{ close(); onOk&&onOk(); };
+    const cancel=h('button','btn btn-ghost','再想想');
+    cancel.style.marginTop='14px';
+    cancel.style.marginLeft='12px';
+    cancel.onclick=close;
+    box.appendChild(ok); box.appendChild(cancel);
+    ov.appendChild(box); ml.appendChild(ov);
   },
 
   /* ================= 月末考核 ================= */

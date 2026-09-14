@@ -120,6 +120,8 @@ const SLOT_INFO = {
   armor:   { name:'护身', icon:'护', desc:'主守御，提升生命、防御与减伤' },
   trinket: { name:'奇物', icon:'奇', desc:'旁门妙用，回血、锁魂、吸血、点火' },
 };
+/* 旧货回收：老道只按原价的一半收（向下取整） */
+const SELL_RATE = 0.5;
 const ITEMS = {
   /* 兵刃 */
   pan:    { name:'判官笔', slot:'weapon', grade:'凡品', price:200, icon:'笔', desc:'攻击 +8。朱笔一点，即定生死。', stat:{atk:8} },
