@@ -79,7 +79,7 @@ body::before{
 
 /* ============ 底部标签导航 ============ */
 #tabbar{
-  flex:none;display:grid;grid-template-columns:repeat(4,1fr);
+  flex:none;display:grid;grid-template-columns:repeat(6,1fr);
   border-top:2px solid var(--ink);
   background:linear-gradient(0deg,#e2d4b5,#eee4cc);
   box-shadow:0 -2px 10px var(--shadow);
@@ -93,10 +93,10 @@ body::before{
   transition:color .15s;
 }
 .tab-ico{
-  font-family:var(--font-brush);font-size:25px;line-height:1.1;
+  font-family:var(--font-brush);font-size:23px;line-height:1.1;
   transition:transform .18s cubic-bezier(.34,1.56,.64,1);
 }
-.tab-txt{font-size:12px;letter-spacing:3px}
+.tab-txt{font-size:11px;letter-spacing:1px}
 .tab:hover{color:var(--ink-soft)}
 .tab.active{color:var(--cinnabar)}
 .tab.active .tab-ico{transform:translateY(-2px) scale(1.1)}
@@ -415,6 +415,50 @@ body::before{
 .shop-row .sr-d{font-size:12px;color:var(--ink-faint);line-height:1.6}
 .price{color:var(--gold);font-weight:bold;white-space:nowrap;margin:0 10px}
 
+/* ============ 商铺 / 装备 ============ */
+.shop-intro .sr-d{margin-top:6px}
+.slot-ico{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:24px;height:24px;border-radius:50%;
+  background:var(--ink);color:#f3e9d2;font-size:13px;vertical-align:-2px;margin-right:2px;
+}
+.item-row{padding:12px 4px}
+.item-ic{
+  flex:none;width:42px;height:42px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-brush);font-size:24px;color:var(--cinnabar-deep);
+  background:rgba(192,60,46,.08);border:1px solid var(--line);
+}
+.item-body{flex:1;min-width:0}
+.item-row.owned{opacity:.62}
+.grade{
+  display:inline-block;font-size:10px;font-style:normal;font-weight:normal;
+  letter-spacing:1px;padding:1px 7px;border-radius:9px;margin-left:6px;
+  border:1px solid;vertical-align:1px;
+}
+.g-fan{color:#6f7a63;border-color:#b7c0aa;background:rgba(120,140,100,.08)}
+.g-ling{color:#2e5f8e;border-color:#9fbcd6;background:rgba(46,95,142,.08)}
+.g-bao{color:#a86418;border-color:#d9a94f;background:rgba(217,169,79,.14)}
+
+/* 装备页三栏位 */
+.wear-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.wear-card{
+  border:1px solid var(--line);border-radius:10px;padding:14px 10px;text-align:center;
+  background:rgba(255,252,244,.6);
+}
+.wear-card.empty{background:rgba(120,110,90,.06);border-style:dashed}
+.wc-head{font-weight:bold;letter-spacing:2px;margin-bottom:8px;font-size:14px}
+.wear-card .item-ic.big{
+  width:54px;height:54px;font-size:30px;margin:0 auto 8px;border-radius:10px;
+}
+.wear-card.empty .item-ic.big{
+  color:var(--ink-faint);background:rgba(120,110,90,.1);border-style:dashed;font-family:var(--font-body);font-size:15px;
+}
+.wc-name{font-weight:bold;margin-bottom:4px}
+.wear-card .sr-d{text-align:left}
+.gear-jump{cursor:pointer;border-radius:8px;padding-left:8px;padding-right:8px;transition:background .15s}
+.gear-jump:hover{background:rgba(192,60,46,.06)}
+
 /* 开场 */
 #intro .intro-card{width:600px;text-align:center}
 .title-brush{font-family:var(--font-brush);font-size:52px;letter-spacing:12px;color:var(--ink)}
@@ -440,8 +484,18 @@ body::before{
   /* 布局：单舞台内部滚动，底部标签常驻 */
   .stage{padding:10px 10px 16px}
   .tab{padding:5px 0 4px}
-  .tab-ico{font-size:22px}
-  .tab-txt{font-size:11px;letter-spacing:2px}
+  .tab-ico{font-size:20px}
+  .tab-txt{font-size:10px;letter-spacing:0}
+
+  /* 商铺 / 装备 */
+  .wear-slots{grid-template-columns:1fr}
+  .wear-card{display:flex;align-items:center;gap:10px;text-align:left;flex-wrap:wrap;padding:10px 12px}
+  .wear-card .wc-head{margin-bottom:0;flex:1 0 100%}
+  .wear-card .item-ic.big{width:44px;height:44px;font-size:24px;margin:0}
+  .wear-card .wc-name{margin-bottom:0;flex:1;min-width:120px}
+  .wear-card .sr-d{flex:1 0 100%}
+  .wear-card .btn{margin:0 0 0 auto}
+  .item-ic{width:38px;height:38px;font-size:22px}
 
   /* 顶栏 */
   #topbar{padding:6px 12px;flex-wrap:wrap;gap:6px}
@@ -551,6 +605,8 @@ body::before{
   .vs{font-size:22px}
   .stat-chip{min-width:52px;padding:2px 6px}
   .stat-chip .v{font-size:13px}
+  .tab-ico{font-size:18px}
+  .tab-txt{font-size:9px}
 }
 
 /* ================================================================

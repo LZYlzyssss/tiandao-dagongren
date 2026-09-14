@@ -10,7 +10,7 @@ const YAMEN_BG = imgURL('Chinese ink wash landscape painting of a lonely ancient
 
 const UI = {
   view:'office',     // office | mission | battle | settle
-  tab:'desk',        // desk(案牍) | cult(修行) | yamen(神衙) | me(我的)
+  tab:'desk',        // desk(案牍) | cult(修行) | yamen(神衙) | shop(商铺) | equip(装备) | me(我的)
   rt:null,           // 下凡运行时 {order, mid, node, ctx, lastResult}
   _momentResolve:null,
 
@@ -31,6 +31,8 @@ const UI = {
     if(this.tab==='desk') this.renderDesk(stage);
     else if(this.tab==='cult') this.renderCult(stage);
     else if(this.tab==='yamen') this.renderYamen(stage);
+    else if(this.tab==='shop') this.renderShop(stage);
+    else if(this.tab==='equip') this.renderEquip(stage);
     else this.renderMe(stage);
     stage.scrollTop=0;
   },
@@ -209,7 +211,8 @@ const UI = {
       <h2>两界交界·破神衙</h2>
       <div class="ya-desc">
         衙门口的灯笼常年不灭，照得见活人，也照得见鬼。<br>
-        营造设施、置办法宝、募点阴兵，都是给自己的打工路添几分底气。
+        营造设施、募点阴兵、闭目调息，都是给自己的打工路添几分底气。
+        买法宝请移步「商铺」。
       </div>`;
     c.appendChild(hero);
 
@@ -227,22 +230,6 @@ const UI = {
       fp.appendChild(r);
     });
     c.appendChild(fp);
-
-    /* ---- 杂货铺 ---- */
-    const ip=h('div','panel');
-    ip.innerHTML=`<h2>阴阳杂货铺 <span class="sub">掌柜是个骑青牛的老道</span></h2>
-      <div class="section-tip">老道说他卖的都是“体制内淘汰下来的好东西”。法宝唯一，购后恒持。</div>`;
-    Object.entries(ITEMS).forEach(([id,it])=>{
-      const owned=!!s.items[id];
-      const r=h('div','shop-row',
-        `<div><div class="sr-t">${it.icon} ${it.name}</div><div class="sr-d">${it.desc}</div></div>
-         <span class="price">${it.price} 文</span>`);
-      const b=h('button','btn btn-sm', owned?'已持有':'请购');
-      b.disabled=owned;
-      b.onclick=()=>Game.buyItem(id);
-      r.appendChild(b); ip.appendChild(r);
-    });
-    c.appendChild(ip);
 
     /* ---- 募兵 ---- */
     const cap=1+(s.fac.banner>0?FACILITIES.banner.levels.slice(0,s.fac.banner).reduce((a,l)=>a+(l.cap||0),0):0);
@@ -280,7 +267,104 @@ const UI = {
     c.appendChild(rp);
   },
 
-  /* ================= 页四：我的（角色卷宗） ================= */
+  /* ================= 页四：商铺（百宝铺） ================= */
+  renderShop(c){
+    const s=Game.s;
+    const intro=h('div','panel shop-intro');
+    intro.innerHTML=`
+      <h2>阴阳百宝铺 <span class="sub">骑青牛的老道坐堂</span></h2>
+      <div class="sr-d">老道说他卖的都是「体制内淘汰下来的好东西」。
+      法宝各只一件，购入后收入<b>背包</b>，须到「装备」页<b>穿戴</b>才生效；
+      兵刃、护身、奇物<b>每栏只可佩一件</b>。</div>`;
+    c.appendChild(intro);
+
+    ['weapon','armor','trinket'].forEach(slot=>{
+      const info=SLOT_INFO[slot];
+      const p=h('div','panel');
+      p.innerHTML=`<h2><span class="slot-ico">${info.icon}</span> ${info.name}
+        <span class="sub">${info.desc}</span></h2>`;
+      Object.entries(ITEMS).filter(([,it])=>it.slot===slot).forEach(([id,it])=>{
+        const owned=!!s.bag[id];
+        const worn=s.wear[slot]===id;
+        const r=h('div','shop-row item-row'+(owned?' owned':''));
+        r.innerHTML=`
+          <div class="item-ic">${it.icon}</div>
+          <div class="item-body">
+            <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
+              ${worn?'<span class="tag tag-merit">佩中</span>':''}</div>
+            <div class="sr-d">${it.desc}</div>
+          </div>
+          <span class="price">${it.price} 文</span>`;
+        const b=h('button','btn btn-sm', owned?'已购入':'请购');
+        b.disabled=owned;
+        b.onclick=()=>Game.buyItem(id);
+        r.appendChild(b);
+        p.appendChild(r);
+      });
+      c.appendChild(p);
+    });
+  },
+
+  /* ================= 页五：装备（三栏位 + 背包） ================= */
+  renderEquip(c){
+    const s=Game.s;
+
+    /* 三个穿戴栏位 */
+    const wp=h('div','panel');
+    wp.innerHTML=`<h2>随身佩饰 <span class="sub">三栏各佩一件</span></h2>`;
+    const slots=h('div','wear-slots');
+    ['weapon','armor','trinket'].forEach(slot=>{
+      const info=SLOT_INFO[slot], id=s.wear[slot];
+      const card=h('div','wear-card'+(id?'':' empty'));
+      if(id){
+        const it=ITEMS[id];
+        card.innerHTML=`
+          <div class="wc-head"><span class="slot-ico">${info.icon}</span>${info.name}</div>
+          <div class="item-ic big">${it.icon}</div>
+          <div class="wc-name">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span></div>
+          <div class="sr-d">${it.desc}</div>`;
+        const b=h('button','btn btn-ghost btn-sm','取下');
+        b.style.marginTop='8px';
+        b.onclick=()=>Game.takeOff(slot);
+        card.appendChild(b);
+      }else{
+        card.innerHTML=`
+          <div class="wc-head"><span class="slot-ico">${info.icon}</span>${info.name}</div>
+          <div class="item-ic big">空</div>
+          <div class="wc-name" style="color:var(--ink-faint)">未佩法宝</div>
+          <div class="sr-d">${info.desc}</div>`;
+      }
+      slots.appendChild(card);
+    });
+    wp.appendChild(slots);
+    c.appendChild(wp);
+
+    /* 背包（未穿戴） */
+    const bp=h('div','panel');
+    const spare=Object.keys(s.bag).filter(id=>s.wear[ITEMS[id].slot]!==id);
+    bp.innerHTML=`<h2>行囊 <span class="sub">在库 ${spare.length} 件 · 已购 ${Object.keys(s.bag).length} 件</span></h2>
+      <div class="section-tip">同栏换新装时，旧法宝自动收回行囊，不会丢失。</div>`;
+    if(!spare.length){
+      bp.appendChild(h('div','shelf-empty','行囊空空如也。<br>去「商铺」淘两件称手的家伙吧。'));
+    }
+    spare.forEach(id=>{
+      const it=ITEMS[id];
+      const r=h('div','shop-row item-row',
+        `<div class="item-ic">${it.icon}</div>
+         <div class="item-body">
+           <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
+             <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
+           <div class="sr-d">${it.desc}</div>
+         </div>`);
+      const b=h('button','btn btn-primary btn-sm','穿戴');
+      b.onclick=()=>Game.wearItem(id);
+      r.appendChild(b);
+      bp.appendChild(r);
+    });
+    c.appendChild(bp);
+  },
+
+  /* ================= 页六：我的（角色卷宗） ================= */
   renderMe(c){
     const s=Game.s, st=Stats.cur(), rk=RANKS[s.rank];
 
@@ -311,8 +395,9 @@ const UI = {
     if(st.clash) bp.appendChild(h('div','clash-warn','道争发动中：神力上限 −20%。'));
     if(st.resonance) bp.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}系，攻击 +10%。`));
     const fx=[];
-    if(st.stunProc) fx.push(`锁魂链：命中 ${Math.round(st.stunProc*100)}% 概率震慑一回合`);
-    if(st.healStart) fx.push(`太乙拂尘：每场开战恢复 ${Math.round(st.healStart*100)}% 生命`);
+    Object.values(s.wear||{}).forEach(id=>{
+      if(id && s.bag[id] && ITEMS[id]) fx.push(`${ITEMS[id].name}：${itemFxText(ITEMS[id])}`);
+    });
     fx.push(...st.passives.map(p=>`${GODHOODS[p.gh].name}·${p.label}`));
     if(fx.length){
       const ul=h('div','fx-list');
@@ -340,19 +425,28 @@ const UI = {
     }
     c.appendChild(gp);
 
-    /* 法宝 */
+    /* 法宝（三栏位穿戴速览，点击跳装备页） */
     const ip=h('div','panel');
-    ip.innerHTML=`<h2>随身法宝</h2>`;
-    const ownedItems=Object.keys(s.items);
-    if(ownedItems.length){
-      ownedItems.forEach(id=>{
-        const it=ITEMS[id];
-        ip.appendChild(h('div','shop-row',
-          `<div><div class="sr-t">${it.icon} ${it.name}</div><div class="sr-d">${it.desc}</div></div>
-           <span class="tag tag-merit">在身</span>`));
+    ip.innerHTML=`<h2>随身法宝 <span class="sub">点击可前往「装备」页</span></h2>`;
+    const worn=Object.values(s.wear||{}).filter(Boolean);
+    if(worn.length){
+      worn.forEach(id=>{
+        const it=ITEMS[id]; if(!it) return;
+        const row=h('div','shop-row gear-jump',
+          `<div class="item-ic">${it.icon}</div>
+           <div class="item-body">
+             <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
+               <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
+             <div class="sr-d">${it.desc}</div>
+           </div>
+           <span class="tag tag-merit">佩中</span>`);
+        row.onclick=()=>{ this.tab='equip'; this.render(); };
+        ip.appendChild(row);
       });
+      const spare=Object.keys(s.bag).filter(x=>s.wear[ITEMS[x].slot]!==x).length;
+      if(spare) ip.appendChild(h('div','section-tip',`行囊里还有 ${spare} 件未穿戴。`));
     }else{
-      ip.appendChild(h('div','section-tip','尚无法宝。去「神衙」的阴阳杂货铺置办。'));
+      ip.appendChild(h('div','section-tip','尚未佩饰法宝。去「商铺」逛逛，购后到「装备」页穿戴。'));
     }
     c.appendChild(ip);
 
@@ -713,6 +807,25 @@ function floatNum(sel,text,color){
 }
 function facEff(n){
   return n.wakeBonus?`觉醒率 +${n.wakeBonus*100}%`:n.shelf?'工单架 +1':n.mana?'神力上限 +'+n.mana:n.cap?'阴兵编制 +1':'';
+}
+function itemGradeCls(g){
+  return g==='宝品'?'bao':g==='灵品'?'ling':'fan';
+}
+/** 法宝当前生效词条简表（用于战册特效一览） */
+function itemFxText(it){
+  const a=[];
+  const st=it.stat||{};
+  if(st.hp) a.push(`神躯+${st.hp}`);
+  if(st.atk) a.push(`攻击+${st.atk}`);
+  if(st.def) a.push(`防御+${st.def}`);
+  if(st.crit) a.push(`暴击+${Math.round(st.crit*100)}%`);
+  if(st.lifesteal) a.push(`吸血${Math.round(st.lifesteal*100)}%`);
+  const pr=it.proc||{};
+  if(pr.stun) a.push(`命中${Math.round(pr.stun*100)}%震慑`);
+  if(pr.healStart) a.push(`开战回血${Math.round(pr.healStart*100)}%`);
+  if(pr.dmgReduce) a.push(`受伤-${Math.round(pr.dmgReduce*100)}%`);
+  if(pr.burnOnHit) a.push(`命中${Math.round(pr.burnOnHit*100)}%点燃`);
+  return a.join('，');
 }
 function bloss2txt(p){ return p?` <span style="color:var(--cinnabar)">感应${p}%</span>`:''; }
 

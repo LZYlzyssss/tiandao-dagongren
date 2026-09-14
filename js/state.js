@@ -11,7 +11,8 @@ const Game = {
       hp:100, strikes:0,
       gh:{},            // id -> {awakened:bool, insight:0..1, sleep:days}
       equipped:[],      // 已镶嵌神格 id
-      items:{},         // id -> true（法宝唯一）
+      bag:{},           // 已购法宝 id -> true
+      wear:{weapon:null, armor:null, trinket:null}, // 三栏位穿戴
       soldiers:[],      // ['xiaojiang',...]
       fac:{ shrine:0, desk:0, incense:0, banner:0 },
       shelf:[],         // [{mid, bargain}]
@@ -31,8 +32,24 @@ const Game = {
       const raw = localStorage.getItem(SAVE_KEY);
       if(!raw) return false;
       this.s = JSON.parse(raw);
+      this.migrate();
       return true;
     }catch(e){ return false; }
+  },
+  /** 旧存档兼容：items(买到即生效) → bag + wear 三栏位 */
+  migrate(){
+    const s=this.s;
+    if(s.bag===undefined) s.bag={};
+    if(!s.wear) s.wear={weapon:null, armor:null, trinket:null};
+    if(s.items){
+      Object.keys(s.items).forEach(id=>{
+        if(!ITEMS[id]) return;
+        s.bag[id]=true;
+        const sl=ITEMS[id].slot;
+        if(!s.wear[sl]) s.wear[sl]=id;   // 旧档已拥有的法宝自动穿戴上
+      });
+      delete s.items;
+    }
   },
   clear(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} },
 
@@ -125,14 +142,31 @@ const Game = {
     Stats.recalc(); this.save(); UI.render();
   },
 
-  /* ---------- 经营 ---------- */
+  /* ---------- 法宝：购买 / 穿戴 / 取下 ---------- */
   buyItem(id){
-    if(this.s.items[id]){ UI.toast('已持有此法宝'); return; }
+    if(this.s.bag[id]){ UI.toast('铺中只剩样品，这一件你已购入'); return; }
     const it = ITEMS[id];
     if(this.s.money < it.price){ UI.toast('香火钱不足'); return; }
-    this.s.money -= it.price; this.s.items[id] = true;
-    Stats.recalc(); this.save(); UI.render();
-    UI.toast(`购入「${it.name}」`);
+    this.s.money -= it.price; this.s.bag[id] = true;
+    this.save(); UI.render();
+    UI.toast(`购入「${it.name}」，已收入背包`);
+  },
+  /** 穿戴：同栏位旧装备自动换回背包 */
+  wearItem(id){
+    if(!this.s.bag[id]) return;
+    const slot = ITEMS[id].slot;
+    this.s.wear[slot] = id;
+    Stats.recalc();
+    if(this.s.hp > Stats.cur().maxHp) this.s.hp = Stats.cur().maxHp;
+    this.save(); UI.render(); UI.toast(`已装备「${ITEMS[id].name}」`);
+  },
+  takeOff(slot){
+    const id = this.s.wear[slot];
+    if(!id) return;
+    this.s.wear[slot] = null;
+    Stats.recalc();
+    if(this.s.hp > Stats.cur().maxHp) this.s.hp = Stats.cur().maxHp;
+    this.save(); UI.render(); UI.toast(`已取下「${ITEMS[id].name}」`);
   },
   recruit(id){
     const cap = 1 + (this.s.fac.banner>0 ? FACILITIES.banner.levels.slice(0,this.s.fac.banner).reduce((a,l)=>a+(l.cap||0),0) : 0);
@@ -222,7 +256,7 @@ const Stats = {
     const s = Game.s;
     const v = { maxHp:150, atk:24, def:12, maxMp:60,
       crit:0.05, lifesteal:0, passives:[], clash:false, resonance:null,
-      stunProc:0, healStart:0 };
+      stunProc:0, healStart:0, dmgReduce:0, burnOnHit:0, burnOnHitDmg:0 };
 
     /* 修为成长 */
     v.maxHp += s.cult;
@@ -265,10 +299,24 @@ const Stats = {
     });
     if(v.resonance) v.atk = Math.floor(v.atk*1.1);
 
-    /* 法宝 */
-    if(s.items.pan) v.atk += ITEMS.pan.stat.atk;
-    if(s.items.suo) v.stunProc = ITEMS.suo.proc.stun;
-    if(s.items.chen) v.healStart = ITEMS.chen.proc.healStart;
+    /* 法宝：仅三栏位中穿戴的生效 */
+    Object.values(s.wear||{}).forEach(id=>{
+      if(!id || !s.bag[id]) return;
+      const it = ITEMS[id]; if(!it) return;
+      if(it.stat){
+        v.maxHp += it.stat.hp||0;
+        v.atk += it.stat.atk||0;
+        v.def += it.stat.def||0;
+        v.crit += it.stat.crit||0;
+        v.lifesteal += it.stat.lifesteal||0;
+      }
+      if(it.proc){
+        v.stunProc = Math.max(v.stunProc, it.proc.stun||0);
+        v.healStart = Math.max(v.healStart, it.proc.healStart||0);
+        v.dmgReduce = Math.max(v.dmgReduce, it.proc.dmgReduce||0);
+        if(it.proc.burnOnHit){ v.burnOnHit = it.proc.burnOnHit; v.burnOnHitDmg = 0.3; }
+      }
+    });
 
     if(s.hp > v.maxHp) s.hp = v.maxHp;
     this._cache = v;

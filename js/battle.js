@@ -21,6 +21,8 @@ const Battle = {
       def: st.def, crit: st.crit, lifesteal: st.lifesteal,
       shield: 0, shieldRounds:0,
       stunProc: st.stunProc, healStart: st.healStart,
+      dmgReduce: st.dmgReduce||0,
+      burnOnHit: st.burnOnHit||0, burnOnHitDmg: st.burnOnHitDmg||0.3,
     };
     /* 可催动的觉醒神格（含融合） */
     p.skillIds = s.equipped.filter(id=>s.gh[id] && s.gh[id].awakened && s.gh[id].sleep<=0);
@@ -63,8 +65,9 @@ const Battle = {
       if(B.log.length>7) B.log.shift();
     };
 
-    const effCrit = ()=> p.passiveGh.reduce((a,id)=>a+(GODHOODS[id].passive?.crit||0), 0.05);
-    const effLife = ()=> p.passiveGh.reduce((a,id)=>a+(GODHOODS[id].passive?.lifesteal||0), 0);
+    /* 暴击/吸血以快照为准（已含修为、神格被动、法宝） */
+    const effCrit = ()=> p.crit;
+    const effLife = ()=> p.lifesteal;
 
     /* ---- 玩家普攻 ---- */
     const playerStrike = async (mult=1, opts={})=>{
@@ -83,6 +86,11 @@ const Battle = {
         e.stun = Math.max(e.stun,1);
         addLog('锁魂链缠上敌魂，它动弹不得！','lg-sys');
       }
+      /* 神火印：命中点燃 */
+      if(p.burnOnHit && e.hp>0 && e.burn<=0 && Math.random()<p.burnOnHit){
+        e.burn = 2; e.burnDmg = Math.round(p.atk*p.burnOnHitDmg);
+        addLog(`神火印火星溅出，点燃了「${e.name}」（每回合 ${e.burnDmg}，2 回合）！`,'lg-sys');
+      }
     };
 
     /* ---- 敌人行动 ---- */
@@ -95,6 +103,8 @@ const Battle = {
         dmg = Math.round(dmg*0.5);
         addLog('阴兵小将挺枪挡在你身前，替你挡下半数攻势！','lg-sys');
       }
+      /* 八卦紫绶仙衣：百分比减伤 */
+      if(p.dmgReduce>0) dmg = Math.max(1, Math.round(dmg*(1-p.dmgReduce)));
       /* 护盾 */
       if(p.shield>0){
         const ab = Math.min(p.shield,dmg); p.shield-=ab; dmg-=ab;

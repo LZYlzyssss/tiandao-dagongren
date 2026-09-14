@@ -112,11 +112,28 @@ const ENEMIES = {
   firebeast:{name:'火魔兽',   icon:'焰', tint:'#a83a1c', hp:185, atk:25, def:7, burnHit:0.35, burnFx:'火星', hpLabel:'妖力', deathFx:'火星' },
 };
 
-/* ---------- 法宝 ---------- */
+/* ---------- 法宝（slot: weapon兵刃 / armor护身 / trinket奇物；每栏只能穿戴一件）
+   grade: 凡品 / 灵品 / 宝品
+   stat: 常驻属性；proc: 战斗特效 stun震慑/healStart开战回血/dmgReduce减伤/burnOnHit命中点燃 ---------- */
+const SLOT_INFO = {
+  weapon:  { name:'兵刃', icon:'刃', desc:'主攻伐，提升攻击与暴击' },
+  armor:   { name:'护身', icon:'护', desc:'主守御，提升生命、防御与减伤' },
+  trinket: { name:'奇物', icon:'奇', desc:'旁门妙用，回血、锁魂、吸血、点火' },
+};
 const ITEMS = {
-  pan:   { name:'判官笔', price:200, icon:'笔', desc:'攻击+8，朱笔一点即定生死。', stat:{atk:8} },
-  suo:   { name:'锁魂链', price:320, icon:'链', desc:'攻击命中时 18% 概率锁魂，令敌 1 回合不能行动。', proc:{stun:0.18} },
-  chen:  { name:'太乙拂尘', price:260, icon:'尘', desc:'每场战斗开始时为你恢复 25% 生命。', proc:{healStart:0.25} },
+  /* 兵刃 */
+  pan:    { name:'判官笔', slot:'weapon', grade:'凡品', price:200, icon:'笔', desc:'攻击 +8。朱笔一点，即定生死。', stat:{atk:8} },
+  zhan:   { name:'斩妖剑', slot:'weapon', grade:'灵品', price:460, icon:'剑', desc:'攻击 +13，暴击率 +5%。', stat:{atk:13,crit:0.05} },
+  chui:   { name:'碎岳锤', slot:'weapon', grade:'宝品', price:780, icon:'锤', desc:'攻击 +20，暴击率 +8%。一锤落下，山灵也要矮三分。', stat:{atk:20,crit:0.08} },
+  /* 护身 */
+  jia:    { name:'锁子黄金甲', slot:'armor', grade:'凡品', price:380, icon:'甲', desc:'防御 +10。', stat:{def:10} },
+  pei:    { name:'龟息玉佩', slot:'armor', grade:'灵品', price:520, icon:'佩', desc:'神躯上限 +45。', stat:{hp:45} },
+  yi:     { name:'八卦紫绶仙衣', slot:'armor', grade:'宝品', price:680, icon:'衣', desc:'受到的所有伤害降低 12%。', proc:{dmgReduce:0.12} },
+  /* 奇物 */
+  chen:   { name:'太乙拂尘', slot:'trinket', grade:'凡品', price:260, icon:'尘', desc:'每场战斗开始时恢复 25% 生命。', proc:{healStart:0.25} },
+  suo:    { name:'锁魂链', slot:'trinket', grade:'凡品', price:320, icon:'链', desc:'攻击命中时 18% 概率锁魂，令敌 1 回合不能行动。', proc:{stun:0.18} },
+  hu:     { name:'聚魂葫芦', slot:'trinket', grade:'灵品', price:560, icon:'葫', desc:'攻击附带 8% 吸血。', stat:{lifesteal:0.08} },
+  yin:    { name:'神火印', slot:'trinket', grade:'宝品', price:900, icon:'印', desc:'命中时 30% 概率以火星点燃敌人，2 回合内每回合受你攻击 30% 的灼烧伤害。', proc:{burnOnHit:0.3} },
 };
 
 /* ---------- 阴兵 ---------- */
