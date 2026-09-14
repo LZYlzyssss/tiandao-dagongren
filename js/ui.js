@@ -33,7 +33,7 @@ const UI = {
     const target=monthTarget(s.month);
     $('topStats').innerHTML = `
       <div class="stat-chip"><span class="k">品阶</span><span class="v">${rk.name}</span></div>
-      <div class="stat-chip"><span class="k">神域日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
+      <div class="stat-chip"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
       <div class="stat-chip"><span class="k">修为</span><span class="v">${s.cult}</span></div>
       <div class="stat-chip"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></div>
       <div class="stat-chip"><span class="k">人情</span><span class="v">${s.favor}</span></div>
@@ -122,10 +122,14 @@ const UI = {
       const cd=h('div','ya-card',`<div class="yc-t">${t}</div><div class="yc-d">${d}</div>`);
       const b=h('button','btn btn-sm',btn); b.onclick=on; cd.appendChild(b); grid.appendChild(cd);
     };
-    mk('修神龛',`觉醒率 +${[15,30][s.fac.shrine]??'-'}%（当前 ${s.fac.shrine} 级）`,'升级神龛',()=>this.openShop('fac'));
-    mk('扩案几',`工单架容量 +1（当前 ${s.fac.desk} 级）`,'升级案几',()=>this.openShop('fac'));
-    mk('添香炉',`神力上限 +30（当前 ${s.fac.incense} 级）`,'升级香炉',()=>this.openShop('fac'));
-    mk('竖招妖幡',`阴兵编制 +1（当前 ${s.fac.banner} 级）`,'升级招妖幡',()=>this.openShop('fac'));
+    const shrineMaxed=s.fac.shrine>=FACILITIES.shrine.levels.length;
+    mk('修神龛',shrineMaxed?'觉醒率已达最高 +30%':`升级后觉醒率 +${FACILITIES.shrine.levels[s.fac.shrine].wakeBonus*100}%（当前 ${s.fac.shrine} 级）`,'升级神龛',()=>this.openShop('fac'));
+    const deskMaxed=s.fac.desk>=FACILITIES.desk.levels.length;
+    const incMaxed=s.fac.incense>=FACILITIES.incense.levels.length;
+    const banMaxed=s.fac.banner>=FACILITIES.banner.levels.length;
+    mk('扩案几',deskMaxed?'工单架容量已达最高':`升级后工单架容量 +1（当前 ${s.fac.desk} 级）`,'升级案几',()=>this.openShop('fac'));
+    mk('添香炉',incMaxed?'神力上限已达最高':`升级后神力上限 +30（当前 ${s.fac.incense} 级）`,'升级香炉',()=>this.openShop('fac'));
+    mk('竖招妖幡',banMaxed?'阴兵编制已达最高':`升级后阴兵编制 +1（当前 ${s.fac.banner} 级）`,'升级招妖幡',()=>this.openShop('fac'));
     mk('法宝铺','判官笔、锁魂链、太乙拂尘','选购法宝',()=>this.openShop('item'));
     mk('休整一日','神躯神力尽复，但白日渐逝','闭目调息',()=>Game.rest());
     wrap.appendChild(grid);
@@ -140,8 +144,8 @@ const UI = {
     /* ---- 神格盘 ---- */
     const p=h('div','panel');
     p.innerHTML=`<h2>神格盘 <span class="sub">槽位 ${s.equipped.length}/${Stats.slots()}</span></h2>`;
-    if(st.clash) p.appendChild(h('div','clash-warn','道争：天启与幽冥神格同嵌，神力上限 −20%。鱼与熊掌，自己掂量。'));
-    if(st.resonance) p.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}途神格齐聚，攻击 +10%。`));
+    if(st.clash) p.appendChild(h('div','clash-warn','道争：天启系与幽冥系神格同嵌，神力上限 −20%。鱼与熊掌，自己掂量。'));
+    if(st.resonance) p.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}系神格齐聚，攻击 +10%。`));
 
     const slots=h('div','slots');
     for(let i=0;i<Stats.slots();i++){
@@ -178,7 +182,7 @@ const UI = {
       eb.disabled=rec.sleep>0;
       eb.onclick=()=>Game.toggleEquip(id); row.appendChild(eb);
       if(!rec.awakened && rec.sleep<=0){
-        const pb=h('button','btn btn-indigo btn-sm','参悟 120');
+        const pb=h('button','btn btn-indigo btn-sm','参悟 · 120文');
         pb.onclick=()=>Game.ponder(id); row.appendChild(pb);
       }
       item.appendChild(row);
@@ -215,7 +219,7 @@ const UI = {
     });
     Object.entries(SOLDIERS).forEach(([id,so])=>{
       const r=h('div','shop-row',
-        `<div><div class="sr-t">${so.icon} 募${so.name}</div><div class="sr-d">${so.desc}</div></div>
+        `<div><div class="sr-t">${so.icon} ${so.name}</div><div class="sr-d">${so.desc}</div></div>
          <span class="price">${so.price} 文</span>`);
       const b=h('button','btn btn-primary btn-sm','招募');
       b.onclick=()=>Game.recruit(id); r.appendChild(b); sp.appendChild(r);
@@ -296,7 +300,7 @@ const UI = {
         let ok=true, reqTxt='';
         if(req&&req.path){
           ok=Game.s.equipped.some(id=>GODHOODS[id].path===req.path && (!Game.s.gh[id].sleep || Game.s.gh[id].sleep<=0));
-          reqTxt=`需镶嵌【${PATHS[req.path].name}】途神格`;
+          reqTxt=`需镶嵌【${PATHS[req.path].name}系】神格`;
         }
         const b=h('button','choice-btn');
         b.innerHTML=`${co.t}${reqTxt?`<span class="req ${ok?'':'no'}">${reqTxt}</span>`:''}`;
@@ -479,7 +483,7 @@ const UI = {
         <div class="fighter foe" id="fFoe">
           <div class="fig-body" id="figFoe" style="color:${B.e.tint}">${B.e.icon}</div>
           <div class="fig-name">${B.e.name}</div>
-          ${fbarHTML('e')}
+          ${fbarHTML('e', B.e.hpLabel)}
           <div class="fstatus" id="eStatus"></div>
         </div>
       </div>
@@ -547,7 +551,7 @@ const UI = {
         const sub=$('mSub'); sub.innerHTML='<div class="skill-list"></div>';
         const list=sub.firstChild;
         const ids=B.p.skillIds;
-        if(!ids.length){ sub.innerHTML='<div class="section-tip" style="margin-top:8px">你还没有觉醒任何神格神通。可选择拼命或遁走。</div>'; return; }
+        if(!ids.length){ sub.innerHTML='<div class="section-tip" style="margin-top:8px">你还没有觉醒任何神格神通。可选择凝神接战、拼命或遁走。</div>'; return; }
         ids.forEach(id=>{
           const g=GODHOODS[id], a=g.active;
           const b=h('button','skill-pick',
@@ -575,9 +579,9 @@ const UI = {
   },
 };
 
-function fbarHTML(k){
+function fbarHTML(k, label){
   return `<div class="fbar">
-    <div class="fl"><span>${k==='p'?'生命':'妖力'}</span><span id="${k}Num"></span></div>
+    <div class="fl"><span>${k==='p'?'生命':(label||'气血')}</span><span id="${k}Num"></span></div>
     <div class="bar"><i class="${k==='p'?'bar-hp':'bar-mp'}" id="${k}Bar" style="width:100%"></i></div>
   </div>`;
 }

@@ -98,18 +98,18 @@ const FUSIONS = [
   { out:'zhongri', in:['juhun','shouhu'],      cost:500, baseRate:0.5 },
 ];
 
-/* ---------- 敌人模板 ---------- */
+/* ---------- 敌人模板（hpLabel:血条名称；burnFx:附带灼烧的名目） ---------- */
 const ENEMIES = {
-  monkeyl: { name:'叛逃小猴', icon:'猴', tint:'#8a6a3a', hp:70,  atk:14, def:4 },
-  monkeyp: { name:'妖猴教头', icon:'猿', tint:'#7a4f28', hp:120, atk:18, def:6 },
-  liuer:   { name:'六耳妖将', icon:'六', tint:'#96301f', hp:150, atk:20, def:8, crit:0.1 },
-  fallen:  { name:'堕天天使', icon:'堕', tint:'#2e4f6f', hp:115, atk:19, def:6, lifesteal:0.15 },
-  fallchief:{name:'堕天使长', icon:'闇', tint:'#1d3550', hp:250, atk:30, def:9 },
-  ghost:   { name:'游魂',     icon:'魂', tint:'#6f6a7a', hp:80,  atk:15, def:2 },
-  ligui:   { name:'厉鬼',     icon:'厉', tint:'#574266', hp:160, atk:25, def:5 },
-  guiwang: { name:'鬼王',     icon:'王', tint:'#3d2c4d', hp:250, atk:31, def:8, crit:0.1 },
-  fireling:{ name:'火丸灵童', icon:'焱', tint:'#d2571c', hp:85,  atk:16, def:3, burnHit:0.3 },
-  firebeast:{name:'火魔兽',   icon:'焰', tint:'#a83a1c', hp:185, atk:25, def:7, burnHit:0.35 },
+  monkeyl: { name:'叛逃小猴', icon:'猴', tint:'#8a6a3a', hp:70,  atk:14, def:4, hpLabel:'妖力', deathFx:'黑烟' },
+  monkeyp: { name:'妖猴教头', icon:'猿', tint:'#7a4f28', hp:120, atk:18, def:6, hpLabel:'妖力', deathFx:'黑烟' },
+  liuer:   { name:'六耳妖将', icon:'六', tint:'#96301f', hp:150, atk:20, def:8, crit:0.1, hpLabel:'妖力', deathFx:'黑烟' },
+  fallen:  { name:'堕天天使', icon:'堕', tint:'#2e4f6f', hp:115, atk:19, def:6, lifesteal:0.15, hpLabel:'邪力', burnFx:'黑焰', burnHit:0.15, deathFx:'黑羽' },
+  fallchief:{name:'堕天使长', icon:'闇', tint:'#1d3550', hp:250, atk:30, def:9, hpLabel:'邪力', burnFx:'黑焰', deathFx:'黑羽' },
+  ghost:   { name:'游魂',     icon:'魂', tint:'#6f6a7a', hp:80,  atk:15, def:2, hpLabel:'魂力', deathFx:'残烟' },
+  ligui:   { name:'厉鬼',     icon:'厉', tint:'#574266', hp:160, atk:25, def:5, hpLabel:'魂力', deathFx:'残烟' },
+  guiwang: { name:'鬼王',     icon:'王', tint:'#3d2c4d', hp:250, atk:31, def:8, crit:0.1, hpLabel:'魂力', deathFx:'残烟' },
+  fireling:{ name:'火灵童子', icon:'焱', tint:'#d2571c', hp:85,  atk:16, def:3, burnHit:0.3, burnFx:'火星', hpLabel:'妖力', deathFx:'火星' },
+  firebeast:{name:'火魔兽',   icon:'焰', tint:'#a83a1c', hp:185, atk:25, def:7, burnHit:0.35, burnFx:'火星', hpLabel:'妖力', deathFx:'火星' },
 };
 
 /* ---------- 法宝 ---------- */
@@ -159,7 +159,7 @@ const MISSIONS = [
 {
   id:'m1', god:'sun', danger:2, forced:false,
   name:'花果山猴患', gh:'douzhan', merit:12, money:60,
-  scroll:'斗战胜佛成佛后不理俗务，六耳旧党占了花果山称王，还偷了桃山的御酒。佛祖不便动手，诉状用一颗桃核压着，送到了你的案头。',
+  scroll:'斗战胜佛成佛后不理俗务，六耳旧党占了花果山称王，还偷了瑶池的御酒。佛祖不便动手，诉状用一颗桃核压着，送到了你的案头。',
   nodes:[
     { type:'event', text:'花果山桃叶被晚霞染得像血。一群小猴持着削尖的竹竿拦路，口口声声说要替大圣爷爷“考校考朝廷的本事”。',
       choices:[
@@ -257,7 +257,7 @@ const MISSIONS = [
 },
 {
   id:'m6', god:'nezha', danger:3, forced:false,
-  name:'缚妖索断库案', gh:'fenghuo', merit:18, money:100,
+  name:'缚妖索断扣案', gh:'fenghuo', merit:18, money:100,
   scroll:'天庭法宝库清点，哪吒发现缚妖索上少了一枚锁扣，几只陈年游魂顺着缺口溜进了库房。大神写来字条：“赔锁扣的钱从我香火里扣，魂你得还我。”',
   nodes:[
     { type:'event', text:'法宝库深处，断口的缚妖索无力地垂着，游魂们披着残破甲胄，正啃噬一杆老火尖枪。',
@@ -301,7 +301,7 @@ const MISSIONS = [
   nodes:[
     { type:'event', text:'簿房的门虚掩着，墨香里混着血腥味。案上的朱批有两种笔迹：一种是判官的，另一种……不像活人写的。',
       choices:[
-        { t:'先比对两页朱批的笔法', r:{log:'你看出伪笔锋中带钩，是被强行改过数的老字。'} },
+        { t:'先比对两处朱批的笔法', r:{log:'你看出伪笔锋中带钩，是被涂改过数次的老字。'} },
         { t:'以幽冥感应搜捕残魂', requires:{path:'nether'}, r:{atkBuff:0.25, heal:15, log:'残魂的哭号顺着律令传入你耳中，你心中再无疑虑。'} },
         { t:'一脚踹门，先拿人再说', r:{hp:-15, log:'门后阴风扑面，像被无数只手推了一把。'} },
       ]},

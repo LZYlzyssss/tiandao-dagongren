@@ -43,6 +43,7 @@ const Battle = {
       maxHp: Math.round(t.hp*scale), hp:0,
       atk: Math.round(t.atk*(1+(scale-1)*0.7)*(1+(ctx.enemyAtk||0))),
       def:t.def, crit:t.crit||0, lifesteal:t.lifesteal||0, burnHit:t.burnHit||0,
+      burnFx:t.burnFx||'黑焰', hpLabel:t.hpLabel||'气血', deathFx:t.deathFx||'黑烟',
       burn:0, burnDmg:0, stun:0, vulnTurns:0, vulnFixed: ctx.enemyVuln?1.5:1,
     };
     e.hp = e.maxHp;
@@ -106,7 +107,7 @@ const Battle = {
       if(e.burnHit && Math.random()<e.burnHit){
         const fx=Math.round(e.atk*0.4);
         p.hp=Math.max(0,p.hp-fx);
-        addLog(`黑焰/火星溅到你身上，追加 ${fx} 点伤害。`,'lg-bad');
+        addLog(`${e.burnFx}溅到你身上，追加 ${fx} 点伤害。`,'lg-bad');
         UI.floatPlayer(`-${fx}`,'#d2571c');
       }
     };
@@ -259,7 +260,7 @@ const Battle = {
       return 'flee';
     }
     if(e.hp<=0){
-      addLog(`「${e.name}」溃散成一地${e.burnHit?'火星':'黑烟'}。`,'lg-good');
+      addLog(`「${e.name}」溃散成一地${e.deathFx}。`,'lg-good');
       UI.killFoe();
       UI.updateBattle(B); await sleep(500);
       s.hp = p.hp; Game.save();
