@@ -133,9 +133,10 @@ const UI = {
       const actTotal=m.acts?m.acts.length:0;
       const actCur=Math.min(o.act||0, actTotal-1);
       const card=h('div','order'+(m.forced?' forced':'')+(typeof ASSET!=='undefined'?' order-bg':'')+' order-ch'+(m.chapter||1));
-      /* 画质批2：卡片按章节挂场景背景 */
+      /* 画质批3：卡片优先用 task_<id> 专属场景图，fallback 章节 bf 图 */
       if(typeof ASSET!=='undefined'){
-        const bgKey=ASSET.bfKey(m.chapter||1, (m.danger||0)>=4);
+        const taskKey='task_'+m.id;
+        const bgKey=ASSET.list[taskKey] ? taskKey : ASSET.bfKey(m.chapter||1, (m.danger||0)>=4);
         card.dataset.bgKey=bgKey;
         ASSET.bg(card, bgKey, 0.42);
       }

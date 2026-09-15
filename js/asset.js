@@ -127,6 +127,59 @@ Object.entries(SCENE_DESC).forEach(([k,d])=>{
   ASSET.list['scene_'+k]=[`${ASSET.INK} of ${d}, cinematic establishing shot, story illustration`, 'landscape_16_9'];
 });
 
+/* ---------- 工单专属场景底图（38）——每个任务一张独特水墨场景 ---------- */
+const TASK_SCENES = {
+  /* 章一 · 两界文书房 */
+  'c1m1':'a dilapidated district office at dawn, paper talismans pasted on walls, a broken gong hanging crooked, ghostly mist hovering above the roof tiles',
+  'c1m2':'an abandoned haunted mortuary courtyard, withered willow trees, scattered old coffins, paper money fluttering in wind, ghost fires floating',
+  'c1m3':'a dark document room in the underworld, stacked scrolls reaching the ceiling, ink stains on wooden shelves, a single tallow candle guttering',
+  'c1m4':'a small courtroom at night, a stern judge figure behind a high desk, moonlight through lattice window, a thin paper ledger on the desk',
+  /* 章二 · 城隍辖区 */
+  'c2m1':'a winding country road at dusk, old stone milestones, a lone traveler silhouette, distant village smoke, mist rolling over fields',
+  'c2m2':'a small kitchen stove with blackened walls, a clay stove god statue on the mantel, oil lamp flickering, shadows dancing on ceiling',
+  'c2m3':'a dilapidated earth god shrine deep in the woods, overgrown weeds, fox paw prints in dust, the shrine door hanging half off',
+  'c2m4':'a burnt-out paper shrine in a village square, ash still smoldering, villagers whispering in circles, red lanterns torn and faded',
+  'c2m5':'the Meng Po Pavilion by the river of forgetfulness, stone railings, white mist over black water, a lone woman figure with a clay pot',
+  /* 章三 · 五殿森罗 */
+  'c3m1':'an underworld registrar office, stacks of land deeds and contracts, ink brushes drying in holders, a jade seal on red cord',
+  'c3m2':'a poisonous swamp at twilight, black water with purple bubbles, will-o-wisps floating, a skeletal hand reaching from the mire',
+  'c3m3':'a massive wooden water clock dripping into a stone basin, paper ledgers stacked beside, a judge sitting motionless in deep thought',
+  'c3m4':'a vast hunting ground at night, the sky torn with lightning, a huge shadowy beast with antlers charging, cracked earth beneath',
+  'c3m5':'a narrow corridor of underworld bureaucracy, doors on both sides, red lanterns with official seals, a figure slipping through a side door',
+  /* 章一 支线 */
+  's01':'a small hill temple with a fox spirit silhouette on the roof, cherry blossoms falling, the temple sign crooked and faded',
+  's02':'a rice paddy at twilight, a farmer clutching his chest, ghostly figures behind the rice stalks, a torn soul-catching talisman',
+  's03':'an ancient stone well glowing faintly orange, fire crackling inside the well mouth, a clay bowl beside it, smoke rising',
+  's04':'a judge desk deep in the underworld, brushes scattered, a half-copied ledger page, midnight hour, the ink still wet',
+  's05':'the grand hall of the first king of hell, massive bronze columns, a dragon seal on the desk, red carpet extending to the throne',
+  /* 章二 支线 */
+  's06':'a kitchen stove with a fake report scroll tucked behind it, the stove god statue looking guilty, ink stains on its paper mouth',
+  's07':'a grand city god temple during festival, red lanterns everywhere, a fake city god statue among the crowd, incense smoke thick',
+  's08':'the Meng Po Pavilion kitchen, vats of soup, a mischievous figure pouring clear water, steam rising, the real Meng Po watching',
+  /* 章三 支线 */
+  's09':'a small medicine shop, herbs hanging from rafters, a cauldron simmering, a figure in white robe weighing herbs with jade scale',
+  's10':'a dreamlike bridge crossing yellow millet fields, a scholar sleeping under a tree, golden light filtering through leaves',
+  's11':'the Qin Guang hall, a life and death book open on the desk, ink brush hovering, a ghostly figure fleeing through the side door',
+  's14':'a thunder department dispatch room, dark clouds outside, lightning flashes illuminating a ledger, an electric god hurrying to write',
+  /* 章四 支线 */
+  's12':'the East Sea Dragon Palace, pearl pillars, a broken jewelry box, water ghosts searching, a single glowing pearl on the floor',
+  's13':'Zhao Gong Ming treasury, gold ingots stacked, an empty shelf, a ghostly figure counting coins at midnight',
+  's15':'a thunder god training camp, flag poles lined up, soldiers drilling, lightning cracking above, a general watching from a hill',
+  's16':'Er Lang Shen training grounds at Guan Jiang Kou, stone pillars, wolf dogs circling, a figure with third eye on forehead, misty mountains behind',
+  's17':'Flower Fruit Mountain slopes, monkey shadows in pines, an imperial edict scroll unfurled, golden mist, distant waterfall roar',
+  's18':'the Wen Chang academic bureau, examination papers spread everywhere, a cheating talisman hidden in a brush, ink stones',
+  's19':'a scale with no pan, heart-shaped shadow below, a judge examining the balance, ink wash style, ancient treasury hall',
+  's20':'a lighthouse during a storm, waves crashing at the base, red lantern swaying, a goddess silhouette holding a lamp',
+  /* 章五 支线 */
+  's21':'a black armor forge, hammer striking iron, sparks flying, a dragon silhouette breathing fire, the True Martial deity overseeing',
+  's22':'a mercy boat on a sea of clouds, a Buddhist figure in white, lotus flowers floating, golden light from the heavens',
+  's23':'a celestial merit-recording hall, glowing plaques on the wall, a figure picking up a fallen tablet, golden aura',
+  's24':'a single lamp in the dark, faint glow, an old paper with a name written, ghostly shadows watching from corners, mist rolling',
+};
+Object.entries(TASK_SCENES).forEach(([id,sc])=>{
+  ASSET.list['task_'+id]=[`${ASSET.INK} of ${sc}, story scene illustration, medium-wide composition`, 'landscape_16_9'];
+});
+
 /* ---------- UI 氛围底图（4） ---------- */
 ASSET.list.ui_main=[`${ASSET.INK} of a humble run-down shrine office of a minor god, wooden desk piled with paperwork, one red lantern glowing, moonlight through lattice window, tea cup`, 'landscape_16_9'];
 ASSET.list.ui_desk =[`${ASSET.INK} of a top-down view of an old wooden desk surface with open scrolls, inkstone and brush, an abacus and stacked case files, a candle burning`, 'landscape_16_9'];
