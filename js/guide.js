@@ -26,6 +26,14 @@ const Guide = {
     const s=Game.s;
     if(!s.tut || s.tut.done) return;
     this._battleCount=0; this._momentCount=0; this._pending=null;
+    if(s.tut.stage==='waitingGh'){
+      const gids=Object.keys(s.gh||{}).filter(k=>s.gh[k]);
+      if(gids.length){
+        s.tut.stage='afterSettle'; Game.save();
+        this.show('cultEmbed');
+      }
+      return;
+    }
     if(s.tut.stage==='afterSettle') this.show('cultTab');
     else this.show('welcome');
   },
@@ -38,12 +46,19 @@ const Guide = {
     this.clearGate();
     const L=$('guideLayer'); if(L) L.classList.add('hidden');
   },
-  /** 引导彻底结束 */
+  /** 引导彻底结束（或暂停等待条件） */
   finish(){
+    const s=Game.s;
+    if(s.tut && s.tut.stage==='waitingGh'){
+      /* v3：第一枚 gh 还没拿到，暂停引导等 gainGodhood 钩子触发 */
+      this.active=false; this.step=null;
+      this.clearGate(); this.stopTick();
+      const L=$('guideLayer'); if(L) L.classList.add('hidden');
+      return;
+    }
     this.active=false; this.step=null;
     this.clearGate(); this.stopTick();
     const L=$('guideLayer'); if(L) L.classList.add('hidden');
-    const s=Game.s;
     if(s.tut){ s.tut.done=true; s.tut.stage='done'; Game.save(); }
     if(typeof UI!=='undefined' && UI.view==='office') UI.render();
   },
@@ -90,8 +105,8 @@ const Guide = {
       btns:[{t:'知道了',close:true}]},
 
     moment:{sel:'#momentSlot',gate:'moment',
-      title:'关键时刻 · 四选一',
-      html:'<b>祭法宝</b>：耗神力，放觉醒神格的大神通<br><b>拼命</b>：透支神格打爆发，沉睡三日<br><b>凝神接战</b>：稳扎稳打<br><b>遁走</b>：保命，但委托黄了<br><span style="color:var(--cinnabar)">第一次，建议选「凝神接战」。</span>',
+      title:'关键时刻 · 四至五选一',
+      html:'<b>祭法宝</b>：耗神力，放觉醒神格的大神通，还能读招克制<br><b>呼神援助</b>（好感 Lv2+ 出现）：相熟以上的神明出手搭救<br><b>拼命</b>：透支神格打爆发，沉睡三日<br><b>凝神接战</b>：稳扎稳打，承伤减半<br><b>遁走</b>：保命，但委托黄了<br><span style="color:var(--cinnabar)">第一次，建议选「凝神接战」。</span>',
       btns:[]},
 
     eventLater:{sel:'.choices',nonblock:true,
@@ -106,7 +121,7 @@ const Guide = {
 
     settle:{sel:'.settle',gate:'settle',
       title:'论功行赏',
-      html:'香火钱、功过、人情到手，神仙还切了一块<b>神格</b>给你：它涨修为，还有几率觉醒大神通。<br>点<b>「回神衙」</b>，教你把神格嵌进神格盘。',
+      html:'香火钱、功过、人情到手。高阶神可能切一块<b>神格</b>给你（涨修为、有几率觉醒大神通）；低阶神给<b>碎末</b>攒同系五枚也能凝格；还有同名碎片、妖丹等报酬。<br>点<b>「回神衙」</b>，教你把神格嵌进神格盘。',
       btns:[]},
 
     fail:{center:true,
@@ -122,12 +137,19 @@ const Guide = {
     cultEmbed:{sel:'.gh-list',gate:'cultOps',
       title:'把神格嵌进神格盘',
       html:'在神格列表找到新神格，点<b>「镶嵌」</b>入盘；嵌上才加属性，战斗中才催得动。（点盘中神格可取下）',
-      btns:[]},
+      btns:[],
+      _checkGhEmpty:true,  // v3 标记：进入时若无 gh 则走 waitingGh 分支
+      _skipNoGh:true},     // 无 gh 时自动跳到 cultTalk
 
     cultTalk:{sel:'.slots',
       title:'神格盘的门道',
-      html:'同道途神格嵌两枚以上有<b>共鸣</b>加成；天启与幽冥同嵌会<b>道争</b>，扣神力上限。<br>未觉醒可花香火钱「参悟」；两枚都觉醒还能「融合」出更强神格。',
+      html:'同道系（兵/法/幽/生/火）嵌两枚有<b>共鸣</b>加成；齐聚四格出「强化共鸣」。<br><b>道争</b>：兵⟷法、幽⟷生同嵌，神力上限 −20%（侵蚀 40+ 扩至 −30%）。<br>未觉醒可花香火钱「参悟」；两枚都觉醒还能「融合」出更强神格。',
       btns:[{t:'下一步',go:'yamenTab'}]},
+
+    cultGhEmpty:{center:true,nonblock:true,
+      title:'你的第一枚神格还在路上',
+      html:'修行页底部目前只有<b>碎末</b>——攒够同系 5 枚，或打完后续工单，就能拿到第一块整格。<br>镶嵌神格这件事，等它来了我再带你做～神衙、商铺、装备、我的这几个页，你自己先逛着熟悉下。',
+      btns:[{t:'好，等我拿到神格再说',act:'finish'}]},
 
     yamenTab:{gate:'tab:yamen',
       title:'去「衙 · 神衙」',
@@ -146,7 +168,7 @@ const Guide = {
 
     shopTalk:{sel:'.shop-intro',
       title:'阴阳百宝铺',
-      html:'法宝分<b>兵刃/护身/奇物</b>三栏，买了先进背包，穿戴才生效；闲置旧物老道只肯按<b>半价</b>回收。',
+      html:'商铺分<b>兵刃/护身/奇物/礼单</b>四栏，装备页三栏佩饰；闲置旧物老道只肯按<b>半价</b>回收。<br>「礼单」上的物件买了送神明——在工单架点头像开档案送礼，好感到位时关键时刻有人搭手。',
       btns:[{t:'下一步',go:'equipTab'}]},
 
     equipTab:{gate:'tab:equip',
@@ -182,6 +204,17 @@ const Guide = {
 
   /* ---------- 渲染 ---------- */
   show(id){
+    /* v3：进入 cultEmbed 前先看有没有整格——没有就走 waitingGh 分支 */
+    if(id==='cultEmbed'){
+      const gh=Game.s.gh||{};
+      const gids=Object.keys(gh).filter(k=>gh[k]);
+      if(!gids.length){
+        if(Game.s.tut){ Game.s.tut.stage='waitingGh'; Game.save(); }
+        this.show('cultGhEmpty'); return;
+      }
+      /* 有 gh 了，说明之前可能存过 waitingGh，清掉 */
+      if(Game.s.tut && Game.s.tut.stage==='waitingGh'){ Game.s.tut.stage='afterSettle'; Game.save(); }
+    }
     const d=this.STEPS[id]; if(!d) return;
     this.active=true; this.step=id;
     const L=$('guideLayer'); L.classList.remove('hidden');
@@ -475,8 +508,8 @@ const Guide = {
     this.show('battle');
   },
 
-  firstNode(){ const m=UI.mission&&UI.mission(); return m?m.nodes[UI.rt.node]:null; },
-  curNode(){ const m=UI.mission&&UI.mission(); return m?m.nodes[UI.rt.node]:null; },
+  firstNode(){ if(!UI.mission) return null; const m=UI.mission(); return m?(UI.curNodes?UI.curNodes():m.nodes)[UI.rt.node]:null; },
+  curNode(){ if(!UI.mission) return null; const m=UI.mission(); return m?(UI.curNodes?UI.curNodes():m.nodes)[UI.rt.node]:null; },
 };
 
 /* 跳过按钮的全局委托（卡片每次重建） */

@@ -131,6 +131,16 @@ const Game = {
       res.isNew=true; res.cultGain=GH_CULT[g.q]||0; this.s.cult+=res.cultGain;
       const rate=this.awakeRate(id);
       if(Math.random()<rate){ this.s.gh[id].awakened=true; res.awakened=true; }
+      /* v3 钩子：首次获得整格时唤起 Guide 的 cultEmbed 指引（若 Guide 暂停在 waitingGh 或尚未开始） */
+      if(res.isNew && typeof Guide!=='undefined'){
+        setTimeout(()=>{
+          try{
+            if(typeof UI==='undefined') return;
+            if(UI.view!=='office' || UI.tab!=='cult'){ UI.tab='cult'; UI.view='office'; UI.render(); }
+            Guide.show('cultEmbed');
+          }catch(e){ console.warn('[GuideHook] error',e.message); }
+        },400);
+      }
     }else{
       res.cultGain=8; this.s.cult+=8;
       const rec=this.s.gh[id];
