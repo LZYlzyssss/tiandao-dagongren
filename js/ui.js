@@ -664,20 +664,19 @@ const UI = {
       <div class="section-tip">交情至「相熟」，战斗关键时刻可呼叫其援助。送礼偏好：挚爱 +18 / 喜欢 +8 / 无感 +4 / 忌讳 +1，每日一礼。</div>`;
     Object.entries(GODS).forEach(([g,gd])=>{
       const rel=s.godsRel[g], met=rel&&rel.met;
-      const unlocked=Game.isGodUnlocked(g);
-      const lv=met?Game.favorLevel(rel.favor):0;
-      const row=h('div','shop-row contact-row'+(met?'':' locked'));
+      /* 只渲染已结识的；未解锁/未结识的完全隐藏 */
+      if(!met) return;
+      const lv=Game.favorLevel(rel.favor);
+      const row=h('div','shop-row contact-row');
       row.innerHTML=`
-        <div class="item-ic" style="font-size:18px">${met?gd.icon:'?'}</div>
+        <div class="item-ic" style="font-size:18px">${gd.icon}</div>
         <div class="item-body">
           <div class="sr-t">${gd.name} <span class="tier-tag tier-${(gd.tier||'e').toLowerCase()}">${gd.tier||'E'}</span>
-            ${met?`<span style="color:var(--cinnabar);font-size:12px"> ${Game.favorName(lv)} · ${rel.favor}</span>`:''}</div>
-          <div class="sr-d">${met?gd.title
-            :(!unlocked?(function(){const u=gd.unlock;return u&&u.rank!==undefined?`晋升「${RANKS[u.rank].name}」后可结识`:u&&u.chapter!==undefined?`主线第 ${u.chapter} 章后可结识`:u&&u.by!==undefined?`需 ${GODS[u.by].name} 引荐`:'机缘未至';})()
-            :'闻名未识——接下其工单便算打上交道')}</div>
+            <span style="color:var(--cinnabar);font-size:12px"> ${Game.favorName(lv)} · ${rel.favor}</span></div>
+          <div class="sr-d">${gd.title}</div>
         </div>
-        ${met?'<span class="tag tag-merit">已结识</span>':unlocked?'<span class="tag">未识</span>':'<span class="tag">未解锁</span>'}`;
-      if(met) row.onclick=()=>this.openGodModal(g);
+        <span class="tag tag-merit">已结识</span>`;
+      row.onclick=()=>this.openGodModal(g);
       rp.appendChild(row);
     });
     c.appendChild(rp);
