@@ -131,7 +131,7 @@ const UI = {
         const taskKey='task_'+m.id;
         const bgKey=ASSET.list[taskKey] ? taskKey : ASSET.bfKey(m.chapter||1, (m.danger||0)>=4);
         card.dataset.bgKey=bgKey;
-        ASSET.bg(card, bgKey, 0.42);
+        ASSET.bg(card, bgKey, 1);
       }
       /* v3 奖励标签：读 m.reward（gh / 五系碎末 / 同名碎片 / 妖丹） */
       const rv=m.reward||{};
