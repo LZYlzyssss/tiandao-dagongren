@@ -888,6 +888,31 @@ body::before{
 .gift-list{display:flex;flex-direction:column;gap:6px}
 .gift-row .price{min-width:0}
 
+/* ---- 众神谱系（关系网格） ---- */
+.god-grid{max-width:96vw;max-height:88vh;overflow-y:auto}
+.gg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.gg-head h2{margin:0}
+.gg-tip{font-size:12px;color:var(--ink-faint);margin-bottom:12px}
+.gg-body{display:flex;flex-direction:column;gap:16px}
+.gg-camp{border:1px solid rgba(43,38,32,.12);border-radius:8px;padding:10px 14px;background:rgba(251,247,235,.4)}
+.gg-camp-title{font-size:16px;font-weight:bold;margin-bottom:8px;letter-spacing:1px;border-bottom:1px dashed rgba(43,38,32,.2);padding-bottom:4px}
+.gg-camp-count{font-size:12px;font-weight:normal;color:var(--ink-faint)}
+.gg-tier-row{display:flex;gap:12px;align-items:flex-start;margin:6px 0}
+.gg-tier-label{min-width:28px;font-size:13px;font-weight:bold;color:var(--cinnabar);padding-top:6px}
+.gg-grid{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.gg-cell{cursor:pointer;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(43,38,32,.1);display:flex;flex-direction:column;align-items:center;min-width:68px;transition:all .2s}
+.gg-cell:hover{background:rgba(255,255,255,.95);box-shadow:0 2px 6px rgba(0,0,0,.08);transform:translateY(-1px)}
+.gg-avatar{margin-bottom:4px}
+.gg-name{font-size:12px;font-weight:bold;white-space:nowrap}
+.gg-title{font-size:10px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
+
+/* ---- 神明档案：登场小传 + 出处 ---- */
+.gm-block{margin-bottom:10px}
+.gm-label{font-size:12px;color:var(--ink-faint);letter-spacing:1px;margin-bottom:4px}
+.gm-intro-text{font-size:14px;line-height:1.8;color:#2b2620;text-indent:2em}
+.gm-sources{font-size:11px;color:var(--ink-faint);margin-top:6px;padding-top:6px;border-top:1px dashed rgba(43,38,32,.15)}
+.ya-grid-btn{margin-top:8px}
+
 .contact-row{cursor:pointer}
 .contact-row.locked{opacity:.55;cursor:default}
 .contact-row:not(.locked):hover{background:rgba(43,38,32,.05)}

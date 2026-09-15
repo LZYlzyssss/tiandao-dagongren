@@ -336,6 +336,11 @@ const UI = {
         营造设施、募点阴兵、闭目调息，都是给自己的打工路添几分底气。
         买法宝请移步「商铺」。
       </div>`;
+    /* 「谱系」入口：总路阵营 + 支路层级的众神关系网格 */
+    const gridBtn=h('button','btn btn-primary btn-lg ya-grid-btn','📜 众神谱系 · 已结识 '+Object.keys(GODS).filter(g=>Game.isGodUnlocked(g)).length+'/47');
+    gridBtn.style.marginTop='8px';
+    gridBtn.onclick=()=>UI.openGodGrid();
+    hero.appendChild(gridBtn);
     c.appendChild(hero);
 
     /* ---- 营造 ---- */
@@ -919,6 +924,61 @@ const UI = {
     ov.appendChild(box); ml.appendChild(ov);
   },
 
+  /* ================= 众神谱系（关系网格） ================= */
+  openGodGrid(){
+    /* 阵营总路 + tier 支路，只渲染已解锁的神 */
+    const CAMP_ORDER=['天庭','地府','民间','妖仙','释门','上古'];
+    const TIER_ORDER=['E','D','C','B','A','S'];
+    /* 按 camp 分组 + tier 子分组 */
+    const byCamp={};
+    Object.entries(GODS).forEach(([gid,gd])=>{
+      if(!Game.isGodUnlocked(gid)) return;   /* 未解锁 → 完全隐藏 */
+      const camp=gd.camp||'民间';
+      const tier=gd.tier||'E';
+      if(!byCamp[camp]) byCamp[camp]={};
+      if(!byCamp[camp][tier]) byCamp[camp][tier]=[];
+      byCamp[camp][tier].push(gid);
+    });
+
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box god-grid');
+    box.innerHTML=`
+      <div class="gg-head">
+        <h2>众神谱系</h2>
+        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
+      </div>
+      <div class="gg-tip">总路：阵营 · 支路：品阶层级 · 点击神格头像看登场小传 / 来历出处 / 援助招式</div>`;
+    const body=h('div','gg-body');
+    CAMP_ORDER.forEach(camp=>{
+      const tiers=byCamp[camp]; if(!tiers) return;
+      const campEl=h('div','gg-camp');
+      campEl.innerHTML=`<div class="gg-camp-title">${camp}<span class="gg-camp-count"> ${Object.values(tiers).reduce((a,b)=>a+b.length,0)} 位</span></div>`;
+      TIER_ORDER.forEach(tier=>{
+        const list=tiers[tier]; if(!list) return;
+        const tierRow=h('div','gg-tier-row');
+        tierRow.innerHTML=`<div class="gg-tier-label">${tier}</div>`;
+        const grid=h('div','gg-grid');
+        list.forEach(gid=>{
+          const gd=GODS[gid];
+          const card=h('div','gg-cell',
+            `<div class="gg-avatar">${godAvatar(gid,48)}</div>
+             <div class="gg-name">${gd.name}</div>
+             <div class="gg-title">${gd.title||''}</div>`);
+          card.onclick=()=>UI.openGodModal(gid);
+          grid.appendChild(card);
+        });
+        tierRow.appendChild(grid);
+        campEl.appendChild(tierRow);
+      });
+      body.appendChild(campEl);
+    });
+    box.appendChild(body);
+    ml.appendChild(ov); ml.appendChild(box);
+    ml.classList.remove('hidden');
+  },
+
   /* ================= 神明档案（好感 / 送礼） ================= */
   openGodModal(g){
     const gd=GODS[g]; if(!gd) return;
@@ -958,6 +1018,11 @@ const UI = {
           <div style="font-size:12px;color:var(--ink-faint)">${gd.title}</div>
         </div>
       </div>
+      ${unlocked?`<div class="gm-block gm-intro">
+        <div class="gm-label">登场小传</div>
+        <div class="gm-intro-text">${gd.intro||''}</div>
+        ${gd.sources?`<div class="gm-sources">📖 出处：${gd.sources}</div>`:''}
+      </div>`:''}
       ${rel.met
         ? `<div class="favor-block">
              <div class="favor-lv">交情：<b style="color:var(--cinnabar)">${cur.name}</b>
