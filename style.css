@@ -189,7 +189,7 @@ body::before{
 /* ============ 工单卡片 ============ */
 .order{
   border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px;
-  background:linear-gradient(180deg,#fbf6e8,#f3ead6);
+  background-color:#f5ecd7;background-image:none;
   position:relative;transition:transform .15s, box-shadow .15s;
   overflow:hidden;
 }
@@ -199,15 +199,15 @@ body::before{
 }
 .order-bg::before{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:linear-gradient(180deg, rgba(251,246,232,.48), rgba(243,234,214,.55));
+  background-image:linear-gradient(180deg, rgba(251,246,232,.48), rgba(243,234,214,.55));
 }
 .order-bg > *{position:relative;z-index:1}
 /* 5 章色调叠层 */
-.order.order-ch1.order-bg::before{background:linear-gradient(180deg, rgba(251,246,232,.45), rgba(243,234,214,.52))}
-.order.order-ch2.order-bg::before{background:linear-gradient(180deg, rgba(248,240,224,.45), rgba(238,228,206,.52))}
-.order.order-ch3.order-bg::before{background:linear-gradient(180deg, rgba(235,222,210,.52), rgba(220,205,188,.58))}
-.order.order-ch4.order-bg::before{background:linear-gradient(180deg, rgba(252,244,220,.45), rgba(240,228,200,.52))}
-.order.order-ch5.order-bg::before{background:linear-gradient(180deg, rgba(255,248,228,.45), rgba(238,225,190,.52))}
+.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.45), rgba(243,234,214,.52))}
+.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.45), rgba(238,228,206,.52))}
+.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.52), rgba(220,205,188,.58))}
+.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.45), rgba(240,228,200,.52))}
+.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.45), rgba(238,225,190,.52))}
 /* 内容区：高亮白底细框，阴影凸显 */
 .order-bg .o-body{
   background:rgba(255,252,244,.94);border-radius:4px;padding:8px 10px;margin-left:52px;
