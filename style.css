@@ -458,7 +458,7 @@ body::before{
 
 /* ============ 弹窗 / Overlay ============ */
 .overlay{
-  position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+  position:fixed;inset:0;z-index:2100;display:grid;place-items:center;
   background:rgba(30,26,20,.55);backdrop-filter:blur(2px);
 }
 .paper{
