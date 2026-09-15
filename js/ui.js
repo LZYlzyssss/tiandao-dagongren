@@ -6,6 +6,7 @@ function godAvatar(key,px){
   const g=GODS[key];
   return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
 }
+const YAMEN_BG = imgURL('Chinese ink wash landscape painting of a lonely ancient yamen office temple at the misty border between mortal world and underworld, distant mountains, one red lantern glowing, sumi-e style with faint cinnabar red and indigo blue color accents, rice paper','landscape_16_9');
 
 const UI = {
   view:'office',     // office | mission | battle | settle
@@ -25,12 +26,6 @@ const UI = {
     const flowing=this.view!=='office';
     $('tabbar').classList.toggle('hidden', flowing);
     if(flowing) return;   /* mission / battle / settle 视图由各自流程维护 */
-    /* 画质升级：office 页签氛围底图 */
-    if(typeof FX!=='undefined'){
-      FX.setChapter(Game.s.chapter||1);
-      FX.setScene(null);
-      FX.setAmbient(this.tab==='desk'?'ui_desk':this.tab==='yamen'?'ui_yamen':'ui_main');
-    }
     this.renderTabbar();
     const stage=$('pageStage'); stage.innerHTML='';
     if(this.tab==='desk') this.renderDesk(stage);
@@ -96,20 +91,6 @@ const UI = {
     const rb=kpi.querySelector('.tut-replay');
     if(rb && typeof Guide!=='undefined') rb.onclick=()=>Guide.begin(true);
     c.appendChild(kpi);
-
-    /* 剧情档案入口：翻查已结之卷 */
-    const total=Math.max(1,MISSIONS.filter(m=>m.main||m.side).length);
-    const doneCnt=Object.keys(s.mainDone).length+Object.keys(s.sideDone).length;
-    const sp=h('div','panel story-entry');
-    sp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-      <div>
-        <div style="font-weight:bold;letter-spacing:1px">📜 剧情档案</div>
-        <div class="sub" style="font-size:12px;color:var(--ink-faint)">经办过的差事都归档在这里，闲时可以翻开重读</div>
-      </div>
-      <button class="btn btn-primary">已结 ${doneCnt}/${total} 卷</button>
-    </div>`;
-    sp.querySelector('button').onclick=()=>UI.openStoryArchive();
-    c.appendChild(sp);
 
     const p=h('div','panel');
     p.innerHTML=`<h2>工单架 <span class="sub">神仙们的脏活累活</span></h2>`;
@@ -347,7 +328,7 @@ const UI = {
   renderYamen(c){
     const s=Game.s;
     const hero=h('div','yamen');
-    ASSET.bg(hero, 'ui_hero', 1);
+    hero.style.backgroundImage=`url("${YAMEN_BG}")`;
     hero.innerHTML=`
       <h2>两界交界·破神衙</h2>
       <div class="ya-desc">
@@ -355,11 +336,6 @@ const UI = {
         营造设施、募点阴兵、闭目调息，都是给自己的打工路添几分底气。
         买法宝请移步「商铺」。
       </div>`;
-    /* 「谱系」入口：总路阵营 + 支路层级的众神关系网格 */
-    const gridBtn=h('button','btn btn-primary btn-lg ya-grid-btn','📜 众神谱系 · 已结识 '+Object.keys(GODS).filter(g=>Game.isGodUnlocked(g)).length+'/'+GODS_TOTAL);
-    gridBtn.style.marginTop='8px';
-    gridBtn.onclick=()=>UI.openGodGrid();
-    hero.appendChild(gridBtn);
     c.appendChild(hero);
 
     /* ---- 营造 ---- */
@@ -740,8 +716,6 @@ const UI = {
       }
     }
     c.appendChild(wrap);
-    /* 画质升级：下凡情景底图（按任务所属章） */
-    if(typeof FX!=='undefined') FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
     if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
       const foeName=node.name||ENEMIES[node.enemy].name;
@@ -755,8 +729,6 @@ const UI = {
   chooseEvent(i){
     const node=this.curNodes()[this.rt.node];
     const co=node.choices[i], r=co.r||{};
-    /* 剧情档案：记录玩家抉择（'单id:幕号:节点号'->选项号） */
-    Game.s.storyChoices[this.rt.mid+':'+(this.rt.order.act||0)+':'+this.rt.node]=i;
     const st=Stats.cur();
     if(r.hp){
       const d=Math.round(st.maxHp*Math.abs(r.hp)/100);
@@ -877,11 +849,6 @@ const UI = {
     s.busy=false;
     this.view='settle';
     Game.save();
-    /* 画质升级：结算用本章情景图；章末水墨转场 + 墨雾换色 */
-    if(typeof FX!=='undefined'){
-      FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
-      if(m.chapterEnd) FX.inkWipe(()=>FX.setChapter(Game.s.chapter||1));
-    }
 
     const c=$('pageStage'); c.innerHTML='';
     $('tabbar').classList.add('hidden');
@@ -952,188 +919,6 @@ const UI = {
     ov.appendChild(box); ml.appendChild(ov);
   },
 
-  /* ================= 剧情档案（卷宗架） ================= */
-  openStoryArchive(){
-    const s=Game.s;
-    const ml=$('modalLayer'); ml.innerHTML='';
-    const ov=h('div','overlay');
-    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
-    const box=h('div','paper m-box story-archive');
-    box.innerHTML=`
-      <div class="gg-head">
-        <h2>剧情档案</h2>
-        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
-      </div>
-      <div class="gg-tip">主线归章，支线归档 · 已结之卷可翻开重读，含你当时的选择</div>`;
-    const body=h('div','gg-body');
-
-    /* 主线按章分组 */
-    const CH_MAX=[1,2,3,4,5];
-    CH_MAX.forEach(ch=>{
-      const list=MISSIONS.filter(m=>m.main&&(m.chapter||1)===ch);
-      if(!list.length) return;
-      const grp=h('div','gg-camp');
-      const met=list.filter(m=>m.main&&s.mainDone[m.main]).length;
-      grp.innerHTML=`<div class="gg-camp-title">第 ${ch} 章 · 主线<span class="gg-camp-count"> 已结 ${met}/${list.length}</span></div>`;
-      list.forEach(m=>grp.appendChild(this.storyCell(m)));
-      body.appendChild(grp);
-    });
-    /* 支线一组 */
-    const sides=MISSIONS.filter(m=>m.side);
-    if(sides.length){
-      const grp=h('div','gg-camp');
-      const met=sides.filter(m=>s.sideDone[m.side]).length;
-      grp.innerHTML=`<div class="gg-camp-title">支线 · 散差<span class="gg-camp-count"> 已结 ${met}/${sides.length}</span></div>`;
-      sides.forEach(m=>grp.appendChild(this.storyCell(m)));
-      body.appendChild(grp);
-    }
-    box.appendChild(body);
-    ml.appendChild(ov); ml.appendChild(box);
-    ml.classList.remove('hidden');
-  },
-
-  /* 卷宗格：已结可读 / 经办中 / 问号占位 */
-  storyCell(m){
-    const s=Game.s;
-    const done=(m.main&&s.mainDone[m.main])||(m.side&&s.sideDone[m.side]);
-    const onShelf=s.shelf.some(o=>o.mid===m.id);
-    const tag=m.main?'主线':'支线';
-    if(done){
-      const cell=h('div','gg-cell sa-done',
-        `<div class="sa-vol">卷</div>
-         <div class="gg-name">${m.name}</div>
-         <div class="gg-title">${tag} · ${'★'.repeat(m.danger)}</div>`);
-      cell.onclick=()=>UI.openStoryScroll(m.id);
-      return cell;
-    }
-    if(onShelf){
-      return h('div','gg-cell gg-unknown',
-        `<div class="gg-avatar gg-q">…</div>
-         <div class="gg-name">经办中</div>
-         <div class="gg-title">${tag}</div>`);
-    }
-    return h('div','gg-cell gg-unknown',
-      `<div class="gg-avatar gg-q">？</div>
-       <div class="gg-name">？？？</div>
-       <div class="gg-title">尚未经办</div>`);
-  },
-
-  /* 翻开一卷：按节点串读剧情 + 抉择回显 */
-  openStoryScroll(mid){
-    const m=MISSIONS.find(x=>x.id===mid); if(!m) return;
-    const s=Game.s, god=GODS[m.god];
-    const ml=$('modalLayer'); ml.innerHTML='';
-    const ov=h('div','overlay');
-    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
-    const box=h('div','paper m-box story-scroll');
-    const back=h('div','gg-head');
-    back.innerHTML=`<button class="btn btn-back">◂ 归档</button>
-      <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>`;
-    back.querySelector('.btn-back').onclick=()=>UI.openStoryArchive();
-    box.appendChild(back);
-
-    const head=h('div','ss-head',`
-      ${godAvatar(m.god,52)}
-      <div style="flex:1;min-width:0">
-        <div style="font-size:17px;font-weight:bold">${m.name}</div>
-        <div style="font-size:12px;color:var(--ink-faint)">${god.name} · ${god.title} 委托 · ${m.main?('第 '+(m.chapter||1)+' 章 · 主线'):('支线 · '+(m.side||'').toUpperCase())}</div>
-      </div>`);
-    box.appendChild(head);
-
-    const bodyEl=h('div','ss-body');
-    const renderNodes=(nodes,actIdx,actTitle)=>{
-      if(actTitle) bodyEl.appendChild(h('div','ss-act-title',actTitle));
-      nodes.forEach((node,ni)=>{
-        if(node.type==='event'){
-          const seg=h('div','ss-node',`<div class="ss-text"><span class="ink-mark">▍</span>${node.text}</div>`);
-          const ci=s.storyChoices[m.id+':'+actIdx+':'+ni];
-          if(ci!==undefined && node.choices && node.choices[ci]){
-            seg.appendChild(h('div','ss-choice','▸ 你当时选了：'+node.choices[ci].t));
-          }
-          bodyEl.appendChild(seg);
-        }else if(node.type==='battle'){
-          bodyEl.appendChild(h('div','ss-battle','⚔ 与 <b>'+(node.name||ENEMIES[node.enemy].name)+'</b> 一战'));
-        }
-      });
-    };
-    if(m.long){ m.acts.forEach((act,ai)=>renderNodes(act.nodes,ai,'〔第 '+(ai+1)+' 幕 · '+act.title+'〕')); }
-    else renderNodes(m.nodes||[],0,null);
-
-    box.appendChild(bodyEl);
-    /* 卷尾注脚：结案所获 */
-    const rv=m.reward||{};
-    let foot='案卷归档 · 两界交界破神衙存照';
-    if(rv.gh) foot='结案所获：神格「'+GODHOODS[rv.gh].name+'」 · '+foot;
-    ml.appendChild(ov); ml.appendChild(box);
-    box.appendChild(h('div','ss-foot',foot));
-    ml.classList.remove('hidden');
-  },
-
-  /* ================= 众神谱系（关系网格） ================= */
-  openGodGrid(){
-    /* 阵营总路 + tier 支路；未结识的神以「圆圈问号」占位，不露真容 */
-    const CAMP_ORDER=['天庭','地府','民间','妖仙','释门','上古'];
-    const TIER_ORDER=['E','D','C','B','A','S'];
-    /* 按 camp 分组 + tier 子分组（含未解锁，占位归组） */
-    const byCamp={};
-    Object.entries(GODS).forEach(([gid,gd])=>{
-      const camp=gd.camp||'民间';
-      const tier=gd.tier||'E';
-      if(!byCamp[camp]) byCamp[camp]={};
-      if(!byCamp[camp][tier]) byCamp[camp][tier]=[];
-      byCamp[camp][tier].push(gid);
-    });
-
-    const ml=$('modalLayer'); ml.innerHTML='';
-    const ov=h('div','overlay');
-    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
-    const box=h('div','paper m-box god-grid');
-    box.innerHTML=`
-      <div class="gg-head">
-        <h2>众神谱系</h2>
-        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
-      </div>
-      <div class="gg-tip">全谱 ${GODS_TOTAL} 位（首批实装 47 位，余者后续登场）· 点击已结识的神看登场小传 / 来历出处 / 援助招式</div>`;
-    const body=h('div','gg-body');
-    CAMP_ORDER.forEach(camp=>{
-      const tiers=byCamp[camp]; if(!tiers) return;
-      const campEl=h('div','gg-camp');
-      const campAll=Object.values(tiers).reduce((a,b)=>a+b.length,0);
-      const campMet=Object.values(tiers).reduce((a,b)=>a+b.filter(g=>Game.isGodUnlocked(g)).length,0);
-      campEl.innerHTML=`<div class="gg-camp-title">${camp}<span class="gg-camp-count"> 已识 ${campMet}/${campAll}</span></div>`;
-      TIER_ORDER.forEach(tier=>{
-        const list=tiers[tier]; if(!list) return;
-        const tierRow=h('div','gg-tier-row');
-        tierRow.innerHTML=`<div class="gg-tier-label">${tier}</div>`;
-        const grid=h('div','gg-grid');
-        list.forEach(gid=>{
-          const gd=GODS[gid];
-          if(!Game.isGodUnlocked(gid)){
-            /* 未结识：圆圈问号占位，不可点击 */
-            const unk=h('div','gg-cell gg-unknown',
-              `<div class="gg-avatar gg-q">？</div>
-               <div class="gg-name">？？？</div>
-               <div class="gg-title">尚未结识</div>`);
-            grid.appendChild(unk);
-            return;
-          }
-          const card=h('div','gg-cell',
-            `<div class="gg-avatar">${godAvatar(gid,48)}</div>
-             <div class="gg-name">${gd.name}</div>
-             <div class="gg-title">${gd.title||''}</div>`);
-          card.onclick=()=>UI.openGodModal(gid);
-          grid.appendChild(card);
-        });
-        tierRow.appendChild(grid);
-        campEl.appendChild(tierRow);
-      });
-      body.appendChild(campEl);
-    });
-    box.appendChild(body);
-    ml.appendChild(ov); ml.appendChild(box);
-    ml.classList.remove('hidden');
-  },
-
   /* ================= 神明档案（好感 / 送礼） ================= */
   openGodModal(g){
     const gd=GODS[g]; if(!gd) return;
@@ -1173,11 +958,6 @@ const UI = {
           <div style="font-size:12px;color:var(--ink-faint)">${gd.title}</div>
         </div>
       </div>
-      ${unlocked?`<div class="gm-block gm-intro">
-        <div class="gm-label">登场小传</div>
-        <div class="gm-intro-text">${gd.intro||''}</div>
-        ${gd.sources?`<div class="gm-sources">📖 出处：${gd.sources}</div>`:''}
-      </div>`:''}
       ${rel.met
         ? `<div class="favor-block">
              <div class="favor-lv">交情：<b style="color:var(--cinnabar)">${cur.name}</b>
@@ -1255,7 +1035,6 @@ const UI = {
     const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','battle-wrap');
     wrap.innerHTML=`<div class="battle-field" id="battleField">
-        <div class="battle-bg" id="battleBg"></div><div class="battle-veil"></div>
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
         <div class="fighter" id="fPlayer">
           <div class="fig-body" id="figPlayer" style="color:var(--cinnabar-deep)">衙</div>
@@ -1275,14 +1054,6 @@ const UI = {
       <div class="battle-log" id="battleLog"></div>
       <div id="momentSlot"></div>`;
     c.appendChild(wrap);
-    /* 画质升级：战场图（按章 + 高危任务为夜战）与章节墨雾 */
-    if(typeof FX!=='undefined'){
-      const mm=(this.rt&&this.rt.mid)?this.mission():null;
-      const chapter=(mm&&mm.chapter)||Game.s.chapter||1;
-      const night=!!(mm&&mm.danger>=4);
-      FX.setChapter(chapter);
-      FX.setBattleBG(ASSET.bfKey(chapter,night));
-    }
     this.updateBattle(B);
     if(typeof Guide!=='undefined') Guide.act('battle');
   },
