@@ -1318,6 +1318,35 @@ const UI = {
   },
 
   killFoe(){ const f=$('figFoe'); if(f) f.classList.add('down'); },
+
+  /* 支援神立绘降临：金色光晕 + 神明立绘淡入淡出 */
+  showAidGod(gkey){
+    const gd=GODS[gkey]; if(!gd) return;
+    const field=$('battleField'); if(!field) return;
+    /* 先清掉上一个残留的 */
+    field.querySelectorAll('.aid-god').forEach(n=>n.remove());
+    const box=h('div','aid-god');
+    const gid='g_'+gkey;
+    const hasAsset=typeof ASSET!=='undefined' && ASSET.list && ASSET.list[gid];
+    let img;
+    if(hasAsset){
+      img=h('img','aid-img');
+      img.alt=gd.name;
+      box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
+      box.insertBefore(img, box.firstChild);
+      ASSET.mount(img, gid);
+    }else{
+      /* 兜底：用 godAvatar 的 imgURL 方式 */
+      img=h('img','aid-img');
+      img.alt=gd.name;
+      img.src=imgURL(gd.img,'portrait_4_3');
+      img.onerror=()=>{ img.style.display='none'; };
+      box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
+      box.insertBefore(img, box.firstChild);
+    }
+    field.appendChild(box);
+    setTimeout(()=>box.remove(), 3000);
+  },
   flash(side,cls){
     const f=$('fig'+(side==='foe'?'Foe':'Player'));
     if(!f) return;

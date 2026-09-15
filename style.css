@@ -766,6 +766,56 @@ body::before{
 }
 @keyframes critFlash{0%{opacity:.8}100%{opacity:0}}
 
+/* 连击墨痕：敌人身上累积墨点 */
+@keyframes comboFade{
+  0%{opacity:.9;transform:scale(.4)}
+  30%{opacity:.8}
+  100%{opacity:0;transform:scale(1.6)}
+}
+/* 血墨溅屏：玩家受击屏边红墨脉冲 */
+@keyframes bloodPulse{
+  0%{opacity:.85;box-shadow:inset 0 0 60px 14px rgba(192,60,46,.65)}
+  60%{opacity:.4;box-shadow:inset 0 0 40px 10px rgba(192,60,46,.35)}
+  100%{opacity:0;box-shadow:inset 0 0 20px 4px rgba(192,60,46,.1)}
+}
+
+/* 支援神降临：全屏金色光晕 + 神明立绘淡入淡出 */
+.aid-god{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:180px;height:240px;z-index:20;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  animation:aidSummon 2.8s ease-out forwards;
+}
+.aid-god .aid-img{
+  width:140px;height:180px;object-fit:cover;border-radius:10px;
+  border:2px solid rgba(217,169,79,.8);
+  box-shadow:0 0 24px 6px rgba(217,169,79,.55), inset 0 0 12px rgba(255,248,228,.3);
+  mix-blend-mode:normal;filter:saturate(1.1);
+}
+.aid-god .aid-label{
+  font-family:var(--font-brush);font-size:22px;color:#d9a94f;
+  text-shadow:0 0 8px rgba(217,169,79,.7);
+  letter-spacing:4px;
+}
+.aid-god::before{
+  content:"";position:absolute;inset:-20px;border-radius:50%;
+  background:radial-gradient(circle, rgba(217,169,79,.4), rgba(217,169,79,0) 65%);
+  animation:aidHalo 2.8s ease-out forwards;
+  z-index:-1;
+}
+@keyframes aidSummon{
+  0%{opacity:0;transform:translate(-50%,-40%) scale(.6);filter:blur(10px)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:blur(0)}
+  75%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-55%) scale(.95);filter:blur(4px)}
+}
+@keyframes aidHalo{
+  0%{opacity:0;transform:scale(.3)}
+  20%{opacity:1;transform:scale(1)}
+  75%{opacity:.6;transform:scale(1.15)}
+  100%{opacity:0;transform:scale(1.4)}
+}
+
 /* ---- 3. 场景淡入 ---- */
 #pageStage > *{animation:sceneIn .4s ease-out}
 @keyframes sceneIn{
