@@ -9,8 +9,8 @@ const ASSET = {
   /* 统一风格后缀（与 GODS.img 水墨风一致） */
   INK : 'Chinese ink wash painting, sumi-e style, dark ink strokes, rice paper texture',
   ICON: 'centered on plain rice paper background, simple bold ink silhouette, game icon, no text',
-  /* 立绘白底抠像后缀：CSS mix-blend-mode:multiply 让白底消隐，人物悬浮融入场景 */
-  CUT : ', isolated on pure white background, no frame, no border, rich vibrant mineral pigment colors, cinnabar red and azurite blue and jade green accents, dramatic rim lighting, character key art',
+  /* 立绘白底抠像后缀：CSS mix-blend-mode:multiply 让白底消隐，人物悬浮融入场景；纯水墨无彩 */
+  CUT : ', isolated on pure white background, no frame, no border, monochrome ink wash only, no color, dramatic ink shading, character key art',
 
   list: {},   /* key -> [prompt, size] */
 

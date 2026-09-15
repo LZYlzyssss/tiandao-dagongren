@@ -290,59 +290,14 @@ body::before{
 }
 .fighter{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;position:relative}
 .fighter.foe{align-self:center}
-/* 彩色光晕（立绘身后）：玩家金朱双色 / 敌人随 tint（--foe-glow 挂在 .fighter 上，供 ::before/::after 共用） */
+/* 淡墨光晕（立绘身后，极弱） */
 .fighter::before{
   content:"";position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
-  width:230px;height:230px;border-radius:50%;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(circle, rgba(201,150,47,.38), rgba(201,150,47,.12) 45%, transparent 70%),
-    radial-gradient(circle at 36% 64%, rgba(192,60,46,.2), transparent 56%);
+  width:180px;height:180px;border-radius:50%;z-index:0;pointer-events:none;
+  background:radial-gradient(circle, rgba(43,38,32,.1), transparent 70%);
   animation:auraPulse 3.4s ease-in-out infinite;
 }
-.fighter.foe::before{
-  background:radial-gradient(circle, var(--foe-glow,#9a6fae) 0%, transparent 66%);
-  animation:auraPulseFoe 3.4s ease-in-out infinite;
-}
-@keyframes auraPulse{0%,100%{opacity:.65;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
-@keyframes auraPulseFoe{0%,100%{opacity:.28;transform:translate(-50%,-50%) scale(1)}50%{opacity:.5;transform:translate(-50%,-50%) scale(1.12)}}
-/* 灵尘光点（绕人物缓缓上升）：玩家金尘 / 敌人 tint 尘 */
-.fighter::after{
-  content:"";position:absolute;left:50%;top:12px;width:150px;height:200px;margin-left:-75px;
-  z-index:3;pointer-events:none;opacity:0;
-  background:
-    radial-gradient(circle 3px at 18% 82%, rgba(233,186,96,.95), transparent 100%),
-    radial-gradient(circle 2px at 72% 64%, rgba(233,186,96,.85), transparent 100%),
-    radial-gradient(circle 2.5px at 44% 92%, rgba(233,186,96,.75), transparent 100%),
-    radial-gradient(circle 2px at 86% 78%, rgba(233,186,96,.65), transparent 100%);
-  animation:motesRise 4.4s ease-in-out infinite;
-}
-.fighter.foe::after{
-  background:
-    radial-gradient(circle 3px at 18% 82%, var(--foe-glow,#9a6fae), transparent 100%),
-    radial-gradient(circle 2px at 72% 64%, var(--foe-glow,#9a6fae), transparent 100%),
-    radial-gradient(circle 2.5px at 44% 92%, var(--foe-glow,#9a6fae), transparent 100%),
-    radial-gradient(circle 2px at 86% 78%, var(--foe-glow,#9a6fae), transparent 100%);
-  animation-delay:1.9s;
-}
-@keyframes motesRise{
-  0%{transform:translateY(10px);opacity:0}
-  28%{opacity:.9}
-  100%{transform:translateY(-30px);opacity:0}
-}
-/* 扫光：一道斜光掠过人物（screen 提亮，暖雪式光泽） */
-.fig-ray{
-  position:absolute;left:50%;top:-6px;width:74px;height:216px;margin-left:-37px;
-  z-index:3;pointer-events:none;mix-blend-mode:screen;opacity:0;
-  background:linear-gradient(105deg, transparent 14%, rgba(255,236,190,.5) 46%, rgba(255,246,224,.78) 50%, rgba(255,236,190,.5) 54%, transparent 86%);
-  filter:blur(2px);
-  animation:raySweep 6s ease-in-out infinite;
-}
-.fighter.foe .fig-ray{animation-delay:3s}
-@keyframes raySweep{
-  0%,62%{opacity:0;transform:translateX(-96px) skewX(-8deg)}
-  72%{opacity:.9}
-  88%,100%{opacity:0;transform:translateX(96px) skewX(-8deg)}
-}
+@keyframes auraPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:.8;transform:translate(-50%,-50%) scale(1.08)}}
 /* 立绘悬浮体：无框无卡；容器整体 multiply 使白底图融入场景 */
 .fig-body{
   width:164px;height:208px;margin-bottom:-14px;
@@ -361,20 +316,19 @@ body::before{
   animation:shadowBreath 3.4s ease-in-out infinite;
 }
 @keyframes shadowBreath{0%,100%{transform:translateX(-50%) scaleX(1);opacity:1}50%{transform:translateX(-50%) scaleX(.86);opacity:.68}}
-/* 立绘图：呼吸悬浮 + 矿物彩提饱和（multiply 在容器层，勿加白底不透明滤镜） */
+/* 立绘图：呼吸悬浮（纯水墨，不提饱和） */
 .fig-body .fig-art{
   width:100%;height:100%;object-fit:contain;object-position:center bottom;z-index:1;
   animation:figFloat 3.4s ease-in-out infinite;
-  filter:saturate(1.24) contrast(1.05);
 }
 @keyframes figFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}}
 @keyframes figInk{0%{filter:blur(10px);opacity:0;transform:scale(.86)}60%{filter:blur(2px);opacity:.85}100%{filter:none;opacity:1;transform:scale(1)}}
 /* 墨字兜底（图未加载时可见） */
 .fig-body .fig-glyph{font-family:var(--font-brush);font-size:56px;z-index:0}
 .fig-body.hit{animation:hit .3s}
-.fig-body.hit .fig-art{filter:saturate(1.9) contrast(1.1) brightness(1.06)}
+.fig-body.hit .fig-art{filter:brightness(1.06)}
 .fig-body.cast{animation:cast .4s}
-.fig-body.cast .fig-art{filter:saturate(1.5) contrast(1.08) brightness(1.16)}
+.fig-body.cast .fig-art{filter:brightness(1.12)}
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
 @keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes cast{0%{box-shadow:0 0 0 rgba(192,60,46,0)}50%{box-shadow:0 0 30px rgba(192,60,46,.7);transform:scale(1.08)}100%{box-shadow:0 0 0 rgba(192,60,46,0)}}
@@ -697,7 +651,6 @@ body::before{
   .fig-body{width:106px;height:140px;margin-bottom:-10px}
   .fig-body .fig-glyph{font-size:38px}
   .fig-body::after{height:11px;bottom:-7px}
-  .fig-ray{height:148px;top:-4px}
   .fig-name{font-size:13px}
   .fbar{width:100%;max-width:140px}
   .fbar .fl{font-size:10px}
@@ -741,7 +694,6 @@ body::before{
   .ya-grid{grid-template-columns:1fr}
   .fig-body{width:88px;height:116px;margin-bottom:-8px}
   .fig-body .fig-glyph{font-size:32px}
-  .fig-ray{height:124px;top:-4px;width:56px;margin-left:-28px}
   .fbar{max-width:100px}
   .vs{font-size:22px}
   .stat-chip{min-width:52px;padding:2px 6px}
