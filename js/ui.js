@@ -92,6 +92,20 @@ const UI = {
     if(rb && typeof Guide!=='undefined') rb.onclick=()=>Guide.begin(true);
     c.appendChild(kpi);
 
+    /* 剧情档案入口：翻查已结之卷 */
+    const total=Math.max(1,MISSIONS.filter(m=>m.main||m.side).length);
+    const doneCnt=Object.keys(s.mainDone).length+Object.keys(s.sideDone).length;
+    const sp=h('div','panel story-entry');
+    sp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div>
+        <div style="font-weight:bold;letter-spacing:1px">📜 剧情档案</div>
+        <div class="sub" style="font-size:12px;color:var(--ink-faint)">经办过的差事都归档在这里，闲时可以翻开重读</div>
+      </div>
+      <button class="btn btn-primary">已结 ${doneCnt}/${total} 卷</button>
+    </div>`;
+    sp.querySelector('button').onclick=()=>UI.openStoryArchive();
+    c.appendChild(sp);
+
     const p=h('div','panel');
     p.innerHTML=`<h2>工单架 <span class="sub">神仙们的脏活累活</span></h2>`;
     if(!s.shelf.length){
@@ -734,6 +748,8 @@ const UI = {
   chooseEvent(i){
     const node=this.curNodes()[this.rt.node];
     const co=node.choices[i], r=co.r||{};
+    /* 剧情档案：记录玩家抉择（'单id:幕号:节点号'->选项号） */
+    Game.s.storyChoices[this.rt.mid+':'+(this.rt.order.act||0)+':'+this.rt.node]=i;
     const st=Stats.cur();
     if(r.hp){
       const d=Math.round(st.maxHp*Math.abs(r.hp)/100);
@@ -922,6 +938,123 @@ const UI = {
     cancel.onclick=close;
     box.appendChild(ok); box.appendChild(cancel);
     ov.appendChild(box); ml.appendChild(ov);
+  },
+
+  /* ================= 剧情档案（卷宗架） ================= */
+  openStoryArchive(){
+    const s=Game.s;
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box story-archive');
+    box.innerHTML=`
+      <div class="gg-head">
+        <h2>剧情档案</h2>
+        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
+      </div>
+      <div class="gg-tip">主线归章，支线归档 · 已结之卷可翻开重读，含你当时的选择</div>`;
+    const body=h('div','gg-body');
+
+    /* 主线按章分组 */
+    const CH_MAX=[1,2,3,4,5];
+    CH_MAX.forEach(ch=>{
+      const list=MISSIONS.filter(m=>m.main&&(m.chapter||1)===ch);
+      if(!list.length) return;
+      const grp=h('div','gg-camp');
+      const met=list.filter(m=>m.main&&s.mainDone[m.main]).length;
+      grp.innerHTML=`<div class="gg-camp-title">第 ${ch} 章 · 主线<span class="gg-camp-count"> 已结 ${met}/${list.length}</span></div>`;
+      list.forEach(m=>grp.appendChild(this.storyCell(m)));
+      body.appendChild(grp);
+    });
+    /* 支线一组 */
+    const sides=MISSIONS.filter(m=>m.side);
+    if(sides.length){
+      const grp=h('div','gg-camp');
+      const met=sides.filter(m=>s.sideDone[m.side]).length;
+      grp.innerHTML=`<div class="gg-camp-title">支线 · 散差<span class="gg-camp-count"> 已结 ${met}/${sides.length}</span></div>`;
+      sides.forEach(m=>grp.appendChild(this.storyCell(m)));
+      body.appendChild(grp);
+    }
+    box.appendChild(body);
+    ml.appendChild(ov); ml.appendChild(box);
+    ml.classList.remove('hidden');
+  },
+
+  /* 卷宗格：已结可读 / 经办中 / 问号占位 */
+  storyCell(m){
+    const s=Game.s;
+    const done=(m.main&&s.mainDone[m.main])||(m.side&&s.sideDone[m.side]);
+    const onShelf=s.shelf.some(o=>o.mid===m.id);
+    const tag=m.main?'主线':'支线';
+    if(done){
+      const cell=h('div','gg-cell sa-done',
+        `<div class="sa-vol">卷</div>
+         <div class="gg-name">${m.name}</div>
+         <div class="gg-title">${tag} · ${'★'.repeat(m.danger)}</div>`);
+      cell.onclick=()=>UI.openStoryScroll(m.id);
+      return cell;
+    }
+    if(onShelf){
+      return h('div','gg-cell gg-unknown',
+        `<div class="gg-avatar gg-q">…</div>
+         <div class="gg-name">经办中</div>
+         <div class="gg-title">${tag}</div>`);
+    }
+    return h('div','gg-cell gg-unknown',
+      `<div class="gg-avatar gg-q">？</div>
+       <div class="gg-name">？？？</div>
+       <div class="gg-title">尚未经办</div>`);
+  },
+
+  /* 翻开一卷：按节点串读剧情 + 抉择回显 */
+  openStoryScroll(mid){
+    const m=MISSIONS.find(x=>x.id===mid); if(!m) return;
+    const s=Game.s, god=GODS[m.god];
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box story-scroll');
+    const back=h('div','gg-head');
+    back.innerHTML=`<button class="btn btn-back">◂ 归档</button>
+      <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>`;
+    back.querySelector('.btn-back').onclick=()=>UI.openStoryArchive();
+    box.appendChild(back);
+
+    const head=h('div','ss-head',`
+      ${godAvatar(m.god,52)}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:17px;font-weight:bold">${m.name}</div>
+        <div style="font-size:12px;color:var(--ink-faint)">${god.name} · ${god.title} 委托 · ${m.main?('第 '+(m.chapter||1)+' 章 · 主线'):('支线 · '+(m.side||'').toUpperCase())}</div>
+      </div>`);
+    box.appendChild(head);
+
+    const bodyEl=h('div','ss-body');
+    const renderNodes=(nodes,actIdx,actTitle)=>{
+      if(actTitle) bodyEl.appendChild(h('div','ss-act-title',actTitle));
+      nodes.forEach((node,ni)=>{
+        if(node.type==='event'){
+          const seg=h('div','ss-node',`<div class="ss-text"><span class="ink-mark">▍</span>${node.text}</div>`);
+          const ci=s.storyChoices[m.id+':'+actIdx+':'+ni];
+          if(ci!==undefined && node.choices && node.choices[ci]){
+            seg.appendChild(h('div','ss-choice','▸ 你当时选了：'+node.choices[ci].t));
+          }
+          bodyEl.appendChild(seg);
+        }else if(node.type==='battle'){
+          bodyEl.appendChild(h('div','ss-battle','⚔ 与 <b>'+(node.name||ENEMIES[node.enemy].name)+'</b> 一战'));
+        }
+      });
+    };
+    if(m.long){ m.acts.forEach((act,ai)=>renderNodes(act.nodes,ai,'〔第 '+(ai+1)+' 幕 · '+act.title+'〕')); }
+    else renderNodes(m.nodes||[],0,null);
+
+    box.appendChild(bodyEl);
+    /* 卷尾注脚：结案所获 */
+    const rv=m.reward||{};
+    let foot='案卷归档 · 两界交界破神衙存照';
+    if(rv.gh) foot='结案所获：神格「'+GODHOODS[rv.gh].name+'」 · '+foot;
+    ml.appendChild(ov); ml.appendChild(box);
+    box.appendChild(h('div','ss-foot',foot));
+    ml.classList.remove('hidden');
   },
 
   /* ================= 众神谱系（关系网格） ================= */

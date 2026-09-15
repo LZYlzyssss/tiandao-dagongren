@@ -37,6 +37,7 @@ const Game = {
       chapter:1,
       mainDone:{},        // 主线幕 id -> true
       sideDone:{},        // 支线 id -> true
+      storyChoices:{},    // 剧情档案：'单id:幕号:节点号' -> 选项号
       gameOver:false,
       log:[],
     };
@@ -65,7 +66,7 @@ const Game = {
     def('erode',0); def('shards',{bing:0,fa:0,you:0,huo:0,sheng:0}); def('dshards',{});
     def('pills',{}); def('devour',{hp:0,atk:0,def:0,crit:0,lifesteal:0,zhanshen:false});
     def('refining',null); def('recipes',{}); def('godsRel',{}); def('flags',{});
-    def('chapter',1); def('mainDone',{}); def('sideDone',{}); def('gameOver',false);
+    def('chapter',1); def('mainDone',{}); def('sideDone',{}); def('storyChoices',{}); def('gameOver',false);
     def('wear',{weapon:null,armor:null,trinket:null}); def('bag',{});
     (s.shelf||[]).forEach(o=>{ if(o.act===undefined) o.act=0; });
     return true;
