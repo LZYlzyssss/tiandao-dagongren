@@ -1117,15 +1117,7 @@ const UI = {
         const grid=h('div','gg-grid');
         list.forEach(gid=>{
           const gd=GODS[gid];
-          if(!Game.isGodUnlocked(gid)){
-            /* 未结识：圆圈问号占位，不可点击 */
-            const unk=h('div','gg-cell gg-unknown',
-              `<div class="gg-avatar gg-q">？</div>
-               <div class="gg-name">？？？</div>
-               <div class="gg-title">尚未结识</div>`);
-            grid.appendChild(unk);
-            return;
-          }
+          if(!Game.isGodUnlocked(gid)) return; /* 未结识：直接跳过，不占位 */
           const card=h('div','gg-cell',
             `<div class="gg-avatar">${godAvatar(gid,48)}</div>
              <div class="gg-name">${gd.name}</div>
@@ -1133,9 +1125,11 @@ const UI = {
           card.onclick=()=>UI.openGodModal(gid);
           grid.appendChild(card);
         });
+        if(!grid.children.length) continue; /* 该 tier 无已结识神明则跳过 */
         tierRow.appendChild(grid);
         campEl.appendChild(tierRow);
       });
+      if(!campEl.querySelector('.gg-cell')) continue; /* 该阵营无已结识神明则跳过 */
       body.appendChild(campEl);
     });
     box.appendChild(body);
