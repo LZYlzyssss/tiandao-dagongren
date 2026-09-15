@@ -1093,6 +1093,8 @@ body::before{
 .gm-block{margin-bottom:10px}
 .gm-label{font-size:12px;color:var(--ink-faint);letter-spacing:1px;margin-bottom:4px}
 .gm-intro-text{font-size:14px;line-height:1.8;color:#2b2620;text-indent:2em}
+.gm-story{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(43,38,32,.2)}
+.gm-story-text{font-size:14px;line-height:1.9;color:var(--ink-soft);text-indent:2em}
 .gm-sources{font-size:11px;color:var(--ink-faint);margin-top:6px;padding-top:6px;border-top:1px dashed rgba(43,38,32,.15)}
 .ya-grid-btn{margin-top:8px}
 

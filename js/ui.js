@@ -1283,6 +1283,10 @@ const UI = {
       ${unlocked?`<div class="gm-block gm-intro">
         <div class="gm-label">登场小传</div>
         <div class="gm-intro-text">${gd.intro||''}</div>
+        ${gd.story?`<div class="gm-block gm-story">
+          <div class="gm-label">相关故事</div>
+          <div class="gm-story-text">${gd.story}</div>
+        </div>`:''}
         ${gd.sources?`<div class="gm-sources">📖 出处：${gd.sources}</div>`:''}
       </div>`:''}
       ${rel.met
