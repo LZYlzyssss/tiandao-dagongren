@@ -6,7 +6,6 @@ function godAvatar(key,px){
   const g=GODS[key];
   return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
 }
-const YAMEN_BG = imgURL('Chinese ink wash landscape painting of a lonely ancient yamen office temple at the misty border between mortal world and underworld, distant mountains, one red lantern glowing, sumi-e style with faint cinnabar red and indigo blue color accents, rice paper','landscape_16_9');
 
 const UI = {
   view:'office',     // office | mission | battle | settle
@@ -26,6 +25,12 @@ const UI = {
     const flowing=this.view!=='office';
     $('tabbar').classList.toggle('hidden', flowing);
     if(flowing) return;   /* mission / battle / settle 视图由各自流程维护 */
+    /* 画质升级：office 页签氛围底图 */
+    if(typeof FX!=='undefined'){
+      FX.setChapter(Game.s.chapter||1);
+      FX.setScene(null);
+      FX.setAmbient(this.tab==='desk'?'ui_desk':this.tab==='yamen'?'ui_yamen':'ui_main');
+    }
     this.renderTabbar();
     const stage=$('pageStage'); stage.innerHTML='';
     if(this.tab==='desk') this.renderDesk(stage);
@@ -342,7 +347,7 @@ const UI = {
   renderYamen(c){
     const s=Game.s;
     const hero=h('div','yamen');
-    hero.style.backgroundImage=`url("${YAMEN_BG}")`;
+    ASSET.bg(hero, 'ui_hero', 1);
     hero.innerHTML=`
       <h2>两界交界·破神衙</h2>
       <div class="ya-desc">
@@ -735,6 +740,8 @@ const UI = {
       }
     }
     c.appendChild(wrap);
+    /* 画质升级：下凡情景底图（按任务所属章） */
+    if(typeof FX!=='undefined') FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
     if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
       const foeName=node.name||ENEMIES[node.enemy].name;
@@ -870,6 +877,11 @@ const UI = {
     s.busy=false;
     this.view='settle';
     Game.save();
+    /* 画质升级：结算用本章情景图；章末水墨转场 + 墨雾换色 */
+    if(typeof FX!=='undefined'){
+      FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
+      if(m.chapterEnd) FX.inkWipe(()=>FX.setChapter(Game.s.chapter||1));
+    }
 
     const c=$('pageStage'); c.innerHTML='';
     $('tabbar').classList.add('hidden');
@@ -1243,6 +1255,7 @@ const UI = {
     const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','battle-wrap');
     wrap.innerHTML=`<div class="battle-field" id="battleField">
+        <div class="battle-bg" id="battleBg"></div><div class="battle-veil"></div>
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
         <div class="fighter" id="fPlayer">
           <div class="fig-body" id="figPlayer" style="color:var(--cinnabar-deep)">衙</div>
@@ -1262,6 +1275,14 @@ const UI = {
       <div class="battle-log" id="battleLog"></div>
       <div id="momentSlot"></div>`;
     c.appendChild(wrap);
+    /* 画质升级：战场图（按章 + 高危任务为夜战）与章节墨雾 */
+    if(typeof FX!=='undefined'){
+      const mm=(this.rt&&this.rt.mid)?this.mission():null;
+      const chapter=(mm&&mm.chapter)||Game.s.chapter||1;
+      const night=!!(mm&&mm.danger>=4);
+      FX.setChapter(chapter);
+      FX.setBattleBG(ASSET.bfKey(chapter,night));
+    }
     this.updateBattle(B);
     if(typeof Guide!=='undefined') Guide.act('battle');
   },

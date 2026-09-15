@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- 画质渲染分层：氛围底图 → 情景图 → Pixi 墨雾 → 浮墨/雾气兜底 -->
+<div id="ambientBg"></div>
+<div id="sceneBg"></div>
+<div id="fxCanvas"></div>
 <div id="inkLayer"></div>
 <div id="mistLayer"></div>
 <div id="app">
@@ -53,6 +57,8 @@
 
   <!-- 弹窗层 -->
   <div id="modalLayer"></div>
+  <!-- 暗角（最高层之下，不挡点击） -->
+  <div id="vignette"></div>
   <!-- 新手引导层 -->
   <div id="guideLayer" class="hidden"></div>
   <!-- 轻提示 -->
@@ -75,8 +81,11 @@
 
 </div>
 
-<script src="js/fx.js"></script>
+<!-- PixiJS 渲染引擎：加载失败时 fx.js 自动降级为 CSS 粒子 -->
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
 <script src="js/data.js"></script>
+<script src="js/asset.js"></script>
+<script src="js/fx.js"></script>
 <script src="js/state.js"></script>
 <script src="js/battle.js"></script>
 <script src="js/ui.js"></script>
