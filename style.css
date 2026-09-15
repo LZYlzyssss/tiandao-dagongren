@@ -420,8 +420,10 @@ body::before{
 .review-list{text-align:left;display:inline-block;font-size:16px;line-height:2.2;margin:10px 0}
 
 /* ============ 弹窗 / Overlay ============ */
+#modalLayer{position:fixed;inset:0;z-index:2100;pointer-events:none}
+#modalLayer>*{pointer-events:auto}
 .overlay{
-  position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+  position:fixed;inset:0;z-index:2100;display:grid;place-items:center;
   background:rgba(30,26,20,.55);backdrop-filter:blur(2px);
 }
 .paper{
@@ -451,7 +453,11 @@ body::before{
   display:flex;align-items:center;justify-content:center;
   font-family:var(--font-brush);font-size:24px;color:var(--cinnabar-deep);
   background:rgba(192,60,46,.08);border:1px solid var(--line);
+  position:relative;overflow:hidden;
 }
+.item-ic .ic-txt{position:relative;z-index:2}
+.item-ic .item-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.item-ic.big{width:54px;height:54px;font-size:30px;border-radius:10px}
 .item-body{flex:1;min-width:0}
 .item-row.owned{opacity:.62}
 .grade{
