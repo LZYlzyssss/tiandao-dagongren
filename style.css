@@ -193,25 +193,27 @@ body::before{
   position:relative;transition:transform .15s, box-shadow .15s;
   overflow:hidden;
 }
-/* 画质批2：工单卡片背景图——ASSET.bg 设置 background-image，薄遮罩让场景图真正透出来 */
+/* 工单卡片：场景图做底，文字区高亮凸显 */
 .order-bg{
-  background-size:cover;background-position:center;background-blend-mode:multiply;
+  background-size:cover;background-position:center;background-blend-mode:normal;
 }
 .order-bg::before{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:linear-gradient(180deg, rgba(251,246,232,.22), rgba(243,234,214,.18));
+  background:linear-gradient(180deg, rgba(251,246,232,.48), rgba(243,234,214,.55));
 }
 .order-bg > *{position:relative;z-index:1}
-/* 5 章专属色调叠层（极薄，仅偏色） */
-.order.order-ch1.order-bg::before{background:linear-gradient(180deg, rgba(251,246,232,.18), rgba(243,234,214,.14))}
-.order.order-ch2.order-bg::before{background:linear-gradient(180deg, rgba(248,240,224,.18), rgba(238,228,206,.14))}
-.order.order-ch3.order-bg::before{background:linear-gradient(180deg, rgba(235,222,210,.22), rgba(220,205,188,.18))}
-.order.order-ch4.order-bg::before{background:linear-gradient(180deg, rgba(252,244,220,.18), rgba(240,228,200,.14))}
-.order.order-ch5.order-bg::before{background:linear-gradient(180deg, rgba(255,248,228,.18), rgba(238,225,190,.14))}
-/* 内容区深色底条，保证文字在背景图上可读 */
+/* 5 章色调叠层 */
+.order.order-ch1.order-bg::before{background:linear-gradient(180deg, rgba(251,246,232,.45), rgba(243,234,214,.52))}
+.order.order-ch2.order-bg::before{background:linear-gradient(180deg, rgba(248,240,224,.45), rgba(238,228,206,.52))}
+.order.order-ch3.order-bg::before{background:linear-gradient(180deg, rgba(235,222,210,.52), rgba(220,205,188,.58))}
+.order.order-ch4.order-bg::before{background:linear-gradient(180deg, rgba(252,244,220,.45), rgba(240,228,200,.52))}
+.order.order-ch5.order-bg::before{background:linear-gradient(180deg, rgba(255,248,228,.45), rgba(238,225,190,.52))}
+/* 内容区：高亮白底细框，阴影凸显 */
 .order-bg .o-body{
-  background:rgba(255,252,244,.78);border-radius:4px;padding:6px 8px;margin-left:52px;
+  background:rgba(255,252,244,.94);border-radius:4px;padding:8px 10px;margin-left:52px;
   position:relative;z-index:2;
+  border:1px solid rgba(185,169,138,.6);
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
 }
 .order:hover{transform:translateY(-2px);box-shadow:0 4px 10px var(--shadow)}
 .order.forced{border:2px solid var(--cinnabar)}
