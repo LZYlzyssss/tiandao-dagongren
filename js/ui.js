@@ -1262,6 +1262,7 @@ const UI = {
         <div class="aid-god" id="aidGod"></div>
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
         <div class="fighter" id="fPlayer">
+          <i class="fig-ray"></i>
           <div class="fig-body" id="figPlayer" style="color:var(--cinnabar-deep)">
             <span class="fig-glyph">衙</span>${ASSET.html(pArt,'fig-art','你')}
           </div>
@@ -1270,7 +1271,8 @@ const UI = {
           <div class="fstatus" id="pStatus"></div>
         </div>
         <div class="vs">战</div>
-        <div class="fighter foe" id="fFoe">
+        <div class="fighter foe" id="fFoe" style="--foe-glow:${B.e.tint}">
+          <i class="fig-ray"></i>
           <div class="intent-bubble" id="eIntent"></div>
           <div class="fig-body" id="figFoe" style="color:${B.e.tint}">
             <span class="fig-glyph">${(B.e.name||'敌')[0]}</span>${ASSET.html(eArt,'fig-art',B.e.name)}

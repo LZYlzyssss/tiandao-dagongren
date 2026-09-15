@@ -9,6 +9,8 @@ const ASSET = {
   /* 统一风格后缀（与 GODS.img 水墨风一致） */
   INK : 'Chinese ink wash painting, sumi-e style, dark ink strokes, rice paper texture',
   ICON: 'centered on plain rice paper background, simple bold ink silhouette, game icon, no text',
+  /* 立绘白底抠像后缀：CSS mix-blend-mode:multiply 让白底消隐，人物悬浮融入场景 */
+  CUT : ', isolated on pure white background, no frame, no border, rich vibrant mineral pigment colors, cinnabar red and azurite blue and jade green accents, dramatic rim lighting, character key art',
 
   list: {},   /* key -> [prompt, size] */
 
@@ -140,7 +142,7 @@ const PLAYER_ROBES = {
   r4:'a formal cinnabar judge robe with gold trim and a judge winged cap',
 };
 Object.entries(PLAYER_ROBES).forEach(([k,robe])=>{
-  ASSET.list['p_'+k]=[`${ASSET.INK} character portrait of a young male underworld clerk deity wearing ${robe}, calm tired expression, holding case files, waist-up character key art`, 'portrait_4_3'];
+  ASSET.list['p_'+k]=[`${ASSET.INK} character portrait of a young male underworld clerk deity wearing ${robe}, calm tired expression, holding case files, waist-up${ASSET.CUT}`, 'portrait_4_3'];
 });
 
 /* ---------- 敌人立绘（23，对齐 ENEMIES） ---------- */
@@ -170,14 +172,14 @@ const ENEMY_DESC = {
   xiangye:'a grey-robed ancient chancellor with an unreadable smile, vast shadow looming behind him',
 };
 Object.keys(ENEMY_DESC).forEach(k=>{
-  ASSET.list['e_'+k]=[`${ASSET.INK} character portrait of ${ENEMY_DESC[k]}, menacing aura, ink splashes, full body character key art`, 'portrait_4_3'];
+  ASSET.list['e_'+k]=[`${ASSET.INK} character portrait of ${ENEMY_DESC[k]}, menacing aura, ink splashes, full body${ASSET.CUT}`, 'portrait_4_3'];
 });
 
 /* ---------- 神明立绘（B/A/S 共 25，复用 GODS.img 提示词） ---------- */
 const GOD_ART=['zhao_gongming','wen_chang','ma_zu','guan_yu','wang_lingguan','zeng_zhang','duo_wen','qin_guang','yan_luo','zhuan_lun','ao_guang','zhong_yue','er_lang','ne_zha','zhen_wu','lei_zu','xi_yue','xuan_nv','guan_yin','di_zang','wei_tuo','sun_wukong','feng_du','dong_yue','xi_wangmu'];
 if(typeof GODS!=='undefined'){
   GOD_ART.forEach(k=>{
-    if(GODS[k] && GODS[k].img) ASSET.list['g_'+k]=[GODS[k].img, 'portrait_4_3'];
+    if(GODS[k] && GODS[k].img) ASSET.list['g_'+k]=[GODS[k].img + ASSET.CUT, 'portrait_4_3'];
   });
 }
 
