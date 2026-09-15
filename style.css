@@ -189,8 +189,29 @@ body::before{
 /* ============ 工单卡片 ============ */
 .order{
   border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px;
-  background:linear-gradient(180deg,#fbf6e8,#f3ead6);
-  position:relative;transition:transform .15s, box-shadow .15s;
+  background-color:#f5ecd7;background-image:none;
+  position:relative;transition:transform .15s, box-shadow .15s;overflow:hidden;
+}
+/* 工单卡片：场景图做底，暗化+浓遮罩防抢 */
+.order-bg{
+  background-size:cover;background-position:center;background-blend-mode:normal;
+  filter:brightness(.85) saturate(.9);
+}
+.order-bg::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(180deg, rgba(251,246,232,.78), rgba(243,234,214,.85));
+}
+.order-bg > *{position:relative;z-index:1}
+.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.76), rgba(243,234,214,.83))}
+.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.76), rgba(238,228,206,.83))}
+.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.82), rgba(220,205,188,.88))}
+.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.76), rgba(240,228,200,.83))}
+.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.76), rgba(238,225,190,.83))}
+.order-bg .o-body{
+  background:rgba(255,252,244,.98);border-radius:4px;padding:8px 10px;margin-left:52px;
+  position:relative;z-index:2;
+  border:1px solid rgba(185,169,138,.7);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
 }
 .order:hover{transform:translateY(-2px);box-shadow:0 4px 10px var(--shadow)}
 .order.forced{border:2px solid var(--cinnabar)}
@@ -865,7 +886,7 @@ body::before{
 .tier-b{background:#7a4f8e}
 .tier-a{background:#c03c2e}
 
-.god-modal{width:720px;max-width:92vw;max-height:80vh;overflow-y:auto}
+.god-modal{width:760px;max-width:92vw;max-height:82vh;overflow-y:auto;font-size:15px}
 .gm-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
 .gm-name{flex:1;min-width:0}
 
@@ -889,22 +910,22 @@ body::before{
 .gift-row .price{min-width:0}
 
 /* ---- 众神谱系（关系网格） ---- */
-.god-grid{width:820px;max-width:92vw;max-height:80vh;overflow-y:auto}
-.gg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.gg-head h2{margin:0}
-.gg-tip{font-size:12px;color:var(--ink-faint);margin-bottom:12px}
+.god-grid{width:860px;max-width:92vw;max-height:82vh;overflow-y:auto;font-size:15px}
+.gg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.gg-head h2{margin:0;font-size:24px}
+.gg-tip{font-size:14px;color:var(--ink-faint);margin-bottom:14px}
 .gg-body{display:flex;flex-direction:column;gap:16px}
-.gg-camp{border:1px solid rgba(43,38,32,.12);border-radius:8px;padding:10px 14px;background:rgba(251,247,235,.4)}
-.gg-camp-title{font-size:16px;font-weight:bold;margin-bottom:8px;letter-spacing:1px;border-bottom:1px dashed rgba(43,38,32,.2);padding-bottom:4px}
-.gg-camp-count{font-size:12px;font-weight:normal;color:var(--ink-faint)}
+.gg-camp{border:1px solid rgba(43,38,32,.12);border-radius:8px;padding:12px 16px;background:rgba(251,247,235,.4)}
+.gg-camp-title{font-size:18px;font-weight:bold;margin-bottom:10px;letter-spacing:1px;border-bottom:1px dashed rgba(43,38,32,.2);padding-bottom:4px}
+.gg-camp-count{font-size:13px;font-weight:normal;color:var(--ink-faint)}
 .gg-tier-row{display:flex;gap:12px;align-items:flex-start;margin:6px 0}
 .gg-tier-label{min-width:28px;font-size:13px;font-weight:bold;color:var(--cinnabar);padding-top:6px}
 .gg-grid{display:flex;flex-wrap:wrap;gap:8px;flex:1}
-.gg-cell{cursor:pointer;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(43,38,32,.1);display:flex;flex-direction:column;align-items:center;min-width:68px;transition:all .2s}
+.gg-cell{cursor:pointer;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(43,38,32,.1);display:flex;flex-direction:column;align-items:center;min-width:72px;transition:all .2s;font-size:14px}
 .gg-cell:hover{background:rgba(255,255,255,.95);box-shadow:0 2px 6px rgba(0,0,0,.08);transform:translateY(-1px)}
+.gg-cell .gg-name{font-size:14px;text-align:center;margin-top:4px;font-weight:bold}
+.gg-cell .gg-title{font-size:12px;color:var(--ink-faint);margin-top:2px;text-align:center}
 .gg-avatar{margin-bottom:4px}
-.gg-name{font-size:12px;font-weight:bold;white-space:nowrap}
-.gg-title{font-size:10px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
 /* 未结识占位：虚线圆圈问号，不可交互 */
 .gg-unknown{cursor:default;opacity:.5;background:transparent;border-style:dashed}
 .gg-unknown:hover{background:transparent;box-shadow:none;transform:none}
@@ -913,10 +934,10 @@ body::before{
 /* ---- 剧情档案（卷宗架 + 卷宗详情） ---- */
 .story-entry{cursor:pointer}
 .story-entry:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.story-archive{width:780px;max-width:92vw;max-height:80vh;overflow-y:auto}
+.story-archive{width:820px;max-width:92vw;max-height:82vh;overflow-y:auto;font-size:15px}
 .sa-done{background:rgba(255,255,255,.8)}
 .sa-vol{width:38px;height:38px;line-height:38px;border:1.5px solid rgba(43,38,32,.5);border-radius:6px;font-size:17px;font-weight:bold;color:var(--ink);text-align:center;background:rgba(251,247,235,.9);margin-bottom:4px}
-.story-scroll{width:720px;max-width:92vw;max-height:80vh;overflow-y:auto;display:flex;flex-direction:column}
+.story-scroll{width:780px;max-width:92vw;max-height:82vh;overflow-y:auto;display:flex;flex-direction:column;font-size:15px}
 .btn-back{align-self:flex-start}
 .ss-head{display:flex;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px dashed rgba(43,38,32,.2);margin-bottom:10px}
 .ss-body{flex:1;display:flex;flex-direction:column;gap:14px}
