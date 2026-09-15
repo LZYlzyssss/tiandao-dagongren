@@ -905,6 +905,10 @@ body::before{
 .gg-avatar{margin-bottom:4px}
 .gg-name{font-size:12px;font-weight:bold;white-space:nowrap}
 .gg-title{font-size:10px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
+/* 未结识占位：虚线圆圈问号，不可交互 */
+.gg-unknown{cursor:default;opacity:.5;background:transparent;border-style:dashed}
+.gg-unknown:hover{background:transparent;box-shadow:none;transform:none}
+.gg-q{width:38px;height:38px;line-height:36px;border:1.5px dashed rgba(43,38,32,.45);border-radius:50%;font-size:17px;color:var(--ink-faint);text-align:center;background:rgba(255,255,255,.35)}
 
 /* ---- 神明档案：登场小传 + 出处 ---- */
 .gm-block{margin-bottom:10px}

@@ -7,6 +7,8 @@
 const PATHS={bing:{name:'兵',color:'#c0392b',desc:'爆发单体震骇'},fa:{name:'法',color:'#2e6f9e',desc:'雷法控制群攻'},you:{name:'幽',color:'#6b3fa0',desc:'真伤拘魂削弱'},huo:{name:'火',color:'#d2691e',desc:'灼烧连击调和'},sheng:{name:'生',color:'#3a8f5a',desc:'治疗护盾超度'}};
 const FAVOR_LEVELS=[{v:0,name:'相识'},{v:20,name:'相熟'},{v:50,name:'信重'},{v:90,name:'莫逆'},{v:140,name:'生死之交'}];
 const AID_POWER=[0,0.25,0.45,0.75,1.0];
+/* 全谱总量：首批实装 47 位 + 储备名录 48 位/组（lore/01 第八节）＝ 95；后续实装只加 GODS 不改此值逻辑 */
+const GODS_TOTAL=95;
 const GODS={
 tudi_gong:{name:'土地公',title:'福德正神',icon:'土',tier:'E',camp:'民间',path:'sheng',unlock:null,gh:null,
 intro:'管一乡一里之小事：田土收成、鸡鸭走失、乡邻口舌，兼给孤魂指路，乃破神衙本境之主、首位工单发放人，空心化早期受害者却浑然不觉。',

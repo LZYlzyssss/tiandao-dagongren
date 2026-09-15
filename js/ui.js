@@ -337,7 +337,7 @@ const UI = {
         买法宝请移步「商铺」。
       </div>`;
     /* 「谱系」入口：总路阵营 + 支路层级的众神关系网格 */
-    const gridBtn=h('button','btn btn-primary btn-lg ya-grid-btn','📜 众神谱系 · 已结识 '+Object.keys(GODS).filter(g=>Game.isGodUnlocked(g)).length+'/47');
+    const gridBtn=h('button','btn btn-primary btn-lg ya-grid-btn','📜 众神谱系 · 已结识 '+Object.keys(GODS).filter(g=>Game.isGodUnlocked(g)).length+'/'+GODS_TOTAL);
     gridBtn.style.marginTop='8px';
     gridBtn.onclick=()=>UI.openGodGrid();
     hero.appendChild(gridBtn);
@@ -926,13 +926,12 @@ const UI = {
 
   /* ================= 众神谱系（关系网格） ================= */
   openGodGrid(){
-    /* 阵营总路 + tier 支路，只渲染已解锁的神 */
+    /* 阵营总路 + tier 支路；未结识的神以「圆圈问号」占位，不露真容 */
     const CAMP_ORDER=['天庭','地府','民间','妖仙','释门','上古'];
     const TIER_ORDER=['E','D','C','B','A','S'];
-    /* 按 camp 分组 + tier 子分组 */
+    /* 按 camp 分组 + tier 子分组（含未解锁，占位归组） */
     const byCamp={};
     Object.entries(GODS).forEach(([gid,gd])=>{
-      if(!Game.isGodUnlocked(gid)) return;   /* 未解锁 → 完全隐藏 */
       const camp=gd.camp||'民间';
       const tier=gd.tier||'E';
       if(!byCamp[camp]) byCamp[camp]={};
@@ -949,12 +948,14 @@ const UI = {
         <h2>众神谱系</h2>
         <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
       </div>
-      <div class="gg-tip">总路：阵营 · 支路：品阶层级 · 点击神格头像看登场小传 / 来历出处 / 援助招式</div>`;
+      <div class="gg-tip">全谱 ${GODS_TOTAL} 位（首批实装 47 位，余者后续登场）· 点击已结识的神看登场小传 / 来历出处 / 援助招式</div>`;
     const body=h('div','gg-body');
     CAMP_ORDER.forEach(camp=>{
       const tiers=byCamp[camp]; if(!tiers) return;
       const campEl=h('div','gg-camp');
-      campEl.innerHTML=`<div class="gg-camp-title">${camp}<span class="gg-camp-count"> ${Object.values(tiers).reduce((a,b)=>a+b.length,0)} 位</span></div>`;
+      const campAll=Object.values(tiers).reduce((a,b)=>a+b.length,0);
+      const campMet=Object.values(tiers).reduce((a,b)=>a+b.filter(g=>Game.isGodUnlocked(g)).length,0);
+      campEl.innerHTML=`<div class="gg-camp-title">${camp}<span class="gg-camp-count"> 已识 ${campMet}/${campAll}</span></div>`;
       TIER_ORDER.forEach(tier=>{
         const list=tiers[tier]; if(!list) return;
         const tierRow=h('div','gg-tier-row');
@@ -962,6 +963,15 @@ const UI = {
         const grid=h('div','gg-grid');
         list.forEach(gid=>{
           const gd=GODS[gid];
+          if(!Game.isGodUnlocked(gid)){
+            /* 未结识：圆圈问号占位，不可点击 */
+            const unk=h('div','gg-cell gg-unknown',
+              `<div class="gg-avatar gg-q">？</div>
+               <div class="gg-name">？？？</div>
+               <div class="gg-title">尚未结识</div>`);
+            grid.appendChild(unk);
+            return;
+          }
           const card=h('div','gg-cell',
             `<div class="gg-avatar">${godAvatar(gid,48)}</div>
              <div class="gg-name">${gd.name}</div>
