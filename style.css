@@ -195,18 +195,17 @@ body::before{
 /* 工单卡片：场景图做底，暗化+浓遮罩防抢 */
 .order-bg{
   background-size:cover;background-position:center;background-blend-mode:normal;
-  filter:brightness(.85) saturate(.9);
 }
 .order-bg::before{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(180deg, rgba(251,246,232,.78), rgba(243,234,214,.85));
+  background-image:linear-gradient(180deg, rgba(251,246,232,.35), rgba(243,234,214,.42));
 }
 .order-bg > *{position:relative;z-index:1}
-.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.76), rgba(243,234,214,.83))}
-.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.76), rgba(238,228,206,.83))}
-.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.82), rgba(220,205,188,.88))}
-.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.76), rgba(240,228,200,.83))}
-.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.76), rgba(238,225,190,.83))}
+.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.32), rgba(243,234,214,.38))}
+.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.32), rgba(238,228,206,.38))}
+.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.38), rgba(220,205,188,.45))}
+.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.32), rgba(240,228,200,.38))}
+.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.32), rgba(238,225,190,.38))}
 .order-bg .o-body{
   background:rgba(255,252,244,.98);border-radius:4px;padding:8px 10px;margin-left:52px;
   position:relative;z-index:2;
