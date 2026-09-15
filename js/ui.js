@@ -6,6 +6,8 @@ function godAvatar(key,px){
   const g=GODS[key];
   return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
 }
+/* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
+function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}"><span class="ic-txt">${txt}</span>${ASSET.html('it_'+id,'item-img',txt)}</div>`; }
 
 const UI = {
   view:'office',     // office | mission | battle | settle
@@ -123,7 +125,14 @@ const UI = {
       const isLong=!!m.long;
       const actTotal=m.acts?m.acts.length:0;
       const actCur=Math.min(o.act||0, actTotal-1);
-      const card=h('div','order'+(m.forced?' forced':''));
+      const card=h('div','order'+(m.forced?' forced':'')+(typeof ASSET!=='undefined'?' order-bg':'')+' order-ch'+(m.chapter||1));
+      /* 画质批3：卡片优先用 task_<id> 专属场景图，fallback 章节 bf 图 */
+      if(typeof ASSET!=='undefined'){
+        const taskKey='task_'+m.id;
+        const bgKey=ASSET.list[taskKey] ? taskKey : ASSET.bfKey(m.chapter||1, (m.danger||0)>=4);
+        card.dataset.bgKey=bgKey;
+        ASSET.bg(card, bgKey, 0.42);
+      }
       /* v3 奖励标签：读 m.reward（gh / 五系碎末 / 同名碎片 / 妖丹） */
       const rv=m.reward||{};
       let rewardTags='';
