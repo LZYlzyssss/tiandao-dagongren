@@ -853,6 +853,7 @@ body::before{
 /* ---- 13. 神明人脉 · 好感 · 送礼（一期骨架） ---- */
 .god-link{cursor:pointer;border-radius:50%;transition:transform .15s}
 .god-link:hover{transform:scale(1.08)}
+.god-link::after{content:"档";position:absolute;font-size:0}
 
 .tier-tag{
   display:inline-block;font-size:10px;line-height:1;padding:2px 6px;border-radius:6px;
@@ -890,3 +891,40 @@ body::before{
 .contact-row{cursor:pointer}
 .contact-row.locked{opacity:.55;cursor:default}
 .contact-row:not(.locked):hover{background:rgba(43,38,32,.05)}
+
+/* ---- 14. v3 战斗意图气泡 ---- */
+.intent-bubble{
+  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+  font-size:11px;line-height:1;padding:3px 8px;border-radius:8px;
+  white-space:nowrap;z-index:5;color:#f7ead2;letter-spacing:1px;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);pointer-events:none;
+  opacity:0;transition:opacity .3s;
+}
+.intent-bubble:not(:empty){opacity:1}
+.intent-qiang{background:var(--cinnabar)}
+.intent-xu{background:var(--purple)}
+.intent-shou{background:var(--indigo)}
+.intent-mixed{background:var(--ink-soft)}
+.fighter.foe{position:relative}
+
+/* ---- 15. v3 侵蚀条 / 顶栏侵蚀 ---- */
+.erode-bar{
+  height:10px;border-radius:6px;background:rgba(43,38,32,.12);
+  overflow:hidden;border:1px solid rgba(43,38,32,.18);margin:6px 0;
+}
+.erode-fill{
+  display:block;height:100%;border-radius:6px;
+  background:var(--ink-soft);transition:width .4s ease;
+}
+.stat-chip.erode-hot{
+  border-color:var(--cinnabar);
+  background:rgba(192,60,46,.08);
+}
+.stat-chip.erode-hot .v{color:var(--cinnabar)}
+
+/* ---- 16. v3 技能克制高亮 ---- */
+.skill-pick.counter{
+  border-color:var(--jade);
+  background:rgba(71,122,90,.08);
+  box-shadow:0 0 0 1px var(--jade);
+}

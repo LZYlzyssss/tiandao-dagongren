@@ -49,19 +49,22 @@ const UI = {
       b.classList.toggle('active', b.dataset.tab===this.tab);
     });
     /* 有官遣单且不在案牍页时，案牍标签亮红点 */
-    const forced=Game.s.shelf.some(o=>MISSIONS.find(m=>m.id===o.mid).forced);
+    const forced=Game.s.shelf.some(o=>{ const m=MISSIONS.find(x=>x.id===o.mid); return m&&m.forced; });
     $('dotDesk').style.display=(forced && this.tab!=='desk')?'block':'none';
   },
 
   renderTop(){
     const s=Game.s, st=Stats.cur(), rk=RANKS[s.rank];
     const target=monthTarget(s.month);
+    const eb=ERODE_BANDS[Game.erodeLevel()];
+    const erodeHot = Game.erodeLevel()>=2;
     $('topStats').innerHTML = `
       <div class="stat-chip"><span class="k">品阶</span><span class="v">${rk.name}</span></div>
       <div class="stat-chip"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
       <div class="stat-chip"><span class="k">修为</span><span class="v">${s.cult}</span></div>
       <div class="stat-chip"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></div>
-      <div class="stat-chip"><span class="k">人情</span><span class="v">${s.favor}</span></div>
+      <div class="stat-chip"><span class="k">人情</span><span class="v">${s.renqing}</span></div>
+      <div class="stat-chip ${erodeHot?'erode-hot':''}"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></div>
       <div class="stat-chip ${s.merit>=target?'':'kpi-hot'}">
         <span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>
       </div>
@@ -95,11 +98,21 @@ const UI = {
       p.appendChild(h('div','shelf-empty','案头空空如也。<br>去「神衙」闭目调息度过今日，明日兴许就有新工单了。'));
     }
     s.shelf.forEach((o,idx)=>{
-      const m=MISSIONS.find(x=>x.id===o.mid), god=GODS[m.god];
+      const m=MISSIONS.find(x=>x.id===o.mid);
+      if(!m) return;
+      const god=GODS[m.god];
       const isLong=!!m.long;
       const actTotal=m.acts?m.acts.length:0;
       const actCur=Math.min(o.act||0, actTotal-1);
       const card=h('div','order'+(m.forced?' forced':''));
+      /* v3 奖励标签：读 m.reward（gh / 五系碎末 / 同名碎片 / 妖丹） */
+      const rv=m.reward||{};
+      let rewardTags='';
+      if(rv.gh) rewardTags+=`<span class="tag tag-gh">神格·${GODHOODS[rv.gh].name}</span>`;
+      if(rv.shards) Object.entries(rv.shards).forEach(([p,n])=>{ rewardTags+=`<span class="tag">${PATHS[p].name}系碎末×${n}</span>`; });
+      if(rv.dshards) Object.entries(rv.dshards).forEach(([g,n])=>{ rewardTags+=`<span class="tag">${GODS[g].name}碎片×${n}</span>`; });
+      if(rv.pill) rewardTags+=`<span class="tag">${PILLS[rv.pill].name}</span>`;
+      if(!rewardTags) rewardTags='<span class="tag">无神格</span>';
       card.innerHTML=`
         <div style="display:flex;gap:10px;align-items:flex-start">
           <span class="god-link" data-god="${m.god}" title="点击查看神明档案">${godAvatar(m.god,40)}</span>
@@ -116,7 +129,7 @@ const UI = {
             </div>
             <div class="o-scroll">${m.scroll}</div>
             <div class="o-meta">
-              ${m.gh?`<span class="tag tag-gh">神格·${GODHOODS[m.gh].name}</span>`:'<span class="tag">无神格</span>'}
+              ${rewardTags}
               <span class="tag tag-money">${Math.round(m.money*(o.bargain?1.5:1))} 文</span>
               <span class="tag tag-merit">功过 ${m.merit}</span>
               ${m.forced?'<span class="tag tag-forced">官遣</span>':''}
@@ -131,7 +144,7 @@ const UI = {
       acts.appendChild(go);
       if(!m.forced){
         const b=h('button','btn btn-sm','加价');
-        b.disabled=o.bargain||s.favor<=0;
+        b.disabled=o.bargain||s.renqing<=0;
         b.title='耗 1 点人情，香火钱报酬 +50%';
         b.onclick=()=>Game.bargain(idx);
         acts.appendChild(b);
@@ -144,13 +157,19 @@ const UI = {
     c.appendChild(p);
   },
 
-  /* ================= 页二：修行（神格盘 / 融合） ================= */
+  /* ================= 页二：修行（神格盘 / 碎末凝格 / 妖丹 / 融合） ================= */
   renderCult(c){
     const s=Game.s, st=Stats.cur();
     const p=h('div','panel');
     p.innerHTML=`<h2>神格盘 <span class="sub">槽位 ${s.equipped.length}/${Stats.slots()}</span></h2>`;
-    if(st.clash) p.appendChild(h('div','clash-warn','道争：天启系与幽冥系神格同嵌，神力上限 −20%。鱼与熊掌，自己掂量。'));
-    if(st.resonance) p.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}系神格齐聚，攻击 +10%。`));
+    if(st.clash) p.appendChild(h('div','clash-warn','道争：兵⟷法、幽⟷生同嵌，神力上限 −20%（侵蚀 40+ 扩至 −30%）。鱼与熊掌，自己掂量。'));
+    if(st.resonance && st.resonance.length){
+      st.resonance.forEach(r=>{
+        const rs=RESONANCE[r.path];
+        const label = r.strong ? (rs.four.label||'强化共鸣') : (rs.two.label||'共鸣');
+        p.appendChild(h('div','resonance',`同道共鸣：${PATHS[r.path].name}系 ${r.strong?'齐聚(四格)':'双格'} —— ${label}`));
+      });
+    }
 
     const slots=h('div','slots');
     for(let i=0;i<Stats.slots();i++){
@@ -177,7 +196,7 @@ const UI = {
       const item=h('div','gh-item'+(eq?' equipped':''));
       let stateHtml;
       if(rec.sleep>0) stateHtml=`<div class="gh-dorm">沉睡中（${rec.sleep} 日）</div>`;
-      else if(rec.awakened) stateHtml=`<div class="gh-wake">已觉醒 · 神通「${g.active.name}」<br><span style="color:var(--ink-faint)">被动：${g.passive?g.passive.label:'—'}</span></div>`;
+      else if(rec.awakened) stateHtml=`<div class="gh-wake">已觉醒 · 神通「${g.active.name}」<br><span style="color:var(--ink-faint)">被动：${g.passive?(g.passive.labels||['—']).join('，'):'—'}</span></div>`;
       else stateHtml=`<div class="gh-dorm">未觉醒（感悟 ${Math.round(rec.insight*100)}%）</div>`;
       item.innerHTML=`
         <div class="gh-t"><span class="path-dot dot-${g.path}"></span>${g.name}
@@ -188,18 +207,104 @@ const UI = {
       eb.disabled=rec.sleep>0;
       eb.onclick=()=>Game.toggleEquip(id); row.appendChild(eb);
       if(!rec.awakened && rec.sleep<=0){
-        const pb=h('button','btn btn-indigo btn-sm','参悟 · 120文');
+        const aw=AWAKE_RATE[g.q]||AWAKE_RATE['凡'];
+        const pb=h('button','btn btn-indigo btn-sm',`参悟 · ${aw.cost}文`);
+        pb.disabled=s.money<aw.cost;
         pb.onclick=()=>Game.ponder(id); row.appendChild(pb);
+      }
+      if(eq && !rec.awakened){
+        const db=h('button','btn btn-ghost btn-sm','拆回碎末');
+        db.title='拆回 1 枚同系碎末（半价回收）';
+        db.onclick=()=>Game.dismantle(id); row.appendChild(db);
       }
       item.appendChild(row);
       list.appendChild(item);
     });
     p.appendChild(list);
+    c.appendChild(p);
 
-    /* 融合 */
+    /* ---- 碎末凝格（同系 5 碎末 → 凝格池随机凡品格） ---- */
+    const sp=h('div','panel');
+    sp.innerHTML=`<h2>碎末凝格 <span class="sub">同系 5 碎末 → 随机凡品格</span></h2>
+      <div class="section-tip">兵/法/火三系碎末可凝格；幽/生系碎末不入凝格池（仅靠整格获取或拆回）。</div>`;
+    Object.entries(s.shards).forEach(([path,n])=>{
+      const pool=CONDENSE_POOL[path];
+      const canCondense = pool && pool.length>0;
+      const r=h('div','shop-row',
+        `<div><div class="sr-t"><span class="path-dot dot-${path}"></span>${PATHS[path].name}系碎末 <span class="lv-tag">${n}/${SHARD_NEED}</span></div>
+         <div class="sr-d">${canCondense?'5 枚可凝出一枚随机凡品格':'该系碎末不入凝格池（拆回专用）'}</div></div>`);
+      if(canCondense){
+        const b=h('button','btn btn-primary btn-sm','凝格');
+        b.disabled=n<SHARD_NEED;
+        b.onclick=()=>Game.condense(path);
+        r.appendChild(b);
+      }
+      sp.appendChild(r);
+    });
+    c.appendChild(sp);
+
+    /* ---- 同名碎片（D 神 5 碎片 → 专属灵品格） ---- */
+    const dsp=Object.entries(s.dshards||{}).filter(([,n])=>n>0);
+    if(dsp.length){
+      const dp=h('div','panel');
+      dp.innerHTML=`<h2>同名碎片 <span class="sub">D 神 5 碎片 → 专属灵品格</span></h2>`;
+      dsp.forEach(([g,n])=>{
+        const gd=GODS[g];
+        if(!gd || !gd.gh) return;
+        const r=h('div','shop-row',
+          `<div><div class="sr-t">${godAvatar(g,28)} ${gd.name} 碎片 <span class="lv-tag">${n}/${SHARD_NEED}</span></div>
+           <div class="sr-d">5 枚可凝成专属灵品格「${GODHOODS[gd.gh].name}」</div></div>`);
+        const b=h('button','btn btn-primary btn-sm','凝格');
+        b.disabled=n<SHARD_NEED;
+        b.onclick=()=>Game.condenseGod(g);
+        r.appendChild(b); dp.appendChild(r);
+      });
+      c.appendChild(dp);
+    }
+
+    /* ---- 妖丹（炼化 / 吞噬 / 侵蚀） ---- */
+    const pp=h('div','panel');
+    pp.innerHTML=`<h2>妖丹炉 <span class="sub">炼化出整格 / 吞噬得常驻属性</span></h2>`;
+    /* 侵蚀条 */
+    const eb=ERODE_BANDS[Game.erodeLevel()];
+    pp.appendChild(h('div','erode-bar',
+      `<div class="erode-fill" style="width:${s.erode}%;background:${Game.erodeLevel()>=3?'var(--cinnabar)':'var(--ink-soft)'}"></div>`));
+    pp.appendChild(h('div','section-tip',`侵蚀 ${s.erode}/100 · ${eb.name} —— ${eb.desc}`));
+    /* 丹炉状态 */
+    if(s.refining){
+      const p2=PILLS[s.refining.pill];
+      pp.appendChild(h('div','clash-warn',`丹炉中正在炼化「${p2.name}」，还需 ${s.refining.daysLeft} 日……`));
+    }
+    const pills=Object.entries(s.pills||{}).filter(([,n])=>n>0);
+    if(!pills.length){
+      pp.appendChild(h('div','section-tip','尚无妖丹。击败妖魔类敌人可获得，或在工单奖励中获取。'));
+    }else{
+      pills.forEach(([id,n])=>{
+        const pl=PILLS[id]; if(!pl) return;
+        const r=h('div','shop-row',
+          `<div><div class="sr-t">${pl.icon} ${pl.name} <span class="lv-tag">×${n}</span></div>
+           <div class="sr-d">炼化：花 ${pl.refineCost}文，${pl.days}日出整格（${(pl.band||[]).join('/')}品质）${pl.pathWeight?'·加权'+PATHS[pl.pathWeight].name+'系':''}<br>
+            吞噬：${pl.devour.hp>0?'神躯+'+pl.devour.hp:''} ${pl.devour.atk>0?'攻击+'+pl.devour.atk:''} ${pl.devour.def>0?'防御+'+pl.devour.def:''} ｜ 侵蚀+${pl.devour.erode}${pl.special?' · '+pl.specialDesc:''}</div></div>`);
+        const rb=h('button','btn btn-indigo btn-sm','炼化');
+        rb.disabled=!!s.refining || s.money<pl.refineCost;
+        rb.onclick=()=>Game.refineStart(id); r.appendChild(rb);
+        const db=h('button','btn btn-sm btn-sell','吞噬');
+        db.title='常驻属性增长，但侵蚀值上升';
+        db.onclick=()=>this.openConfirm('吞噬妖丹',
+          `当真要吞下「${pl.name}」？<br>常驻属性会永久增长，但侵蚀值 +${pl.devour.erode}。<br>
+           <span style="color:var(--ink-faint);font-size:13px">侵蚀达 80 锁定 D 级神格获取，100 锁定坏结局轨道。</span>`,
+          ()=>Game.devourPill(id), '吞下');
+        r.appendChild(db);
+        pp.appendChild(r);
+      });
+    }
+    c.appendChild(pp);
+
+    /* ---- 融合（按章节/配方过滤） ---- */
     const fp=h('div','panel');
     fp.innerHTML=`<h2>神格融合 <span class="sub">两枚觉醒神格合而为一</span></h2>`;
     FUSIONS.forEach(f=>{
+      if(!Game.hasRecipe(f)) return;   /* 仅显示已解锁配方 */
       const out=GODHOODS[f.out], ins=f.in.map(x=>GODHOODS[x].name).join(' + ');
       const allAwake=f.in.every(x=>Game.awakened(x));
       const anyEquipped=f.in.some(x=>s.equipped.includes(x));
@@ -213,7 +318,9 @@ const UI = {
       b.onclick=()=>Game.fuse(f);
       fp.appendChild(b);
     });
-    c.appendChild(p);
+    if(!FUSIONS.some(f=>Game.hasRecipe(f))){
+      fp.appendChild(h('div','section-tip','尚未习得任何融合配方。推进主线、完成支线可获配方；商铺配方随章节解锁。'));
+    }
     c.appendChild(fp);
   },
 
@@ -421,7 +528,7 @@ const UI = {
       <div class="me-seal">衙</div>
       <div class="me-id">
         <div class="me-rank">${rk.name}</div>
-        <div class="sr-d">第 ${s.month} 月 ${s.day} 日 ｜ 修为 <b>${s.cult}</b> ｜ 香火钱 <b style="color:var(--gold)">${s.money} 文</b> ｜ 人情 <b>${s.favor}</b></div>
+        <div class="sr-d">第 ${s.month} 月 ${s.day} 日 ｜ 修为 <b>${s.cult}</b> ｜ 香火钱 <b style="color:var(--gold)">${s.money} 文</b> ｜ 人情 <b>${s.renqing}</b></div>
       </div>`;
     c.appendChild(idp);
 
@@ -438,8 +545,14 @@ const UI = {
       cell('暴击率', Math.round(st.crit*100)+'%')+
       cell('吸血', Math.round(st.lifesteal*100)+'%');
     bp.appendChild(grid);
-    if(st.clash) bp.appendChild(h('div','clash-warn','道争发动中：神力上限 −20%。'));
-    if(st.resonance) bp.appendChild(h('div','resonance',`同道共鸣：${PATHS[st.resonance].name}系，攻击 +10%。`));
+    if(st.clash) bp.appendChild(h('div','clash-warn','道争发动中：神力上限 −20%（侵蚀 40+ 扩至 −30%）。'));
+    if(st.resonance && st.resonance.length){
+      st.resonance.forEach(r=>{
+        const rs=RESONANCE[r.path];
+        const lbl = r.strong ? (rs.four.label||'强化') : (rs.two.label||'共鸣');
+        bp.appendChild(h('div','resonance',`同道共鸣：${PATHS[r.path].name}系 ${r.strong?'齐聚':'双格'} —— ${lbl}`));
+      });
+    }
     const fx=[];
     Object.values(s.wear||{}).forEach(id=>{
       if(id && s.bag[id] && ITEMS[id]) fx.push(`${ITEMS[id].name}：${itemFxText(ITEMS[id])}`);
@@ -527,7 +640,7 @@ const UI = {
           <div class="sr-t">${gd.name} <span class="tier-tag tier-${(gd.tier||'e').toLowerCase()}">${gd.tier||'E'}</span>
             ${met?`<span style="color:var(--cinnabar);font-size:12px"> ${Game.favorName(lv)} · ${rel.favor}</span>`:''}</div>
           <div class="sr-d">${met?gd.title
-            :(!unlocked?(function(){const u=gd.unlock;return u&&u.rank!==undefined?`晋升「${RANKS[u.rank].name}」后可结识`:u&&u.chapter!==undefined?`主线第 ${u.chapter} 章后可结识`:'机缘未至';})()
+            :(!unlocked?(function(){const u=gd.unlock;return u&&u.rank!==undefined?`晋升「${RANKS[u.rank].name}」后可结识`:u&&u.chapter!==undefined?`主线第 ${u.chapter} 章后可结识`:u&&u.by!==undefined?`需 ${GODS[u.by].name} 引荐`:'机缘未至';})()
             :'闻名未识——接下其工单便算打上交道')}</div>
         </div>
         ${met?'<span class="tag tag-merit">已结识</span>':unlocked?'<span class="tag">未识</span>':'<span class="tag">未解锁</span>'}`;
@@ -605,7 +718,8 @@ const UI = {
     c.appendChild(wrap);
     if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
-      const sc=h('div','scroll-card',`<span class="ink-mark">▍</span>前方杀气翻涌——<b style="color:var(--cinnabar)">${ENEMIES[node.enemy].name}</b> 拦住去路！`);
+      const foeName=node.name||ENEMIES[node.enemy].name;
+      const sc=h('div','scroll-card',`<span class="ink-mark">▍</span>前方杀气翻涌——<b style="color:var(--cinnabar)">${foeName}</b> 拦住去路！`);
       wrap.appendChild(sc);
       c.appendChild(wrap);
       this.runBattleNode(node);
@@ -626,6 +740,17 @@ const UI = {
     if(r.enemyAtk) this.rt.ctx.enemyAtk+=r.enemyAtk;
     if(r.enemyVuln) this.rt.ctx.enemyVuln=true;
     if(r.money){ Game.s.money+=r.money; }
+    /* v3 抉择后果：功过/人情/侵蚀/好感/旗标/免战跳节点 */
+    if(r.merit) Game.s.merit+=r.merit;
+    if(r.renqing) Game.s.renqing+=r.renqing;
+    if(r.erode) Game.addErode(r.erode);
+    if(r.cleanse) Game.reduceErode(r.cleanse);
+    if(r.favor) Object.entries(r.favor).forEach(([g,n])=>Game.addFavor(g,n));
+    if(r.flags) Object.entries(r.flags).forEach(([k,v])=>{
+      if(typeof v==='number' && typeof Game.s.flags[k]==='number') Game.s.flags[k]+=v;
+      else Game.s.flags[k]=(v===undefined?true:v);
+    });
+    if(r.skip) this.rt.pendingSkip=r.skip;
     this.rt.result=r.log||'你继续前行。';
     Game.save(); this.renderTop(); this.renderMissionNode();
     if(typeof Guide!=='undefined') Guide.act('chooseEvent');
@@ -633,6 +758,7 @@ const UI = {
 
   nextNode(){
     this.rt.node++; this.rt.result=null;
+    if(this.rt.pendingSkip){ this.rt.node+=this.rt.pendingSkip; this.rt.pendingSkip=0; }
     if(this.rt.node>=this.curNodes().length){ this.settle(); return; }
     this.renderMissionNode();
     if(typeof Guide!=='undefined') Guide.act('nextNode');
@@ -697,15 +823,26 @@ const UI = {
     }
 
     const money=Math.round(m.money*(o.bargain?1.5:1));
-    s.money+=money; s.merit+=m.merit; s.favor+=1;
-    Game.addFavor(m.god, 4+m.danger*2);   // 办差自然增进交情
-    const gh=Game.grantGodhood(m.id);
-    /* 主线章单完成：记旗标、推进章节 */
+    /* v3 统一发奖：构建 reward 对象，grantReward 处理 gh/shards/dshards/pill/merit/money/favor/erode/flags */
+    const rew = m.reward ? Object.assign({}, m.reward) : {};
+    rew.money = (rew.money||0) + money;
+    rew.merit = (rew.merit||0) + (m.merit||0);
+    rew.favor = Object.assign({}, rew.favor||{});
+    rew.favor[m.god] = (rew.favor[m.god]||0) + 4 + m.danger*2;
+    const out = Game.grantReward(rew);
+    s.renqing += 1;
+    const gh = out.gh || {noGh:true};
+    /* 主线幕 / 支线结案落 flag（防重复上架）；章末任务推进章节并敕封 */
+    if(m.main) s.mainDone[m.main]=true;
+    if(m.side) s.sideDone[m.side]=true;
     let mainMsg='';
-    if(m.main){
-      s.flags['main_'+m.id]=1;
+    if(m.chapterEnd){
       if(s.chapter<=(m.chapter||1)) s.chapter=(m.chapter||1)+1;
-      mainMsg=`<div style="color:var(--cinnabar);margin-top:6px"><b>—— 主线 · 第 ${m.chapter} 章完 ——</b></div>`;
+      Game.promoteRank();
+      mainMsg=`<div style="color:var(--cinnabar);margin-top:8px"><b>—— 第 ${m.chapter} 章终 ——</b><br>
+        敕封「${RANKS[s.rank].name}」！神格盘与工单容量随品阶扩充。</div>`;
+    }else if(m.main){
+      mainMsg=`<div style="color:var(--cinnabar);margin-top:6px"><b>—— 主线推进 ——</b></div>`;
     }
     /* 移除已完成工单 */
     s.shelf=s.shelf.filter(x=>x!==o);
@@ -716,16 +853,21 @@ const UI = {
     const c=$('pageStage'); c.innerHTML='';
     $('tabbar').classList.add('hidden');
     const wrap=h('div','panel settle');
+    /* 奖励文案 */
+    let rwdHtml=`香火钱 <b style="color:var(--gold)">+${money} 文</b><br>
+      功过 <b style="color:var(--jade)">+${m.merit||0}</b> ｜ 人情 <b>+1</b> ｜ 与${GODS[m.god].name}交情 <b>+${4+m.danger*2}</b>`;
+    if(gh.noGh){
+      rwdHtml+=`<br><span style="color:var(--ink-faint)">低阶神拿不出神格作谢，这份人情他记下了。</span>`;
+    }else{
+      rwdHtml+=`<br>${GODS[m.god].name}赐你神格：<b>${gh.name}</b>（修为 +${gh.cultGain}）`;
+    }
+    if(out.shards && out.shards.length) out.shards.forEach(([p,n])=>{ rwdHtml+=`<br>碎末 <b>${PATHS[p].name}系 +${n}</b>`; });
+    if(out.dshards && out.dshards.length) out.dshards.forEach(([g,n])=>{ rwdHtml+=`<br>同名碎片 <b>${GODS[g].name} +${n}</b>`; });
+    if(out.pill) rwdHtml+=`<br>妖丹 <b>${PILLS[out.pill].name}</b>`;
     wrap.innerHTML=`<h3>${m.long?'长单完结 · 回衙复命':'差使办妥 · 回衙复命'}</h3>
       <div style="width:80px;height:80px;margin:6px auto 4px">${godAvatar(m.god,80)}</div>
-      <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name}${gh.noGh?' 一揖到地':' 亲赐神格'}</div>
-      <div class="reward-line">
-        香火钱 <b style="color:var(--gold)">+${money} 文</b><br>
-        功过 <b style="color:var(--jade)">+${m.merit}</b> ｜ 人情 <b>+1</b> ｜ 与${GODS[m.god].name}交情 <b>+${4+m.danger*2}</b><br>
-        ${gh.noGh
-          ? `低阶神拿不出神格作谢，这份人情他记下了。`
-          : `${GODS[m.god].name}切下一块神格掷给你：<b>${gh.name}</b>（修为 +${gh.cultGain}）`}
-      </div>${mainMsg}`;
+      <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name} 一揖到地</div>
+      <div class="reward-line">${rwdHtml}</div>${mainMsg}`;
     if(gh.awakened){
       const pop=h('div','wake-pop',
         `<h4>神格觉醒！</h4><div>「${gh.name}」在你神躯中轰然亮起——<br>
@@ -785,6 +927,8 @@ const UI = {
     const cur=FAVOR_LEVELS[lv], next=FAVOR_LEVELS[lv+1];
     const unlocked=Game.isGodUnlocked(g);
     const aidOk=rel.met && lv>=1;
+    const aidLv=Game.aidLevelOf(g);
+    const aidPct=Math.round(Game.aidFactor(g)*100);
     /* 解锁条件文案 */
     let unlockTxt='';
     if(!unlocked && gd.unlock){
@@ -818,11 +962,11 @@ const UI = {
         ? `<div class="favor-block">
              <div class="favor-lv">交情：<b style="color:var(--cinnabar)">${cur.name}</b>
                ${next?`<span style="color:var(--ink-faint);font-size:12px">（再 ${next.v-rel.favor} 点进阶「${next.name}」）</span>`:'<span style="color:var(--ink-faint);font-size:12px">（已至顶）</span>'}</div>
-             <div class="favor-bar"><i style="width:${Math.min(100,rel.favor)}%"></i></div>
-             <div style="font-size:12px;color:var(--ink-faint)">好感 ${rel.favor}/100 · 每日一礼，办差亦增进交情</div>
+             <div class="favor-bar"><i style="width:${Math.min(100,rel.favor/140*100)}%"></i></div>
+             <div style="font-size:12px;color:var(--ink-faint)">好感 ${rel.favor}/140 · 每日一礼，办差亦增进交情</div>
            </div>
-           ${aidOk?`<div class="aid-hint">◆ 好感相熟以上：战斗关键时刻可呼叫「<b>${gd.aid.name}</b>」——${gd.aid.desc}</div>`
-                  :`<div class="aid-hint" style="color:var(--ink-faint)">◆ 交情至「相熟」，战斗关键时刻可呼叫其援助</div>`}
+           ${aidOk?`<div class="aid-hint">◆ 援助档位【${FAVOR_LEVELS[aidLv].name}】· 威力 ${aidPct}%：战斗关键时刻可呼叫「<b>${gd.aid.name}</b>」——${gd.aid.desc}</div>`
+                  :`<div class="aid-hint" style="color:var(--ink-faint)">◆ 交情至「相熟」（好感 20），战斗关键时刻可呼叫其援助（五档：神念25%/分身45%/完整75%/本体100%）</div>`}
            <div class="gm-gifts"><b>行囊中的礼物</b>${giftToday?'<span style="color:var(--ink-faint);font-size:12px"> · 今日已送过，明日再来</span>':''}</div>
            <div class="gift-list"></div>
            ${gifts.length?'':'<div class="section-tip">行囊中没有礼物。去「商铺 · 礼单」购些心意。</div>'}`
@@ -849,12 +993,12 @@ const UI = {
     box.appendChild(cb); ov.appendChild(box); ml.appendChild(ov);
   },
 
-  /* ================= 月末考核 ================= */
-  showReview(pass,promoted,target,strikes){
+  /* ================= 月末考核（v3：上/称/下/不称职，连续两次不称职即贬） ================= */
+  showReview({grade,target,bonus,fine,strikes,gameOver}){
     if(typeof Guide!=='undefined') Guide.act('review');
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay'), box=h('div','paper review-card');
-    if(strikes>=2){
+    if(gameOver){
       box.innerHTML=`
         <div class="big-seal" style="background:#3d3020">黜</div>
         <h2>贬为孤魂</h2>
@@ -868,14 +1012,18 @@ const UI = {
       box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
       return;
     }
+    const sealMap={shang:'优',ping:'称',xia:'平',bu:'过'};
+    const gradeName={shang:'上考',ping:'称职',xia:'下考',bu:'不称职'}[grade]||'不称职';
+    const sealColor = grade==='shang'?'var(--cinnabar)':grade==='bu'?'#6f6a7a':'var(--jade)';
     box.innerHTML=`
-      <div class="big-seal" style="background:${pass?'var(--cinnabar)':'#6f6a7a'}">${pass?'考':'过'}</div>
-      <h2>${pass?'考核称职':'考核不称职'}</h2>
+      <div class="big-seal" style="background:${sealColor}">${sealMap[grade]||'过'}</div>
+      <h2>考核 · ${gradeName}</h2>
       <div class="review-list">
-        <div>本月功过目标：${target} 点</div>
-        ${pass?`<div>阎王爷朱批：<b>尚堪驱驰</b>，赏香火钱 80 文。</div>`
-              :`<div>阎王爷朱批：<b>着实废物</b>，记大过一次（${strikes}/2）。</div>`}
-        ${promoted?`<div style="color:var(--cinnabar);font-size:18px"><b>敕封：${RANKS[Game.s.rank].name}！</b><br>神格镶嵌槽 +1，可承接更大的神仙私活。</div>`:''}
+        <div>本月功过目标：${target} 点 ｜ 实得 ${Game.s.merit} 点</div>
+        ${bonus?`<div>阎王爷朱批：<b>尚堪驱驰</b>，赏香火钱 ${bonus} 文。</div>`:''}
+        ${fine?`<div>阎王爷朱批：<b>着实废物</b>，罚没香火钱 ${fine} 文，记大过一次（${strikes}/2）。</div>`:''}
+        ${grade==='xia'?`<div>阎王爷朱批：<b>勉强够看</b>，无赏无罚。</div>`:''}
+        <div style="color:var(--ink-faint);font-size:13px;margin-top:6px">侵蚀值自然回落 3 点。晋升走主线敕封，不在此处。</div>
       </div>`;
     const b=h('button','btn btn-primary btn-lg','翻开新一月的黄历');
     b.onclick=()=>{ ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); if(typeof Guide!=='undefined') Guide.act('reviewed'); };
@@ -896,6 +1044,7 @@ const UI = {
         </div>
         <div class="vs">战</div>
         <div class="fighter foe" id="fFoe">
+          <div class="intent-bubble" id="eIntent"></div>
           <div class="fig-body" id="figFoe" style="color:${B.e.tint}">${B.e.icon}</div>
           <div class="fig-name">${B.e.name}</div>
           ${fbarHTML('e', B.e.hpLabel)}
@@ -923,6 +1072,15 @@ const UI = {
       B.e.stun>0?`震骇 ${B.e.stun}回合`:'',
       (B.e.vulnTurns>0||B.e.vulnFixed>1)?'破绽':''
     ].filter(Boolean).join(' · ');
+    /* v3：敌人意图气泡 */
+    const ie=$('eIntent');
+    if(ie){
+      const it=B.e.intentNext||B.e.intent||'mixed';
+      const info=INTENT_INFO[it]||INTENT_INFO.mixed;
+      ie.textContent=info.name;
+      ie.title=info.desc;
+      ie.className='intent-bubble intent-'+it;
+    }
     const lg=$('battleLog');
     if(lg) lg.innerHTML=B.log.map(l=>`<div class="${l.cls}">${l.html}</div>`).join('');
   },
@@ -946,21 +1104,22 @@ const UI = {
   floatFoe(t,color){ floatNum('#fFoe',t,color); },
   floatPlayer(t,color){ floatNum('#fPlayer',t,color); },
 
-  /* 关键时刻：等待玩家抉择 */
+  /* 关键时刻：等待玩家抉择（v3：援助五档 / 技能冷却 / 读招克制提示） */
   battleMoment(B){
     return new Promise(resolve=>{
       this._momentResolve=resolve;
       const slot=$('momentSlot'); if(!slot){ resolve({act:'flee'}); return; }
       const m=h('div','moment');
-      /* 神明援助：好感 Lv2（相熟）+，每场一次 */
+      /* 神明援助：好感 Lv1+（相熟），AID_POWER > 0 即可，每场一次 */
       const gm=this.mission?this.mission():null;
       const gkey=gm?gm.god:null;
-      const fav=gkey?Game.favorOf(gkey):0;
-      const canAid=gkey && !B.aidUsed && Game.favorLevel(fav)>=1;
+      const canAid=gkey && !B.aidUsed && Game.aidFactor(gkey)>0;
+      const aidPct = gkey ? Math.round(Game.aidFactor(gkey)*100) : 0;
+      const aidLvName = gkey ? FAVOR_LEVELS[Game.aidLevelOf(gkey)].name : '';
       m.innerHTML=`<h3>关键时刻 · 你当如何？</h3>
         <div class="m-actions">
           <button class="btn btn-indigo" id="mCast">祭法宝（催动神格神通）</button>
-          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name}）</button>`:''}
+          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name} · ${aidLvName}${aidPct}%威力）</button>`:''}
           <button class="btn" id="mBurn">拼命（透支神格，沉睡三日）</button>
           <button class="btn" id="mWait">凝神接战（见招拆招）</button>
           <button class="btn btn-ghost" id="mFlee">遁走（保命，委托失败）</button>
@@ -977,12 +1136,19 @@ const UI = {
         const list=sub.firstChild;
         const ids=B.p.skillIds;
         if(!ids.length){ sub.innerHTML='<div class="section-tip" style="margin-top:8px">你还没有觉醒任何神格神通。可选择凝神接战、拼命或遁走。</div>'; return; }
+        /* 当前意图用于读招克制提示 */
+        const curIntent = B.e.intentNext||B.e.intent||'mixed';
+        const ci = COUNTER[curIntent];
         ids.forEach(id=>{
           const g=GODHOODS[id], a=g.active;
-          const b=h('button','skill-pick',
-            `<b>${g.name}·${a.name}</b> <span class="sp-cost">神力 ${a.cost}</span><br>
+          const cd=B.p.cooldowns[id]||0;
+          const isCounter = ci && ci.skill && ci.skill.includes(a.type);
+          const cdHtml = cd>0 ? `<span class="sp-cost" style="color:var(--cinnabar)">冷却 ${cd}回合</span>` : `<span class="sp-cost">神力 ${a.cost}</span>`;
+          const ctrHtml = isCounter ? `<span style="color:var(--jade);font-size:11px"> ◆读招克制！</span>` : '';
+          const b=h('button','skill-pick'+(isCounter?' counter':''),
+            `<b>${g.name}·${a.name}</b> ${cdHtml}${ctrHtml}<br>
              <span style="font-size:12px;color:var(--ink-soft)">${a.desc}</span>`);
-          b.disabled=B.p.mp<a.cost;
+          b.disabled = cd>0 || B.p.mp<a.cost;
           b.onclick=()=>{ slot.innerHTML=''; resolve({act:'cast',id}); };
           list.appendChild(b);
         });
