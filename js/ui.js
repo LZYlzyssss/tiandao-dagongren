@@ -784,7 +784,7 @@ const UI = {
       const lv=Game.favorLevel(rel.favor);
       const row=h('div','shop-row contact-row');
       row.innerHTML=`
-        <div class="item-ic" style="font-size:18px">${gd.icon}</div>
+        ${godAvatar(g,40)}
         <div class="item-body">
           <div class="sr-t">${gd.name} <span class="tier-tag tier-${(gd.tier||'e').toLowerCase()}">${gd.tier||'E'}</span>
             <span style="color:var(--cinnabar);font-size:12px"> ${Game.favorName(lv)} · ${rel.favor}</span></div>
