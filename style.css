@@ -58,12 +58,6 @@ body::before{
   padding:3px 12px;border:1px solid var(--line);border-radius:4px;
   background:rgba(255,252,244,.7);position:relative;gap:2px;
 }
-/* 批3：stat-chip 前加墨画小图标 */
-.stat-chip::before{
-  font-family:var(--font-brush);font-size:14px;color:var(--ink-soft);line-height:1;
-}
-.stat-chip:has(.k)::before{content:attr(data-ico);display:block}
-.stat-chip[data-ico]::before{content:attr(data-ico)}
 .stat-chip .k{font-size:11px;color:var(--ink-faint);letter-spacing:2px}
 .stat-chip .v{font-size:17px;font-weight:bold}
 .stat-chip .v small{font-size:11px;color:var(--ink-faint);font-weight:normal}
@@ -199,20 +193,26 @@ body::before{
   position:relative;transition:transform .15s, box-shadow .15s;
   overflow:hidden;
 }
-/* 画质批2：工单卡片背景图——ASSET.bg 设置 background-image，此样式叠墨晕 */
+/* 画质批2：工单卡片背景图——ASSET.bg 设置 background-image，薄遮罩让场景图真正透出来 */
 .order-bg{
   background-size:cover;background-position:center;background-blend-mode:multiply;
 }
 .order-bg::before{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background:linear-gradient(180deg, rgba(251,246,232,.82), rgba(243,234,214,.88));
+  background:linear-gradient(180deg, rgba(251,246,232,.22), rgba(243,234,214,.18));
 }
 .order-bg > *{position:relative;z-index:1}
-.order.order-ch1.order-bg::before{background:linear-gradient(180deg, rgba(251,246,232,.84), rgba(243,234,214,.9))}
-.order.order-ch2.order-bg::before{background:linear-gradient(180deg, rgba(248,240,224,.82), rgba(238,228,206,.88))}
-.order.order-ch3.order-bg::before{background:linear-gradient(180deg, rgba(235,222,210,.86), rgba(220,205,188,.92))}
-.order.order-ch4.order-bg::before{background:linear-gradient(180deg, rgba(252,244,220,.82), rgba(240,228,200,.9))}
-.order.order-ch5.order-bg::before{background:linear-gradient(180deg, rgba(255,248,228,.84), rgba(238,225,190,.9))}
+/* 5 章专属色调叠层（极薄，仅偏色） */
+.order.order-ch1.order-bg::before{background:linear-gradient(180deg, rgba(251,246,232,.18), rgba(243,234,214,.14))}
+.order.order-ch2.order-bg::before{background:linear-gradient(180deg, rgba(248,240,224,.18), rgba(238,228,206,.14))}
+.order.order-ch3.order-bg::before{background:linear-gradient(180deg, rgba(235,222,210,.22), rgba(220,205,188,.18))}
+.order.order-ch4.order-bg::before{background:linear-gradient(180deg, rgba(252,244,220,.18), rgba(240,228,200,.14))}
+.order.order-ch5.order-bg::before{background:linear-gradient(180deg, rgba(255,248,228,.18), rgba(238,225,190,.14))}
+/* 内容区深色底条，保证文字在背景图上可读 */
+.order-bg .o-body{
+  background:rgba(255,252,244,.78);border-radius:4px;padding:6px 8px;margin-left:52px;
+  position:relative;z-index:2;
+}
 .order:hover{transform:translateY(-2px);box-shadow:0 4px 10px var(--shadow)}
 .order.forced{border:2px solid var(--cinnabar)}
 .order .o-head{display:flex;justify-content:space-between;align-items:baseline;gap:6px}
@@ -238,14 +238,7 @@ body::before{
   font-family:var(--font-body);font-size:14px;letter-spacing:2px;cursor:pointer;
   border:1px solid var(--ink-soft);background:#f5ecd7;color:var(--ink);
   padding:6px 14px;border-radius:4px;transition:all .12s;flex:1;
-  display:inline-flex;align-items:center;gap:6px;
 }
-/* 批3：按钮前加墨画小图标——按 data-ico 或文字匹配 */
-.btn::before{
-  font-family:var(--font-brush);font-size:14px;line-height:1;color:inherit;opacity:.9;
-}
-.btn[data-ico]::before{content:attr(data-ico)}
-.btn::before:empty{display:none}
 .btn:hover{background:#e8dcc0}
 .btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.4;cursor:not-allowed}

@@ -73,16 +73,16 @@ const UI = {
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
     $('topStats').innerHTML = `
-      <div class="stat-chip" data-ico="品"><span class="k">品阶</span><span class="v">${rk.name}</span></div>
-      <div class="stat-chip" data-ico="历"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
-      <div class="stat-chip" data-ico="修"><span class="k">修为</span><span class="v">${s.cult}</span></div>
-      <div class="stat-chip" data-ico="钱"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></div>
-      <div class="stat-chip" data-ico="情"><span class="k">人情</span><span class="v">${s.renqing}</span></div>
-      <div class="stat-chip ${erodeHot?'erode-hot':''}" data-ico="蚀"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></div>
-      <div class="stat-chip ${s.merit>=target?'':'kpi-hot'}" data-ico="过">
+      <div class="stat-chip"><span class="k">品阶</span><span class="v">${rk.name}</span></div>
+      <div class="stat-chip"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
+      <div class="stat-chip"><span class="k">修为</span><span class="v">${s.cult}</span></div>
+      <div class="stat-chip"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></div>
+      <div class="stat-chip"><span class="k">人情</span><span class="v">${s.renqing}</span></div>
+      <div class="stat-chip ${erodeHot?'erode-hot':''}"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></div>
+      <div class="stat-chip ${s.merit>=target?'':'kpi-hot'}">
         <span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>
       </div>
-      <div class="stat-chip bar-chip" data-ico="躯">
+      <div class="stat-chip bar-chip">
         <span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
         <div class="bar"><i class="bar-hp" style="width:${Math.max(0,s.hp/st.maxHp*100)}%"></i></div>
       </div>`;
@@ -94,7 +94,7 @@ const UI = {
     const kpi=h('div','panel kpi-panel');
     kpi.innerHTML=`
       <h2>案头工单 <span class="sub">三十日一考 · 阎魔王亲阅</span>
-        ${s.tut&&s.tut.done?'<button class="tut-replay" data-ico="引">重看指引</button>':''}</h2>
+        ${s.tut&&s.tut.done?'<button class="tut-replay">重看指引</button>':''}</h2>
       <div class="kpi-row">
         <div><span class="kpi-k">本月功过</span><b style="color:var(--${s.merit>=target?'jade':'cinnabar'})">${s.merit}/${target}</b></div>
         <div><span class="kpi-k">本月还剩</span><b>${MONTH_DAYS - s.day + 1} 日</b></div>
@@ -1019,7 +1019,7 @@ const UI = {
     ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
     const box=h('div','paper m-box story-scroll');
     const back=h('div','gg-head');
-    back.innerHTML=`<button class="btn btn-back" data-ico="归">◂ 归档</button>
+    back.innerHTML=`<button class="btn btn-back">◂ 归档</button>
       <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>`;
     back.querySelector('.btn-back').onclick=()=>UI.openStoryArchive();
     box.appendChild(back);
@@ -1353,11 +1353,11 @@ const UI = {
       const aidLvName = gkey ? FAVOR_LEVELS[Game.aidLevelOf(gkey)].name : '';
       m.innerHTML=`<h3>关键时刻 · 你当如何？</h3>
         <div class="m-actions">
-          <button class="btn btn-indigo" id="mCast" data-ico="法">祭法宝（催动神格神通）</button>
-          ${canAid?`<button class="btn btn-primary" id="mAid" data-ico="援">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name} · ${aidLvName}${aidPct}%威力）</button>`:''}
-          <button class="btn" id="mBurn" data-ico="命">拼命（透支神格，沉睡三日）</button>
-          <button class="btn" id="mWait" data-ico="守">凝神接战（见招拆招）</button>
-          <button class="btn btn-ghost" id="mFlee" data-ico="遁">遁走（保命，委托失败）</button>
+          <button class="btn btn-indigo" id="mCast">祭法宝（催动神格神通）</button>
+          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name} · ${aidLvName}${aidPct}%威力）</button>`:''}
+          <button class="btn" id="mBurn">拼命（透支神格，沉睡三日）</button>
+          <button class="btn" id="mWait">凝神接战（见招拆招）</button>
+          <button class="btn btn-ghost" id="mFlee">遁走（保命，委托失败）</button>
         </div><div id="mSub"></div>`;
       slot.innerHTML=''; slot.appendChild(m);
       if(typeof Guide!=='undefined') Guide.act('momentOpen');
