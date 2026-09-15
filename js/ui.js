@@ -1257,11 +1257,17 @@ const UI = {
   renderBattle(B){
     const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','battle-wrap');
+    /* 立绘 key：玩家 p_r{rank}，敌人 e_{id} */
+    const pKey='p_r'+(Game.s.rank||0);
+    const eKey='e_'+(B.e.id||'');
     wrap.innerHTML=`<div class="battle-field" id="battleField">
         <div class="battle-bg" id="battleBg"></div><div class="battle-veil"></div>
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
         <div class="fighter" id="fPlayer">
-          <div class="fig-body" id="figPlayer" style="color:var(--cinnabar-deep)">衙</div>
+          <div class="fig-body fig-player" id="figPlayer" style="color:var(--cinnabar-deep)">
+            ${typeof ASSET!=='undefined'?ASSET.html(pKey,'fig-img',RANKS[Game.s.rank].name):''}
+            <span class="fig-fallback">衙</span>
+          </div>
           <div class="fig-name">你 · ${RANKS[Game.s.rank].name}</div>
           ${fbarHTML('p')}
           <div class="fstatus" id="pStatus"></div>
@@ -1269,7 +1275,10 @@ const UI = {
         <div class="vs">战</div>
         <div class="fighter foe" id="fFoe">
           <div class="intent-bubble" id="eIntent"></div>
-          <div class="fig-body" id="figFoe" style="color:${B.e.tint}">${B.e.icon}</div>
+          <div class="fig-body fig-foe" id="figFoe" style="color:${B.e.tint}">
+            ${typeof ASSET!=='undefined'?ASSET.html(eKey,'fig-img',B.e.name):''}
+            <span class="fig-fallback">${B.e.icon}</span>
+          </div>
           <div class="fig-name">${B.e.name}</div>
           ${fbarHTML('e', B.e.hpLabel)}
           <div class="fstatus" id="eStatus"></div>

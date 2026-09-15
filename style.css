@@ -310,13 +310,37 @@ body::before{
 }
 .fighter{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1}
 .fighter.foe{align-self:center}
+/* 立绘容器：矩形竖版，适配 portrait_4_3 水墨立绘 */
 .fig-body{
-  width:96px;height:96px;border-radius:50%;
-  display:grid;place-items:center;font-family:var(--font-brush);font-size:52px;
-  background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6);
-  border:2px solid var(--ink);box-shadow:0 4px 12px var(--shadow);
-  transition:transform .15s;
+  position:relative;
+  width:120px;height:160px;
+  display:grid;place-items:center;
+  background:linear-gradient(180deg,#f3e8cc,#d9c9a6);
+  border:2px solid var(--ink);border-radius:8px;
+  box-shadow:0 4px 14px var(--shadow);
+  overflow:hidden;transition:transform .15s;
 }
+/* 玩家立绘：朱砂光晕 */
+.fig-player{box-shadow:0 4px 14px var(--shadow), 0 0 18px rgba(192,60,46,.25)}
+/* 敌人立绘：按 tint 染色光晕（由 inline style 控制 color，这里加通用墨影） */
+.fig-foe{box-shadow:0 4px 14px var(--shadow), 0 0 14px rgba(43,38,32,.35)}
+/* 立绘图片层 */
+.fig-body .fig-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:1;opacity:0;transition:opacity .35s ease-out;
+  mix-blend-mode:normal;
+}
+.fig-body .fig-img.loaded{opacity:1}
+/* 兜底文字层 */
+.fig-body .fig-fallback{
+  position:relative;z-index:2;
+  font-family:var(--font-brush);font-size:48px;letter-spacing:2px;
+  text-shadow:0 1px 2px rgba(255,255,255,.5);
+}
+/* 立绘加载成功后隐藏兜底文字 */
+.fig-body .fig-img.loaded ~ .fig-fallback{display:none}
+/* 失败/无图时保留文字兜底 */
+.fig-body .fig-img:not(.loaded) ~ .fig-fallback{display:grid}
 .fig-body.hit{animation:hit .3s}
 .fig-body.cast{animation:cast .4s}
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
@@ -645,7 +669,8 @@ body::before{
     grid-template-columns:1fr 60px 1fr;
     padding:14px 10px;min-height:180px;
   }
-  .fig-body{width:64px;height:64px;font-size:36px}
+  .fig-body{width:80px;height:106px}
+  .fig-body .fig-fallback{font-size:36px}
   .fig-name{font-size:13px}
   .fbar{width:100%;max-width:140px}
   .fbar .fl{font-size:10px}
@@ -687,7 +712,8 @@ body::before{
 
 @media (max-width:380px){
   .ya-grid{grid-template-columns:1fr}
-  .fig-body{width:54px;height:54px;font-size:32px}
+  .fig-body{width:68px;height:90px}
+  .fig-body .fig-fallback{font-size:28px}
   .fbar{max-width:100px}
   .vs{font-size:22px}
   .stat-chip{min-width:52px;padding:2px 6px}
