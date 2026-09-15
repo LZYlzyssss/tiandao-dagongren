@@ -2,6 +2,8 @@
 const $ = id => document.getElementById(id);
 const h = (tag, cls, html)=>{ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
 const imgURL = (prompt,size)=>`https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${size||'square'}`;
+/* 批3：物品图标——img 覆在文字兜底上，由 ASSET.scan 挂载 */
+function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}"><span class="ic-txt">${txt}</span>${ASSET.html('it_'+id,'item-img',txt)}</div>`; }
 function godAvatar(key,px){
   const g=GODS[key];
   return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
@@ -436,7 +438,7 @@ const UI = {
         const worn=s.wear[slot]===id;
         const r=h('div','shop-row item-row'+(owned?' owned':''));
         r.innerHTML=`
-          <div class="item-ic">${it.icon}</div>
+          ${ic(id,it.icon)}
           <div class="item-body">
             <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
               ${worn?'<span class="tag tag-merit">佩中</span>':''}</div>
@@ -463,7 +465,7 @@ const UI = {
       spare.forEach(id=>{
         const it=ITEMS[id], gain=Math.floor(it.price*SELL_RATE);
         const r=h('div','shop-row item-row',
-          `<div class="item-ic">${it.icon}</div>
+          `${ic(id,it.icon)}
            <div class="item-body">
              <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
                <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
@@ -497,7 +499,7 @@ const UI = {
         const it=ITEMS[id];
         card.innerHTML=`
           <div class="wc-head"><span class="slot-ico">${info.icon}</span>${info.name}</div>
-          <div class="item-ic big">${it.icon}</div>
+          ${ic(id,it.icon,true)}
           <div class="wc-name">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span></div>
           <div class="sr-d">${it.desc}</div>`;
         const b=h('button','btn btn-ghost btn-sm','取下');
@@ -527,7 +529,7 @@ const UI = {
     spare.forEach(id=>{
       const it=ITEMS[id];
       const r=h('div','shop-row item-row',
-        `<div class="item-ic">${it.icon}</div>
+        `${ic(id,it.icon)}
          <div class="item-body">
            <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
              <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
@@ -616,7 +618,7 @@ const UI = {
       worn.forEach(id=>{
         const it=ITEMS[id]; if(!it) return;
         const row=h('div','shop-row gear-jump',
-          `<div class="item-ic">${it.icon}</div>
+          `${ic(id,it.icon)}
            <div class="item-body">
              <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
                <span class="tag" style="margin-left:4px">${SLOT_INFO[it.slot].name}</span></div>
@@ -1196,7 +1198,7 @@ const UI = {
       gifts.forEach(id=>{
         const it=ITEMS[id];
         const r=h('div','shop-row gift-row',
-          `<div class="item-ic">${it.icon}</div>
+          `${ic(id,it.icon)}
            <div class="item-body">
              <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span> ${prefTag(id)}</div>
              <div class="sr-d">${it.desc}</div>

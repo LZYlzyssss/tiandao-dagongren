@@ -131,6 +131,7 @@ const Battle = {
       if(life>0){ h=Math.round(dmg*life); p.hp=clamp(p.hp+h,0,p.maxHp); }
       if(!opts.silent) addLog(`你出手，${isCrit?'<b>暴击！</b>':''}造成 <b>${dmg}</b> 点伤害${h?`，汲取 ${h} 点生机`:''}`, 'lg-good');
       UI.flash('foe','hit'); UI.floatFoe(`-${dmg}`, isCrit?'#c03c2e':'#5c5347');
+      if(typeof FX!=='undefined') FX.comboHit();
       if(isCrit) await sleep(120);
       /* 锁魂链 */
       if(p.stunProc && Math.random()<p.stunProc && e.hp>0 && !(e.traits&&e.traits.stunImmune)){
@@ -185,6 +186,7 @@ const Battle = {
       p.hp = Math.max(0,p.hp-dmg);
       addLog(`「${e.name}」${tag}反击，造成 <b>${dmg}</b> 点伤害`, 'lg-bad');
       UI.flash('player','hit'); UI.floatPlayer(`-${dmg}`,'#c03c2e');
+      if(typeof FX!=='undefined'){ FX.comboReset(); FX.bloodScreen(); }
       /* 敌方特性 */
       if(e.lifesteal>0 && e.hp>0){ e.hp=clamp(e.hp+Math.round(dmg*e.lifesteal),0,e.maxHp); }
       if(e.traits.burnHit && Math.random()<e.traits.burnHit){

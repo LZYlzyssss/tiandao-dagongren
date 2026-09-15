@@ -191,6 +191,35 @@ const FX = {
     setTimeout(()=>f.remove(), 250);
   },
 
+  /* 连击墨痕：敌人身上累积墨点（连续命中时叠层） */
+  _combo:0,
+  comboHit(){
+    this._combo++;
+    const foe=$('figFoe'); if(!foe) return;
+    const mark=document.createElement('i');
+    mark.className='combo-mark';
+    mark.style.cssText=`position:absolute;left:${20+Math.random()*60}%;top:${15+Math.random()*60}%;width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:50%;background:radial-gradient(circle,#2b2622,rgba(43,38,32,.3) 60%,transparent);z-index:5;pointer-events:none;opacity:.75;animation:comboFade 2.5s ease-out forwards;`;
+    foe.style.position=foe.style.position||'relative';
+    foe.appendChild(mark);
+    setTimeout(()=>mark.remove(),2500);
+    /* 满 5 连击时全屏墨震 */
+    if(this._combo>=5){
+      this.shake();
+      this._combo=0;
+    }
+  },
+  comboReset(){ this._combo=0; },
+
+  /* 血墨溅屏：玩家受击时屏边红墨脉冲 */
+  bloodScreen(){
+    const field=$('battleField'); if(!field) return;
+    const v=document.createElement('div');
+    v.className='blood-vignette';
+    v.style.cssText='position:absolute;inset:0;z-index:6;pointer-events:none;border-radius:8px;box-shadow:inset 0 0 40px 8px rgba(192,60,46,.45);animation:bloodPulse .8s ease-out forwards;';
+    field.appendChild(v);
+    setTimeout(()=>v.remove(),800);
+  },
+
   /* 立绘加载完成标记 */
   markAvatarLoad(img){
     if(!img) return;
