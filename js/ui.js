@@ -482,8 +482,12 @@ const UI = {
     Object.entries(FACILITIES).forEach(([key,f])=>{
       const lv=s.fac[key], maxed=lv>=f.levels.length;
       const next=maxed?null:f.levels[lv];
+      const imgHTML=ASSET.list['fac_'+key]?ASSET.html('fac_'+key,'ya-img',f.icon):'';
       const r=h('div','shop-row',
-        `<div><div class="sr-t">${f.icon} ${f.name} <span class="lv-tag">${lv} 级</span></div>
+        `<div><div class="sr-t">
+          <span class="ya-ico">${imgHTML}<span class="ya-fb">${f.icon}</span></span>
+          ${f.name} <span class="lv-tag">${lv} 级</span>
+         </div>
          <div class="sr-d">${f.desc}${next?'<br>下一级：'+facEff(next)+' · 花费 '+next.cost+' 文':' · 已至最高级'}</div></div>`);
       if(next){ const b=h('button','btn btn-primary btn-sm','营造'); b.onclick=()=>Game.upgradeFac(key); r.appendChild(b); }
       else r.appendChild(h('span','tag tag-merit','已满级'));
@@ -506,8 +510,11 @@ const UI = {
       sp.appendChild(h('div','section-tip','光杆司令一个。募点阴兵，战场上能替你偷袭挡刀。'));
     }
     Object.entries(SOLDIERS).forEach(([id,so])=>{
+      const imgHTML=ASSET.list['sol_'+id]?ASSET.html('sol_'+id,'ya-img',so.icon):'';
       const r=h('div','shop-row',
-        `<div><div class="sr-t">${so.icon} ${so.name}</div><div class="sr-d">${so.desc}</div></div>
+        `<div><div class="sr-t">
+          <span class="ya-ico">${imgHTML}<span class="ya-fb">${so.icon}</span></span>
+          ${so.name}</div><div class="sr-d">${so.desc}</div></div>
          <span class="price">${so.price} 文</span>`);
       const b=h('button','btn btn-primary btn-sm','招募');
       b.disabled=s.soldiers.length>=cap;

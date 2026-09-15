@@ -277,7 +277,18 @@ Object.entries(GH_DESC).forEach(([k,d])=>{
   ASSET.list['gh_'+k]=[`${ASSET.INK} of ${d}, ${ASSET.ICON}`, 'square_hd'];
 });
 
-/* ---------- 顶栏属性图标（8） ---------- */
+/* ---------- 神衙营造 + 阴兵（6） ---------- */
+const YAMEN_ICONS = {
+  fac_shrine:'an ancient small chinese shrine altar with wooden deity tablet and candles',
+  fac_desk:'an old chinese magistrate desk with stacked documents and ink stone',
+  fac_incense:'a bronze incense burner with curling smoke and red candles',
+  fac_banner:'a tall tattered summon banner with dark ink characters fluttering',
+  sol_xiaojiang:'a ghost soldier in tattered black uniform holding a rusty dagger',
+  sol_duwei:'a ghost general in broken armor with a translucent long spear',
+};
+Object.entries(YAMEN_ICONS).forEach(([k,d])=>{
+  ASSET.list[k]=[`${ASSET.INK} of ${d}, ${ASSET.ICON}`, 'square_hd'];
+});
 const STAT_ICONS = {
   rank:'a small chinese official seal stamp',
   calendar:'an ancient chinese almanac calendar page with ink brush date',

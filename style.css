@@ -491,7 +491,22 @@ body::before{
 .m-close{float:right;cursor:pointer;font-size:18px;color:var(--ink-faint);border:none;background:none;font-family:var(--font-body)}
 .shop-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px dashed var(--line)}
 .shop-row:last-child{border:none}
-.shop-row .sr-t{font-weight:bold}
+.shop-row .sr-t{font-weight:bold;display:flex;align-items:center;gap:8px}
+/* 神衙营造 + 阴兵的小图标 */
+.ya-ico{
+  flex:none;width:28px;height:28px;border-radius:5px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#f3e8cc,#e4d3a8);
+  border:1px solid rgba(43,38,32,.2);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.08);
+  display:grid;place-items:center;
+}
+.ya-ico .ya-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;opacity:0;transition:opacity .35s;border-radius:5px;
+}
+.ya-ico .ya-img.loaded{opacity:1}
+.ya-ico .ya-fb{font-family:var(--font-brush);font-size:15px;color:var(--ink);position:relative;z-index:2}
+.ya-ico .ya-img.loaded ~ .ya-fb{display:none}
 .shop-row .sr-d{font-size:13px;color:var(--ink-soft);line-height:1.7}
 .price{color:var(--gold);font-weight:bold;white-space:nowrap;margin:0 10px}
 
