@@ -291,12 +291,18 @@ body::before{
 .fighter{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1}
 .fighter.foe{align-self:center}
 .fig-body{
-  width:96px;height:96px;border-radius:50%;
-  display:grid;place-items:center;font-family:var(--font-brush);font-size:52px;
+  width:116px;height:156px;border-radius:10px;
+  position:relative;overflow:hidden;
+  display:grid;place-items:center;
   background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6);
   border:2px solid var(--ink);box-shadow:0 4px 12px var(--shadow);
   transition:transform .15s;
+  animation:figInk 1.1s ease-out both;
 }
+/* 立绘：图覆盖卡面，失败露出墨字兜底 */
+.fig-body .fig-glyph{font-family:var(--font-brush);font-size:56px;z-index:0}
+.fig-body .fig-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;z-index:1}
+@keyframes figInk{0%{filter:blur(10px);opacity:0;transform:scale(.86)}60%{filter:blur(2px);opacity:.85}100%{filter:none;opacity:1;transform:scale(1)}}
 .fig-body.hit{animation:hit .3s}
 .fig-body.cast{animation:cast .4s}
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
@@ -618,7 +624,8 @@ body::before{
     grid-template-columns:1fr 60px 1fr;
     padding:14px 10px;min-height:180px;
   }
-  .fig-body{width:64px;height:64px;font-size:36px}
+  .fig-body{width:78px;height:106px;border-radius:8px}
+  .fig-body .fig-glyph{font-size:38px}
   .fig-name{font-size:13px}
   .fbar{width:100%;max-width:140px}
   .fbar .fl{font-size:10px}
@@ -660,7 +667,8 @@ body::before{
 
 @media (max-width:380px){
   .ya-grid{grid-template-columns:1fr}
-  .fig-body{width:54px;height:54px;font-size:32px}
+  .fig-body{width:66px;height:90px}
+  .fig-body .fig-glyph{font-size:32px}
   .fbar{max-width:100px}
   .vs{font-size:22px}
   .stat-chip{min-width:52px;padding:2px 6px}
@@ -888,6 +896,52 @@ body::before{
 .gift-list{display:flex;flex-direction:column;gap:6px}
 .gift-row .price{min-width:0}
 
+/* ---- 众神谱系（关系网格） ---- */
+.god-grid{max-width:96vw;max-height:88vh;overflow-y:auto}
+.gg-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.gg-head h2{margin:0}
+.gg-tip{font-size:12px;color:var(--ink-faint);margin-bottom:12px}
+.gg-body{display:flex;flex-direction:column;gap:16px}
+.gg-camp{border:1px solid rgba(43,38,32,.12);border-radius:8px;padding:10px 14px;background:rgba(251,247,235,.4)}
+.gg-camp-title{font-size:16px;font-weight:bold;margin-bottom:8px;letter-spacing:1px;border-bottom:1px dashed rgba(43,38,32,.2);padding-bottom:4px}
+.gg-camp-count{font-size:12px;font-weight:normal;color:var(--ink-faint)}
+.gg-tier-row{display:flex;gap:12px;align-items:flex-start;margin:6px 0}
+.gg-tier-label{min-width:28px;font-size:13px;font-weight:bold;color:var(--cinnabar);padding-top:6px}
+.gg-grid{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.gg-cell{cursor:pointer;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.6);border:1px solid rgba(43,38,32,.1);display:flex;flex-direction:column;align-items:center;min-width:68px;transition:all .2s}
+.gg-cell:hover{background:rgba(255,255,255,.95);box-shadow:0 2px 6px rgba(0,0,0,.08);transform:translateY(-1px)}
+.gg-avatar{margin-bottom:4px}
+.gg-name{font-size:12px;font-weight:bold;white-space:nowrap}
+.gg-title{font-size:10px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:72px}
+/* 未结识占位：虚线圆圈问号，不可交互 */
+.gg-unknown{cursor:default;opacity:.5;background:transparent;border-style:dashed}
+.gg-unknown:hover{background:transparent;box-shadow:none;transform:none}
+.gg-q{width:38px;height:38px;line-height:36px;border:1.5px dashed rgba(43,38,32,.45);border-radius:50%;font-size:17px;color:var(--ink-faint);text-align:center;background:rgba(255,255,255,.35)}
+
+/* ---- 剧情档案（卷宗架 + 卷宗详情） ---- */
+.story-entry{cursor:pointer}
+.story-entry:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.story-archive{max-width:96vw;max-height:88vh;overflow-y:auto}
+.sa-done{background:rgba(255,255,255,.8)}
+.sa-vol{width:38px;height:38px;line-height:38px;border:1.5px solid rgba(43,38,32,.5);border-radius:6px;font-size:17px;font-weight:bold;color:var(--ink);text-align:center;background:rgba(251,247,235,.9);margin-bottom:4px}
+.story-scroll{max-width:96vw;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column}
+.btn-back{align-self:flex-start}
+.ss-head{display:flex;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px dashed rgba(43,38,32,.2);margin-bottom:10px}
+.ss-body{flex:1;display:flex;flex-direction:column;gap:14px}
+.ss-act-title{font-size:13px;font-weight:bold;color:var(--gold);letter-spacing:1px;text-align:center;margin:4px 0}
+.ss-node{display:flex;flex-direction:column;gap:4px}
+.ss-text{font-size:14px;line-height:1.9;color:#2b2620;text-indent:2em}
+.ss-choice{font-size:13px;color:var(--cinnabar);padding-left:1.2em}
+.ss-battle{font-size:13px;color:var(--ink-faint);text-align:center;padding:4px 0;letter-spacing:1px}
+.ss-foot{font-size:11px;color:var(--ink-faint);text-align:center;padding-top:10px;border-top:1px dashed rgba(43,38,32,.15);margin-top:10px}
+
+/* ---- 神明档案：登场小传 + 出处 ---- */
+.gm-block{margin-bottom:10px}
+.gm-label{font-size:12px;color:var(--ink-faint);letter-spacing:1px;margin-bottom:4px}
+.gm-intro-text{font-size:14px;line-height:1.8;color:#2b2620;text-indent:2em}
+.gm-sources{font-size:11px;color:var(--ink-faint);margin-top:6px;padding-top:6px;border-top:1px dashed rgba(43,38,32,.15)}
+.ya-grid-btn{margin-top:8px}
+
 .contact-row{cursor:pointer}
 .contact-row.locked{opacity:.55;cursor:default}
 .contact-row:not(.locked):hover{background:rgba(43,38,32,.05)}
@@ -927,4 +981,84 @@ body::before{
   border-color:var(--jade);
   background:rgba(71,122,90,.08);
   box-shadow:0 0 0 1px var(--jade);
+}
+
+/* ================================================================
+   画质升级 · 渲染分层（对标暖雪：氛围底图/情景图/墨雾/暗角/水墨转场）
+   ================================================================ */
+
+/* ---- 氛围底图（office 各页签）与情景底图（下凡/战斗/结算） ---- */
+#ambientBg,#sceneBg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-size:cover;background-position:center;
+  opacity:0;transition:opacity .8s ease;
+  filter:saturate(.85) contrast(.98);
+}
+/* Pixi 墨雾画布 */
+#fxCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#fxCanvas canvas{display:block}
+
+/* ---- 暗角（蒙在一切内容上，不挡点击） ---- */
+#vignette{
+  position:fixed;inset:0;z-index:900;pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 52%, rgba(22,17,10,.24) 100%);
+  mix-blend-mode:multiply;
+}
+
+/* ---- 战场底图（battle-field 内） ---- */
+.battle-bg{
+  position:absolute;inset:0;z-index:0;
+  background-size:cover;background-position:center;
+  opacity:0;transition:opacity .9s ease;
+  filter:saturate(.9);
+}
+.battle-veil{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg, rgba(246,238,219,.66) 0%, rgba(234,221,194,.30) 100%);
+}
+
+/* ---- 水墨转场（章末/大事） ---- */
+.ink-wipe{
+  position:fixed;inset:-12%;z-index:2000;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,
+    #17140f 0%, #17140f 38%,
+    rgba(23,20,15,.88) 52%, rgba(23,20,15,0) 72%);
+  transform:scale(.04);opacity:.97;
+  animation:inkWipe 1s cubic-bezier(.5,0,.4,1) forwards;
+}
+@keyframes inkWipe{
+  0%  {transform:scale(.04);opacity:.97}
+  45% {transform:scale(1.3);opacity:.99}
+  58% {transform:scale(1.3);opacity:.99}
+  100%{transform:scale(2.8);opacity:0}
+}
+
+/* ---- 资产图淡入（data-asset 图加载完成） ---- */
+.asset-fade{opacity:0;transition:opacity .5s ease}
+.asset-fade.loaded{opacity:1}
+
+/* ---- 批2：支援神金光立绘（呼神援助时降临玩家身后） ---- */
+.aid-god{
+  position:absolute;left:4%;bottom:10%;z-index:2;
+  width:118px;height:160px;pointer-events:none;opacity:0;
+  filter:drop-shadow(0 0 18px rgba(201,150,47,.55));
+}
+.aid-god .ag-art{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:top;border-radius:10px;
+  border:2px solid var(--gold);
+  box-shadow:0 0 24px rgba(201,150,47,.5), inset 0 0 18px rgba(255,240,200,.35);
+}
+.aid-god .ag-name{
+  position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);
+  white-space:nowrap;font-size:12px;letter-spacing:1px;
+  color:#f7ead2;background:rgba(43,38,32,.85);
+  padding:2px 10px;border-radius:8px;border:1px solid var(--gold);
+}
+.aid-god.show{animation:aidGodIn 3s ease-out forwards}
+@keyframes aidGodIn{
+  0%  {opacity:0;filter:blur(10px) brightness(2) drop-shadow(0 0 26px rgba(201,150,47,.9));transform:translateY(8px) scale(.94)}
+  16% {opacity:.95;filter:blur(0) brightness(1.22) drop-shadow(0 0 20px rgba(201,150,47,.6));transform:translateY(0) scale(1)}
+  72% {opacity:.95;filter:blur(0) brightness(1.05)}
+  100%{opacity:0;filter:blur(5px) brightness(1.4);transform:translateY(-10px) scale(1.02)}
 }

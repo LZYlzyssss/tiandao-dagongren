@@ -332,6 +332,7 @@ const Battle = {
       const lv=Game.aidLevelOf(gkey), factor=Game.aidFactor(gkey);
       if(lv<=0 || factor<=0){ UI.toast('交情尚浅，无法呼神'); return; }
       B.aidUsed=true; B.aidGod=gkey;
+      if(UI.showAidGod) UI.showAidGod(gkey);   /* 画质批2：支援神立绘降临 */
       UI.flash('player','cast');
       const lvName=FAVOR_LEVELS[lv].name;
       addLog(`危难之际，你遥唤「${gd.name}」——${lvName}降临，<b>${a.name}</b>！`,'lg-sys');
