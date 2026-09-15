@@ -997,7 +997,7 @@ const UI = {
       body.appendChild(grp);
     }
     box.appendChild(body);
-    ml.appendChild(ov); ml.appendChild(box);
+    ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
   },
 
@@ -1073,8 +1073,8 @@ const UI = {
     const rv=m.reward||{};
     let foot='案卷归档 · 两界交界破神衙存照';
     if(rv.gh) foot='结案所获：神格「'+GODHOODS[rv.gh].name+'」 · '+foot;
-    ml.appendChild(ov); ml.appendChild(box);
     box.appendChild(h('div','ss-foot',foot));
+    ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
   },
 
@@ -1139,7 +1139,7 @@ const UI = {
       body.appendChild(campEl);
     });
     box.appendChild(body);
-    ml.appendChild(ov); ml.appendChild(box);
+    ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
   },
 
