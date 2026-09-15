@@ -184,6 +184,9 @@ const UI = {
         <div class="si-row"><b class="si-l">介绍</b><div class="si-v">${info.介绍}</div></div>
       </div>`;
     ov.appendChild(box); ml.appendChild(ov); ml.classList.remove('hidden');
+    /* 手动扫描弹窗内的 img，确保资产管线挂载（不依赖 MutationObserver 时序） */
+    if(typeof ASSET!=='undefined') ASSET.scan(ml);
+    if(typeof FX!=='undefined') FX.scanAvatars && FX.scanAvatars(ml);
   },
 
   /* ================= 页一：案牍（工单架） ================= */
@@ -1110,6 +1113,7 @@ const UI = {
     box.appendChild(body);
     ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
+    if(typeof ASSET!=='undefined') ASSET.scan(ml);
   },
 
   /* 卷宗格：已结可读 / 经办中 / 问号占位 */
@@ -1187,6 +1191,7 @@ const UI = {
     box.appendChild(h('div','ss-foot',foot));
     ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
+    if(typeof ASSET!=='undefined') ASSET.scan(ml);
   },
 
   /* ================= 众神谱系（关系网格） ================= */
@@ -1246,6 +1251,7 @@ const UI = {
     box.appendChild(body);
     ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
+    if(typeof ASSET!=='undefined') ASSET.scan(ml);
   },
 
   /* ================= 神明档案（好感 / 送礼） ================= */
@@ -1329,9 +1335,9 @@ const UI = {
     cb.style.marginTop='12px';
     cb.onclick=()=>{ ml.innerHTML=''; };
     box.appendChild(cb); ov.appendChild(box); ml.appendChild(ov);
+    if(typeof ASSET!=='undefined') ASSET.scan(ml);
+    if(typeof FX!=='undefined') FX.scanAvatars && FX.scanAvatars(ml);
   },
-
-  /* ================= 月末考核（v3：上/称/下/不称职，连续两次不称职即贬） ================= */
   showReview({grade,target,bonus,fine,strikes,gameOver}){
     if(typeof Guide!=='undefined') Guide.act('review');
     const ml=$('modalLayer'); ml.innerHTML='';
