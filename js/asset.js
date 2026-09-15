@@ -276,3 +276,19 @@ const GH_DESC={
 Object.entries(GH_DESC).forEach(([k,d])=>{
   ASSET.list['gh_'+k]=[`${ASSET.INK} of ${d}, ${ASSET.ICON}`, 'square_hd'];
 });
+
+/* ---------- 顶栏属性图标（8） ---------- */
+const STAT_ICONS = {
+  rank:'a small chinese official seal stamp',
+  calendar:'an ancient chinese almanac calendar page with ink brush date',
+  cult:'a glowing cultivation core or spiritual energy orb',
+  money:'a string of ancient chinese copper coins with square holes',
+  favor:'a pair of clasped hands representing friendship and favor',
+  erode:'a withering ink lantern or an eroding broken seal',
+  merit:'a red merit registry scroll with brush strokes',
+  hp:'a red life candle or heart wrapped in talisman paper',
+  mp:'a blue spiritual gourd bottle',
+};
+Object.entries(STAT_ICONS).forEach(([k,d])=>{
+  ASSET.list['stat_'+k]=[`${ASSET.INK} of ${d}, ${ASSET.ICON}`, 'square_hd'];
+});

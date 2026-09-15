@@ -61,15 +61,27 @@ body::before{
   background:rgba(255,252,244,.75);position:relative;
   transition:border-color .2s, background .2s;
 }
-/* 毛笔印章 icon */
+/* 毛笔印章 icon 容器（放图片 + 文字兜底） */
 .stat-chip .sc-ico{
   flex:none;width:24px;height:24px;border-radius:4px;
-  display:grid;place-items:center;
-  font-family:var(--font-brush);font-size:15px;line-height:1;
+  display:grid;place-items:center;position:relative;overflow:hidden;
   background:linear-gradient(135deg,#f3e8cc,#e4d3a8);
   border:1px solid rgba(43,38,32,.2);
   box-shadow:inset 0 1px 2px rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.08);
 }
+/* stat-chip 内的图片图标 */
+.stat-chip .sc-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;z-index:1;opacity:0;
+  transition:opacity .35s ease-out;
+  border-radius:4px;
+}
+.stat-chip .sc-img.loaded{opacity:1}
+/* 文字兜底（图片未加载时显示） */
+.stat-chip .sc-fallback{
+  position:relative;z-index:2;font-family:var(--font-brush);font-size:15px;line-height:1;
+}
+.stat-chip .sc-img.loaded ~ .sc-fallback{display:none}
 .stat-chip .sc-txt{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
 .stat-chip .k{font-size:11px;color:var(--ink-faint);letter-spacing:2px;line-height:1}
 .stat-chip .v{font-size:15px;font-weight:bold;line-height:1.2;margin-top:1px}
@@ -634,7 +646,8 @@ body::before{
   .brand-seal{width:34px;height:34px;font-size:20px}
   .top-stats{gap:4px;width:100%;justify-content:flex-start}
   .stat-chip{padding:2px 8px 2px 5px;gap:5px}
-  .stat-chip .sc-ico{width:20px;height:20px;font-size:13px}
+  .stat-chip .sc-ico{width:20px;height:20px}
+  .stat-chip .sc-fallback{font-size:13px}
   .stat-chip .k{font-size:10px}
   .stat-chip .v{font-size:13px}
   .stat-chip .v small{font-size:10px}
@@ -737,7 +750,8 @@ body::before{
   .fbar{max-width:100px}
   .vs{font-size:22px}
   .stat-chip{padding:2px 6px;gap:4px}
-  .stat-chip .sc-ico{width:18px;height:18px;font-size:11px}
+  .stat-chip .sc-ico{width:18px;height:18px}
+  .stat-chip .sc-fallback{font-size:11px}
   .stat-chip .v{font-size:12px}
   .tab-ico{font-size:18px}
   .tab-txt{font-size:9px}
@@ -990,6 +1004,30 @@ body::before{
 .tier-a{background:#c03c2e}
 
 .god-modal{width:760px;max-width:92vw;max-height:82vh;overflow-y:auto;font-size:15px}
+
+/* ============ 顶栏属性详情弹窗 ============ */
+.stat-modal{width:560px;max-width:92vw;font-size:14px}
+.si-head{display:flex;gap:16px;align-items:center;margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.si-ico{
+  width:72px;height:72px;border-radius:8px;background:linear-gradient(135deg,#f3e8cc,#e4d3a8);
+  display:grid;place-items:center;position:relative;overflow:hidden;flex:none;
+  border:2px solid var(--ink);box-shadow:0 2px 8px var(--shadow);
+}
+.si-ico .si-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s}
+.si-ico .si-img.loaded{opacity:1}
+.si-ico .si-fallback{font-family:var(--font-brush);font-size:36px;color:var(--ink)}
+.si-ico .si-img.loaded ~ .si-fallback{display:none}
+.si-title{flex:1;min-width:0;position:relative}
+.si-title h3{font-family:var(--font-brush);font-size:26px;letter-spacing:3px;color:var(--ink);margin:0}
+.si-title .gc-skip{position:absolute;top:0;right:0;cursor:pointer;color:var(--ink-faint);font-size:18px}
+.si-body{display:flex;flex-direction:column;gap:10px}
+.si-row{display:flex;gap:12px;align-items:flex-start;line-height:1.7}
+.si-l{
+  flex:none;width:48px;font-family:var(--font-brush);font-size:15px;color:var(--cinnabar-deep);
+  padding:2px 0;text-align:center;border-bottom:1px solid rgba(192,60,46,.2);
+}
+.si-v{flex:1;color:var(--ink-soft);font-size:14px}
+
 .gm-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
 .gm-name{flex:1;min-width:0}
 

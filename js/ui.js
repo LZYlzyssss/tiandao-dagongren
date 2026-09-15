@@ -9,6 +9,66 @@ function godAvatar(key,px){
 /* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
 function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}">${ASSET.html('it_'+id,'item-img',txt)}<span class="ic-txt">${txt}</span></div>`; }
 
+/* 顶栏 8 个属性的点击弹窗文案 */
+const STAT_INFO = {
+  rank:{
+    name:'品阶', fallback:'品', img:'stat_rank',
+    用途:'决定你可接工单的品阶上限、可召唤援助的神格档位上限，以及 KPI 考核的难度系数。',
+    来源:'两界劳务契上白纸黑字写死的档位。九品从九品是外包，七品以上才算有正式编制。',
+    作用:'每升一品，HP/MP 基础值 +15，解锁新的神格槽位和装备槽位，众神对你的初始态度也会变化。',
+    介绍:'外包阴神没资格挑活，活多钱少背锅快；正式神则有编有俸，养尊处优但 KPI 不达标一样贬谪。'
+  },
+  calendar:{
+    name:'两界日历', fallback:'日', img:'stat_calendar',
+    用途:'显示你在两界办差了多少天。每月 30 日，月底阎王爷考功过，不够 65 记贬谪。',
+    来源:'天地运行自有节律。你签的劳务契按两界日历计酬，逾期自动扣钱。',
+    作用:'时间推进触发：每日结算侵蚀、香火钱自然衰减、人情每日扣 2 点（未送）、工单自动上架下架。',
+    介绍:'凡人看阳历年月日，你看两界日历——正月不接阴差，七月鬼门大开，神仙也得歇年节。'
+  },
+  cult:{
+    name:'修为', fallback:'修', img:'stat_cult',
+    用途:'综合反映你当前的神格等级。通过凝聚碎末、合成神格、战斗历练提升。',
+    来源:'来自神格入体的累积感悟，以及战斗中以战养战的修行。',
+    作用:'修为越高，攻击/防御/暴击基础值越高，某些高阶神格需要修为门槛才能凝出。',
+    介绍:'外包阴神的修行路：从阴差到巡山夜叉，再到判官，最后能不能坐上阎王爷的位子——看你打多少杂工。'
+  },
+  money:{
+    name:'香火钱', fallback:'钱', img:'stat_money',
+    用途:'可用于商铺买装备、给神明送礼、招阴兵、炼化丹药、升级神衙。',
+    来源:'工单结算（主力）、出售装备/丹药、神衙投资分红、神明援助回礼。',
+    作用:'没钱寸步难行。HP 归零的死亡惩罚还要扣 15% 香火钱，死不起啊。',
+    介绍:'神仙的钱叫"香火钱"，因为最早的神仙靠民间烧香供奉吃饭。你是外包，给神仙干活神仙给你香火钱，变相是神仙在发工资。'
+  },
+  favor:{
+    name:'人情', fallback:'情', img:'stat_favor',
+    用途:'显示你与所有神明的交情总值。战斗紧急时刻（HP<30%）可呼叫已结识的神援助。',
+    来源:'接单即结识（+2）、战斗成功神感谢（+4）、送礼（挚爱+18 / 喜欢+8 / 无感+4 / 忌讳+1）。',
+    作用:'交情到"相熟"的神可呼叫援助，交情越深援助威力越大。忌讳礼送多了交情会反向。',
+    介绍:'神仙也是人情社会。阎王爷送钟馗的钟馗像他就笑纳，送灶王爷他就拉黑你——记住每个神的爱好，别送错。'
+  },
+  erode:{
+    name:'侵蚀', fallback:'蚀', img:'stat_erode',
+    用途:'反映神格道争对你精神的侵蚀。0 为清净，20-39 偶发幻觉，60+ 灯火将改（坏结局锁定）。',
+    来源:'吸收相冲的神格（主因）、某些结局选项、长期维持高道争的战斗风格。',
+    作用:'侵蚀≥2 时战斗偶有失误；≥3 时援助神可能降档；≥4 时终章倾向坏结局。',
+    介绍:'外包阴神的核心矛盾：你靠吸收各路神格变强，但神格之间会打架——道争越烈侵蚀越重。结局分岔的关键之一。'
+  },
+  merit:{
+    name:'本月功过', fallback:'过', img:'stat_merit',
+    用途:'本月 KPI 进度条。月底阎王爷考功过，够 65 记升品，不够降品。',
+    来源:'工单结算给功过（官遣+主线+长单给得多，支线给得少）。驳回工单倒扣功过。',
+    作用:'功过不够 = 品阶下调 → 属性下降 + 可接工单降级 → 循环恶化；满额则额外奖励。',
+    介绍:'阎王爷的考核指标很实在：每月 65 记功过起步。品阶越高目标越高，干不活就降级，外包又少一只。'
+  },
+  hp:{
+    name:'神躯 / 神力', fallback:'躯', img:'stat_hp',
+    用途:'HP（神躯）是战斗血量，归零则委托失败并受死亡惩罚；MP（神力）是释放技能/援助的消耗。',
+    来源:'HP/MP 由品阶 + 修为 + 装备 + 神格槽位决定上限；每次战斗前满血满蓝。',
+    作用:'HP 在战斗中归零 → 扣香火钱 15%、侵蚀 +3、推进一日；MP 不足无法释放技能或呼神。',
+    介绍:'外包阴神的神躯本质是借来的——你只是一个容器，神格是主要战斗力。所以 HP 归零你不会真死，只会被打回原形继续打杂工。'
+  },
+};
+
 const UI = {
   view:'office',     // office | mission | battle | settle
   tab:'desk',        // desk(案牍) | cult(修行) | yamen(神衙) | shop(商铺) | equip(装备) | me(我的)
@@ -65,20 +125,65 @@ const UI = {
     const target=monthTarget(s.month);
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
-    $('topStats').innerHTML = `
-      <div class="stat-chip"><span class="sc-ico" style="color:#2b2622">品</span><span class="sc-txt"><span class="k">品阶</span><span class="v">${rk.name}</span></span></div>
-      <div class="stat-chip"><span class="sc-ico" style="color:#2b2622">日</span><span class="sc-txt"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
-      <div class="stat-chip"><span class="sc-ico" style="color:#4e6b82">修</span><span class="sc-txt"><span class="k">修为</span><span class="v">${s.cult}</span></span></div>
-      <div class="stat-chip"><span class="sc-ico" style="color:#b5822a">钱</span><span class="sc-txt"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></span></div>
-      <div class="stat-chip"><span class="sc-ico" style="color:#7a4f6b">情</span><span class="sc-txt"><span class="k">人情</span><span class="v">${s.renqing}</span></span></div>
-      <div class="stat-chip ${erodeHot?'erode-hot':''}"><span class="sc-ico" style="color:#7a6a3a">蚀</span><span class="sc-txt"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></span></div>
-      <div class="stat-chip ${s.merit>=target?'':'kpi-hot'}">
-        <span class="sc-ico" style="color:#2b5a4a">过</span><span class="sc-txt"><span class="k">本月功过</span><span class="v">${s.merit}/${target}</span></span>
-      </div>
-      <div class="stat-chip bar-chip">
-        <span class="sc-ico" style="color:#a8382c">躯</span><span class="sc-txt" style="flex:1"><span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
+    /* 辅助：生成 stat-chip（图片图标 + 点击弹窗） */
+    const chip=(key, titleHTML, cls='')=>{
+      const info=STAT_INFO[key];
+      const imgHTML=typeof ASSET!=='undefined' && ASSET.list[info.img]
+        ? ASSET.html(info.img,'sc-img',info.fallback)
+        : '';
+      return `<div class="stat-chip${cls?' '+cls:''}" data-stat="${key}" style="cursor:pointer">
+        <span class="sc-ico">${imgHTML}<span class="sc-fallback" style="color:var(--ink)">${info.fallback}</span></span>
+        <span class="sc-txt">${titleHTML}</span></div>`;
+    };
+    $('topStats').innerHTML =
+      chip('rank',    `<span class="k">品阶</span><span class="v">${rk.name}</span>`) +
+      chip('calendar',`<span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span>`) +
+      chip('cult',    `<span class="k">修为</span><span class="v">${s.cult}</span>`) +
+      chip('money',   `<span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span>`) +
+      chip('favor',   `<span class="k">人情</span><span class="v">${s.renqing}</span>`) +
+      chip('erode',   `<span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span>`, erodeHot?'erode-hot':'') +
+      chip('merit',   `<span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>`, s.merit>=target?'':'kpi-hot') +
+      /* 神躯/神力 chip 特殊：带血条 */
+      `<div class="stat-chip bar-chip" data-stat="hp" style="cursor:pointer">
+        <span class="sc-ico">${typeof ASSET!=='undefined'?ASSET.html('stat_hp','sc-img','躯'):''}<span class="sc-fallback" style="color:#a8382c">躯</span></span>
+        <span class="sc-txt" style="flex:1"><span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
         <div class="bar"><i class="bar-hp" style="width:${Math.max(0,s.hp/st.maxHp*100)}%"></i></div></span>
       </div>`;
+    /* 绑定点击事件（事件委托，避免 innerHTML 丢失） */
+    setTimeout(()=>{
+      document.querySelectorAll('#topStats .stat-chip').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const k=el.dataset.stat; if(k) UI.openStatInfo(k);
+        });
+      });
+    },0);
+  },
+
+  /* ================= 顶栏属性详情弹窗 ================= */
+  openStatInfo(key){
+    const info=STAT_INFO[key]; if(!info) return;
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box stat-modal');
+    const imgHTML=typeof ASSET!=='undefined' && ASSET.list[info.img]
+      ? ASSET.html(info.img,'si-img',info.fallback)
+      : '';
+    box.innerHTML=`
+      <div class="si-head">
+        <div class="si-ico">${imgHTML}<span class="si-fallback">${info.fallback}</span></div>
+        <div class="si-title">
+          <h3>${info.name}</h3>
+          <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
+        </div>
+      </div>
+      <div class="si-body">
+        <div class="si-row"><b class="si-l">用途</b><div class="si-v">${info.用途}</div></div>
+        <div class="si-row"><b class="si-l">来源</b><div class="si-v">${info.来源}</div></div>
+        <div class="si-row"><b class="si-l">作用</b><div class="si-v">${info.作用}</div></div>
+        <div class="si-row"><b class="si-l">介绍</b><div class="si-v">${info.介绍}</div></div>
+      </div>`;
+    ov.appendChild(box); ml.appendChild(ov); ml.classList.remove('hidden');
   },
 
   /* ================= 页一：案牍（工单架） ================= */
