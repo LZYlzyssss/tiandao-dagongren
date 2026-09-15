@@ -1125,12 +1125,12 @@ const UI = {
           card.onclick=()=>UI.openGodModal(gid);
           grid.appendChild(card);
         });
-        if(!grid.children.length) continue; /* 该 tier 无已结识神明则跳过 */
-        tierRow.appendChild(grid);
-        campEl.appendChild(tierRow);
+        if(grid.children.length){
+          tierRow.appendChild(grid);
+          campEl.appendChild(tierRow);
+        }
       });
-      if(!campEl.querySelector('.gg-cell')) continue; /* 该阵营无已结识神明则跳过 */
-      body.appendChild(campEl);
+      if(campEl.querySelector('.gg-cell')) body.appendChild(campEl);
     });
     box.appendChild(body);
     ov.appendChild(box); ml.appendChild(ov);
