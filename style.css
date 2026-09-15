@@ -936,7 +936,8 @@ body::before{
 .tier-b{background:#7a4f8e}
 .tier-a{background:#c03c2e}
 
-.god-modal{max-width:92vw;max-height:80vh;overflow-y:auto}
+.god-grid{width:820px;max-width:92vw;max-height:80vh;overflow-y:auto}
+.god-modal{width:720px;max-width:92vw;max-height:80vh;overflow-y:auto}
 .gm-head{display:flex;gap:12px;align-items:center;margin-bottom:10px}
 .gm-name{flex:1;min-width:0}
 
@@ -984,10 +985,10 @@ body::before{
 /* ---- 剧情档案（卷宗架 + 卷宗详情） ---- */
 .story-entry{cursor:pointer}
 .story-entry:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.story-archive{max-width:96vw;max-height:88vh;overflow-y:auto}
+.story-archive{width:780px;max-width:92vw;max-height:80vh;overflow-y:auto}
 .sa-done{background:rgba(255,255,255,.8)}
 .sa-vol{width:38px;height:38px;line-height:38px;border:1.5px solid rgba(43,38,32,.5);border-radius:6px;font-size:17px;font-weight:bold;color:var(--ink);text-align:center;background:rgba(251,247,235,.9);margin-bottom:4px}
-.story-scroll{max-width:96vw;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column}
+.story-scroll{width:720px;max-width:92vw;max-height:80vh;overflow-y:auto;display:flex;flex-direction:column}
 .btn-back{align-self:flex-start}
 .ss-head{display:flex;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px dashed rgba(43,38,32,.2);margin-bottom:10px}
 .ss-body{flex:1;display:flex;flex-direction:column;gap:14px}
