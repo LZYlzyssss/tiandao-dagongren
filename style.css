@@ -56,8 +56,14 @@ body::before{
 .stat-chip{
   display:flex;flex-direction:column;align-items:center;min-width:78px;
   padding:3px 12px;border:1px solid var(--line);border-radius:4px;
-  background:rgba(255,252,244,.7);position:relative;
+  background:rgba(255,252,244,.7);position:relative;gap:2px;
 }
+/* 批3：stat-chip 前加墨画小图标 */
+.stat-chip::before{
+  font-family:var(--font-brush);font-size:14px;color:var(--ink-soft);line-height:1;
+}
+.stat-chip:has(.k)::before{content:attr(data-ico);display:block}
+.stat-chip[data-ico]::before{content:attr(data-ico)}
 .stat-chip .k{font-size:11px;color:var(--ink-faint);letter-spacing:2px}
 .stat-chip .v{font-size:17px;font-weight:bold}
 .stat-chip .v small{font-size:11px;color:var(--ink-faint);font-weight:normal}
@@ -232,7 +238,14 @@ body::before{
   font-family:var(--font-body);font-size:14px;letter-spacing:2px;cursor:pointer;
   border:1px solid var(--ink-soft);background:#f5ecd7;color:var(--ink);
   padding:6px 14px;border-radius:4px;transition:all .12s;flex:1;
+  display:inline-flex;align-items:center;gap:6px;
 }
+/* 批3：按钮前加墨画小图标——按 data-ico 或文字匹配 */
+.btn::before{
+  font-family:var(--font-brush);font-size:14px;line-height:1;color:inherit;opacity:.9;
+}
+.btn[data-ico]::before{content:attr(data-ico)}
+.btn::before:empty{display:none}
 .btn:hover{background:#e8dcc0}
 .btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
