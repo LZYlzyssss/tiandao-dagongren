@@ -394,7 +394,13 @@ body::before{
   display:grid;place-items:center;position:relative;cursor:pointer;
   background:rgba(255,255,255,.4);font-size:24px;font-family:var(--font-brush);
 }
-.slot.filled{border-style:solid;border-color:var(--ink-soft);background:#fbf4e2}
+.slot.filled{border-style:solid;border-color:var(--ink-soft);background:#fbf4e2;background-size:cover;background-position:center}
+/* 批3：五系神格底图已铺背景，叠薄纸纹保证 emoji 可读 */
+.slot.filled::after{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:6px;
+  background:linear-gradient(180deg, rgba(251,244,226,.3), rgba(251,244,226,.45));
+}
+.slot.filled > *:not(.p-dot){position:relative;z-index:1}
 .slot.sleeping{opacity:.5}
 .slot .p-dot{position:absolute;right:2px;top:2px;width:9px;height:9px;border-radius:50%;border:1.5px solid #fff}
 .gh-list{display:flex;flex-direction:column;gap:7px}

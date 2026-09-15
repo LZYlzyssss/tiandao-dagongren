@@ -205,6 +205,8 @@ const UI = {
       if(id){
         const g=GODHOODS[id], rec=s.gh[id];
         sl.title=`${g.name}（${PATHS[g.path].name}系）${rec.sleep>0?` 沉睡中 ${rec.sleep} 日`:''}`;
+        /* 批3：五系神格底图铺槽位背景 */
+        if(typeof ASSET!=='undefined') ASSET.bg(sl,'gh_'+g.path, 0.62);
         const dot=h('span','p-dot dot-'+g.path); sl.appendChild(dot);
         if(rec.sleep>0) sl.classList.add('sleeping');
         sl.onclick=()=>Game.toggleEquip(id);
