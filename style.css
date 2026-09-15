@@ -457,6 +457,7 @@ body::before{
 }
 .item-ic .ic-txt{position:relative;z-index:2}
 .item-ic .item-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.item-ic .item-img.loaded ~ .ic-txt{display:none}
 .item-ic.big{width:54px;height:54px;font-size:30px;border-radius:10px}
 .item-body{flex:1;min-width:0}
 .item-row.owned{opacity:.62}

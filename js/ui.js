@@ -7,7 +7,7 @@ function godAvatar(key,px){
   return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
 }
 /* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
-function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}"><span class="ic-txt">${txt}</span>${ASSET.html('it_'+id,'item-img',txt)}</div>`; }
+function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}">${ASSET.html('it_'+id,'item-img',txt)}<span class="ic-txt">${txt}</span></div>`; }
 
 const UI = {
   view:'office',     // office | mission | battle | settle
