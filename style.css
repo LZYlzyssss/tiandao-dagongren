@@ -193,27 +193,28 @@ body::before{
   position:relative;transition:transform .15s, box-shadow .15s;
   overflow:hidden;
 }
-/* 工单卡片：场景图做底，文字区高亮凸显 */
+/* 工单卡片：场景图做底（暗化+浓遮罩），文字区高亮凸显 */
 .order-bg{
   background-size:cover;background-position:center;background-blend-mode:normal;
+  filter:brightness(.85) saturate(.9);
 }
 .order-bg::before{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(180deg, rgba(251,246,232,.48), rgba(243,234,214,.55));
+  background-image:linear-gradient(180deg, rgba(251,246,232,.78), rgba(243,234,214,.85));
 }
 .order-bg > *{position:relative;z-index:1}
 /* 5 章色调叠层 */
-.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.45), rgba(243,234,214,.52))}
-.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.45), rgba(238,228,206,.52))}
-.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.52), rgba(220,205,188,.58))}
-.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.45), rgba(240,228,200,.52))}
-.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.45), rgba(238,225,190,.52))}
-/* 内容区：高亮白底细框，阴影凸显 */
+.order.order-ch1.order-bg::before{background-image:linear-gradient(180deg, rgba(251,246,232,.76), rgba(243,234,214,.83))}
+.order.order-ch2.order-bg::before{background-image:linear-gradient(180deg, rgba(248,240,224,.76), rgba(238,228,206,.83))}
+.order.order-ch3.order-bg::before{background-image:linear-gradient(180deg, rgba(235,222,210,.82), rgba(220,205,188,.88))}
+.order.order-ch4.order-bg::before{background-image:linear-gradient(180deg, rgba(252,244,220,.76), rgba(240,228,200,.83))}
+.order.order-ch5.order-bg::before{background-image:linear-gradient(180deg, rgba(255,248,228,.76), rgba(238,225,190,.83))}
+/* 内容区：实底高亮白，细框阴影 */
 .order-bg .o-body{
-  background:rgba(255,252,244,.94);border-radius:4px;padding:8px 10px;margin-left:52px;
+  background:rgba(255,252,244,.98);border-radius:4px;padding:8px 10px;margin-left:52px;
   position:relative;z-index:2;
-  border:1px solid rgba(185,169,138,.6);
-  box-shadow:0 2px 8px rgba(0,0,0,.12);
+  border:1px solid rgba(185,169,138,.7);
+  box-shadow:0 2px 8px rgba(0,0,0,.14);
 }
 .order:hover{transform:translateY(-2px);box-shadow:0 4px 10px var(--shadow)}
 .order.forced{border:2px solid var(--cinnabar)}
