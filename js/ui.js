@@ -66,18 +66,18 @@ const UI = {
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
     $('topStats').innerHTML = `
-      <div class="stat-chip"><span class="k">品阶</span><span class="v">${rk.name}</span></div>
-      <div class="stat-chip"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
-      <div class="stat-chip"><span class="k">修为</span><span class="v">${s.cult}</span></div>
-      <div class="stat-chip"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></div>
-      <div class="stat-chip"><span class="k">人情</span><span class="v">${s.renqing}</span></div>
-      <div class="stat-chip ${erodeHot?'erode-hot':''}"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></div>
+      <div class="stat-chip"><span class="sc-ico" style="color:#2b2622">品</span><span class="sc-txt"><span class="k">品阶</span><span class="v">${rk.name}</span></span></div>
+      <div class="stat-chip"><span class="sc-ico" style="color:#2b2622">日</span><span class="sc-txt"><span class="k">两界日历</span><span class="v">${s.month}<small>月</small> ${s.day}<small>日</small></span></div>
+      <div class="stat-chip"><span class="sc-ico" style="color:#4e6b82">修</span><span class="sc-txt"><span class="k">修为</span><span class="v">${s.cult}</span></span></div>
+      <div class="stat-chip"><span class="sc-ico" style="color:#b5822a">钱</span><span class="sc-txt"><span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span></span></div>
+      <div class="stat-chip"><span class="sc-ico" style="color:#7a4f6b">情</span><span class="sc-txt"><span class="k">人情</span><span class="v">${s.renqing}</span></span></div>
+      <div class="stat-chip ${erodeHot?'erode-hot':''}"><span class="sc-ico" style="color:#7a6a3a">蚀</span><span class="sc-txt"><span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span></span></div>
       <div class="stat-chip ${s.merit>=target?'':'kpi-hot'}">
-        <span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>
+        <span class="sc-ico" style="color:#2b5a4a">过</span><span class="sc-txt"><span class="k">本月功过</span><span class="v">${s.merit}/${target}</span></span>
       </div>
       <div class="stat-chip bar-chip">
-        <span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
-        <div class="bar"><i class="bar-hp" style="width:${Math.max(0,s.hp/st.maxHp*100)}%"></i></div>
+        <span class="sc-ico" style="color:#a8382c">躯</span><span class="sc-txt" style="flex:1"><span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
+        <div class="bar"><i class="bar-hp" style="width:${Math.max(0,s.hp/st.maxHp*100)}%"></i></div></span>
       </div>`;
   },
 
