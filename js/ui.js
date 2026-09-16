@@ -863,8 +863,8 @@ const UI = {
       }
     }
     c.appendChild(wrap);
-    /* 画质升级：下凡情景底图（按任务所属章） */
-    if(typeof FX!=='undefined') FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
+    /* 画质升级：下凡情景底图——优先本工单专属场景图全屏，无则退本章过场图 */
+    if(typeof FX!=='undefined') FX.setScene(ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1));
     if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
       const foeName=node.name||ENEMIES[node.enemy].name;
