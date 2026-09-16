@@ -863,8 +863,11 @@ const UI = {
       }
     }
     c.appendChild(wrap);
-    /* 画质升级：下凡情景底图——优先本工单专属场景图全屏，无则退本章过场图 */
-    if(typeof FX!=='undefined') FX.setScene(ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1));
+    /* 画质升级：下凡情景底图——优先本工单专属场景图全屏，无则退本章过场图；清页签氛围层避免叠图 */
+    if(typeof FX!=='undefined'){
+      FX.setAmbient(null);
+      FX.setScene(ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1), .45);
+    }
     if(node.type==='event' && typeof Guide!=='undefined') Guide.act('eventNode');
     if(node.type==='battle'){
       const foeName=node.name||ENEMIES[node.enemy].name;
@@ -1000,9 +1003,10 @@ const UI = {
     s.busy=false;
     this.view='settle';
     Game.save();
-    /* 画质升级：结算用本章情景图；章末水墨转场 + 墨雾换色 */
+    /* 画质升级：结算用本章情景图（清页签氛围层）；章末水墨转场 + 墨雾换色 */
     if(typeof FX!=='undefined'){
-      FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1));
+      FX.setAmbient(null);
+      FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1), .4);
       if(m.chapterEnd) FX.inkWipe(()=>FX.setChapter(Game.s.chapter||1));
     }
 
