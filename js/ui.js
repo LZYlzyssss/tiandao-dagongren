@@ -853,6 +853,11 @@ const UI = {
         ch.appendChild(b);
       });
       wrap.appendChild(ch);
+      const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
+      quit.style.marginTop='10px';
+      quit.title='本次办理暂告段落，工单留在工单架，之后可重新接案（本幕进度从头计）';
+      quit.onclick=()=>this.quitMission();
+      wrap.appendChild(quit);
       if(this.rt.result){
         const rl=h('div','result-line','▸ '+this.rt.result);
         wrap.appendChild(rl);
@@ -951,6 +956,14 @@ const UI = {
       this.openNotice('委托失败', msg,
         ()=>{ if(typeof Guide!=='undefined') Guide.act('noticeClosed'); });
     }
+    this.render();
+  },
+
+  /* 剧情中暂离：无惩罚、不跨天，工单留在架上，重接从头计 */
+  quitMission(){
+    this.rt=null; this.view='office'; this.tab='desk';
+    Game.s.busy=false;
+    Game.save();
     this.render();
   },
 
