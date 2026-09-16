@@ -1,10 +1,10 @@
 /* ================= 天道打工人 · 界面层（分页版） ================= */
 const $ = id => document.getElementById(id);
 const h = (tag, cls, html)=>{ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
-const imgURL = (prompt,size)=>`https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=${encodeURIComponent(prompt)}&image_size=${size||'square'}`;
+/* 头像：本地 img/av_<gid>.jpg 真图优先；缺失则 onerror 移除 img，露出下层毛笔字（不再直连在线图床） */
 function godAvatar(key,px){
   const g=GODS[key];
-  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${imgURL(g.img)}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"></span>`;
+  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${ASSET.avatarFile(key)}" onload="this.classList.add('loaded')" onerror="this.remove()"></span>`;
 }
 /* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
 function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}">${ASSET.html('it_'+id,'item-img',txt)}<span class="ic-txt">${txt}</span></div>`; }
@@ -1468,11 +1468,11 @@ const UI = {
       box.insertBefore(img, box.firstChild);
       ASSET.mount(img, gid);
     }else{
-      /* 兜底：用 godAvatar 的 imgURL 方式 */
+      /* 兜底：本地头像 av_<gid>.jpg，再失败则仅留名号（不请求在线图床） */
       img=h('img','aid-img');
       img.alt=gd.name;
-      img.src=imgURL(gd.img,'portrait_4_3');
-      img.onerror=()=>{ img.style.display='none'; };
+      img.src=ASSET.avatarFile(gkey);
+      img.onerror=()=>{ img.remove(); };
       box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
       box.insertBefore(img, box.firstChild);
     }
