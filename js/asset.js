@@ -48,26 +48,46 @@ const ASSET = {
   html(key, cls, alt){
     return `<img class="${cls||''}" alt="${alt||''}" data-asset="${key}" src="">`;
   },
+
+  /* 统一图片加载：首次用稳定 URL，3 秒后自动用时间戳 URL 刷新一次（绕过 API 占位图缓存） */
+  _loadImg(key, onOk, onFail){
+    let attempt=0;
+    const maxAttempt=2;
+    const delays=[0, 3000, 7000];
+    const tryLoad=()=>{
+      const isRetry=attempt>0;
+      const u=this.url(key)+(isRetry?'&_t='+Date.now():'');
+      const im=new Image();
+      im.onload=()=>{
+        if(onOk) onOk(u, attempt, im.naturalWidth);
+        if(attempt<maxAttempt){ attempt++; setTimeout(tryLoad, delays[attempt]); }
+      };
+      im.onerror=()=>{
+        if(attempt<maxAttempt){ attempt++; setTimeout(tryLoad, delays[attempt]); }
+        else if(onFail) onFail('error');
+      };
+      im.src=u;
+    };
+    tryLoad();
+  },
+
   mount(img, key){
     if(!key || !this.list[key]){ img.style.display='none'; return; }
     img.classList.add('asset-fade');
-    let done=false, retryCount=0, maxRetry=2;
-    const finish=(ok)=>{
-      if(done) return; done=true;
-      if(ok) img.classList.add('loaded');
-      else img.classList.add('img-failed');
-    };
-    img.addEventListener('load', ()=>finish(true), {once:true});
-    img.addEventListener('error', ()=>{
-      if(done) return;
-      if(retryCount<maxRetry){ retryCount++; img.src=this.url(key)+'&_r='+retryCount; }
-      else finish(false);
-    }, {once:true});
-    this.src(key).then(s=>{
-      if(!s){ img.classList.add('img-failed'); return; }
-      img.src=s;
-      /* 超时兜底：15 秒还没 load 就算失败 */
-      setTimeout(()=>{ if(!done) finish(false); }, 15000);
+    this.src(key).then(finalUrl=>{
+      if(!finalUrl){ img.classList.add('img-failed'); return; }
+      /* 本地图直接设 */
+      if(finalUrl.startsWith('img/')){
+        img.addEventListener('load',()=>img.classList.add('loaded'),{once:true});
+        img.addEventListener('error',()=>img.classList.add('img-failed'),{once:true});
+        img.src=finalUrl;
+        return;
+      }
+      /* API 图：自动刷新占位图 */
+      let bestAttempt=-1;
+      this._loadImg(key, (u, attempt)=>{
+        if(attempt>=bestAttempt){ bestAttempt=attempt; img.src=u; img.classList.add('loaded'); }
+      }, ()=>{ img.classList.add('img-failed'); });
     });
   },
   scan(root){
@@ -85,16 +105,26 @@ const ASSET = {
     el._assetKey=key;
     el.style.opacity=0;
     const target=(opacity!=null?opacity:1);
-    this.src(key).then(s=>{
-      if(el._assetKey!==key) return;      /* 已被新的覆盖 */
-      if(!s) return;
-      const pre=new Image();
-      pre.onload =()=>{ if(el._assetKey===key){ el.style.backgroundImage=`url("${s}")`; el.style.opacity=target; } };
-      pre.onerror=()=>{
-        const u=this.url(key);
-        if(u && el._assetKey===key){ el.style.backgroundImage=`url("${u}")`; el.style.opacity=target; }
-      };
-      pre.src=s;
+    this.src(key).then(finalUrl=>{
+      if(el._assetKey!==key || !finalUrl) return;
+      /* 本地图直接设，不需要重试 */
+      if(finalUrl.startsWith('img/')){
+        el.style.backgroundImage=`url("${finalUrl}")`;
+        el.style.opacity=target;
+        return;
+      }
+      /* API 图：首次可能拿到占位图，3 秒 / 7 秒后自动刷新绕过缓存 */
+      let bestAttempt=-1;
+      this._loadImg(key, (u, attempt)=>{
+        if(el._assetKey!==key) return;
+        if(attempt>=bestAttempt){
+          bestAttempt=attempt;
+          el.style.backgroundImage=`url("${u}")`;
+          el.style.opacity=target;
+        }
+      }, ()=>{
+        if(el._assetKey===key) el.style.opacity=0;
+      });
     });
   },
 
