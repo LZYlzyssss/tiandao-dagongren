@@ -1408,6 +1408,8 @@ const UI = {
       <div class="battle-log" id="battleLog"></div>
       <div id="momentSlot"></div>`;
     c.appendChild(wrap);
+    /* 显式挂载所有战斗内资产图（立绘 + 背景图），不依赖 MutationObserver 时序 */
+    if(typeof ASSET!=='undefined') ASSET.scan(wrap);
     /* 画质升级：战场图（按章 + 高危任务为夜战）与章节墨雾 */
     if(typeof FX!=='undefined'){
       const mm=(this.rt&&this.rt.mid)?this.mission():null;

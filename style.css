@@ -372,6 +372,9 @@ body::before{
 .fig-body .fig-img.loaded ~ .fig-fallback{display:none}
 /* 失败/无图时保留文字兜底 */
 .fig-body .fig-img:not(.loaded) ~ .fig-fallback{display:grid}
+.fig-body .fig-img.img-failed{display:none}
+/* 全局：img-failed 隐藏破图占位 */
+.asset-fade.img-failed{display:none}
 .fig-body.hit{animation:hit .3s}
 .fig-body.cast{animation:cast .4s}
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}

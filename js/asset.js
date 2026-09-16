@@ -15,8 +15,9 @@ const ASSET = {
   /* ---- 在线生成 URL ---- */
   url(key){
     const a=this.list[key]; if(!a) return '';
+    /* 用 key 自身做缓存戳，保证同一资源 URL 稳定（首次生成后浏览器复用） */
     return 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt='
-      + encodeURIComponent(a[0]) + '&image_size=' + a[1];
+      + encodeURIComponent(a[0]) + '&image_size=' + a[1] + '&_k=' + key;
   },
   file(key){ return 'img/'+key+'.jpg'; },
 
@@ -50,18 +51,24 @@ const ASSET = {
   mount(img, key){
     if(!key || !this.list[key]){ img.style.display='none'; return; }
     img.classList.add('asset-fade');
-    this.src(key).then(s=>{
-      if(!s){ img.style.display='none'; return; }
-      img.addEventListener('load', ()=>img.classList.add('loaded'));
-      img.src=s;
-    });
-    img.onerror=()=>{
-      if(img.dataset.step!=='api' && this.url(key)){
-        img.dataset.step='api'; img.src=this.url(key);
-      }else{
-        img.style.display='none';
-      }
+    let done=false, retryCount=0, maxRetry=2;
+    const finish=(ok)=>{
+      if(done) return; done=true;
+      if(ok) img.classList.add('loaded');
+      else img.classList.add('img-failed');
     };
+    img.addEventListener('load', ()=>finish(true), {once:true});
+    img.addEventListener('error', ()=>{
+      if(done) return;
+      if(retryCount<maxRetry){ retryCount++; img.src=this.url(key)+'&_r='+retryCount; }
+      else finish(false);
+    }, {once:true});
+    this.src(key).then(s=>{
+      if(!s){ img.classList.add('img-failed'); return; }
+      img.src=s;
+      /* 超时兜底：15 秒还没 load 就算失败 */
+      setTimeout(()=>{ if(!done) finish(false); }, 15000);
+    });
   },
   scan(root){
     (root||document).querySelectorAll('img[data-asset]').forEach(img=>{
