@@ -573,6 +573,52 @@ const ENEMIES = {
     deathFx: '青羽坠地',
     shell: false
   },
+  dengyou_shu: {
+    name: '灯油鼠群',
+    icon: 'dengyou_shu',
+    tint: '#a3a380',
+    kind: 'yao',
+    tier: 1,
+    hp: 105,
+    atk: 18,
+    def: 4,
+    weak: ['bing', 'fa'],
+    resist: { you: 0.2 },
+    intent: 'shou',
+    traits: {
+      tags: ['闪避', '群涌'],
+      dodge: 0.3,
+      regen: { pct: 0.05 }
+    },
+    pill: 'danmo',
+    hpLabel: '妖力',
+    deathFx: '鼠窜四散',
+    shell: false
+  },
+  qieyou_shu: {
+    name: '窃油鼠君',
+    icon: 'qieyou_shu',
+    tint: '#d97706',
+    kind: 'yao',
+    tier: 2,
+    hp: 260,
+    atk: 34,
+    def: 8,
+    weak: ['bing', 'fa'],
+    resist: { you: 0.2 },
+    intent: 'xu',
+    traits: {
+      tags: ['油滑', '蓄力打断'],
+      burnHit: 0.35,
+      burnPct: 0.3,
+      stunImmune: '油身滑溜，震骇跳过不超过1回合；被兵系重击破防时DEF归零一回合',
+      special: '油火：攻击35%附带灼烧3回合；蓄力满喷一城油火群伤，须雷法打断蓄力'
+    },
+    pill: 'dan',
+    hpLabel: '妖力',
+    deathFx: '油鼠瘫倒',
+    shell: false
+  },
   dafeng: {
     name: '大风',
     icon: 'dafeng',
@@ -1131,8 +1177,8 @@ const MISSIONS = [
  nodes:[
   {type:'event',text:'你问他尊姓、管哪方地界、今日几号，他一概答「好，好，都好」。他还活着，还会倒茶，可「他」已经不在了。灯油鼠被人气惊出，直扑面门。',
    choices:[{t:'护住神龛，先除鼠患',r:{log:'鼠群之后，还有一只硕大的鼠君。'}}]},
-  {type:'battle',enemy:'yehu',name:'灯油鼠群',scale:1.15},
-  {type:'battle',enemy:'bifang',name:'窃油鼠君',scale:0.8},
+  {type:'battle',enemy:'dengyou_shu',name:'灯油鼠群',scale:1.15},
+  {type:'battle',enemy:'qieyou_shu',name:'窃油鼠君',scale:0.8},
   {type:'event',text:'老鼠除尽，老土地依旧微笑着给你倒茶，茶满了也不停手。',
    choices:[
     {t:'如实上报「鼠患窃油，致神失格」',r:{log:'城隍起初认可。你采纳了摆在明面上的答案。'}},
