@@ -336,7 +336,7 @@ const UI = {
       else stateHtml=`<div class="gh-dorm">未觉醒（感悟 ${Math.round(rec.insight*100)}%）</div>`;
       item.innerHTML=`
         <div class="gh-t"><span class="path-dot dot-${g.path}"></span>${g.name}
-          <span style="font-size:11px;color:var(--ink-faint)">${g.fusion?'【融合】':PATHS[g.path].name+'系 · '+(g.god?GODS[g.god].name:'天道自生')}</span></div>
+          <span style="font-size:11px;color:var(--ink-faint)">${g.fusion?'【融合】':PATHS[g.path].name+'系 · '+(g.god||'天道自生')}</span></div>
         <div class="gh-s">${g.desc}<br>${stateHtml}</div>`;
       const row=h('div','o-actions'); row.style.marginTop='5px';
       const eb=h('button','btn btn-sm', eq?'取下':'镶嵌');

@@ -417,7 +417,8 @@ const Guide = {
 
   /* ---------- 事件状态机（由 UI/state 钩子调用） ---------- */
   act(ev, p){
-    if(!this.active) return;
+    /* waitingGh 暂停态仅放行 backOffice（用于拿到首枚神格后恢复引导）*/
+    if(!this.active && ev!=='backOffice') return;
     const s=this.step;
 
     if(ev==='startMission'){
@@ -463,6 +464,14 @@ const Guide = {
     }
     if(ev==='settle'){ this.show('settle'); return; }
     if(ev==='backOffice'){
+      /* waitingGh 暂停态（active=false）下拿到首枚神格后，
+         玩家点结算「回神衙」由此恢复引导，走标准巡览流程 */
+      if(!this.active){
+        const t0=Game.s.tut;
+        const hasGh=Object.keys(Game.s.gh||{}).some(k=>Game.s.gh[k]);
+        if(!t0||t0.done||t0.stage!=='waitingGh'||!hasGh) return;
+        this.active=true;
+      }
       if($('modalLayer').children.length){ this._pending='backOffice'; this.suspend(); return; }
       this.toTour();
       return;

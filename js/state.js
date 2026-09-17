@@ -132,15 +132,20 @@ const Game = {
       res.isNew=true; res.cultGain=GH_CULT[g.q]||0; this.s.cult+=res.cultGain;
       const rate=this.awakeRate(id);
       if(Math.random()<rate){ this.s.gh[id].awakened=true; res.awakened=true; }
-      /* v3 钩子：首次获得整格时唤起 Guide 的 cultEmbed 指引（若 Guide 暂停在 waitingGh 或尚未开始） */
+      /* v3 钩子：仅当指引暂停在 waitingGh（首单未给格）时恢复嵌入指引。
+         严禁在 settle/mission/battle 等流程视图强切 UI——
+         那种情况下交给玩家点「回神衙」触发 Guide.act('backOffice') 恢复。 */
       if(res.isNew && typeof Guide!=='undefined'){
-        setTimeout(()=>{
-          try{
-            if(typeof UI==='undefined') return;
-            if(UI.view!=='office' || UI.tab!=='cult'){ UI.tab='cult'; UI.view='office'; UI.render(); }
-            Guide.show('cultEmbed');
-          }catch(e){ console.warn('[GuideHook] error',e.message); }
-        },400);
+        const t=this.s.tut;
+        if(t && !t.done && t.stage==='waitingGh'){
+          setTimeout(()=>{
+            try{
+              if(typeof UI==='undefined' || UI.view!=='office') return;
+              if(UI.tab!=='cult'){ UI.tab='cult'; UI.render(); }
+              Guide.show('cultEmbed');
+            }catch(e){ console.warn('[GuideHook] error',e.message); }
+          },400);
+        }
       }
     }else{
       res.cultGain=8; this.s.cult+=8;
@@ -197,15 +202,18 @@ const Game = {
 
   toggleEquip(id){
     const eq=this.s.equipped, i=eq.indexOf(id);
-    if(i>=0){ eq.splice(i,1); }
+    let action=null;
+    if(i>=0){ eq.splice(i,1); action='unequip'; }
     else{
       if(this.s.gh[id] && this.s.gh[id].sleep>0){ this.toast('该神格正在沉睡，无法催动'); return; }
       if(eq.length>=Stats.slots()){ this.toast('神格盘槽位已满（晋升品阶可扩充）'); return; }
-      eq.push(id);
+      eq.push(id); action='equip';
     }
     Stats.recalc();
     if(this.s.hp>Stats.cur().maxHp) this.s.hp=Stats.cur().maxHp;
     this.save(); if(typeof UI!=='undefined') UI.render();
+    /* 指引：成功镶嵌后从 cultEmbed 推进到 cultTalk */
+    if(action==='equip' && typeof Guide!=='undefined') Guide.act('toggleEquip');
   },
 
   /* ---------------- 碎片凝格（04册第六节） ---------------- */
