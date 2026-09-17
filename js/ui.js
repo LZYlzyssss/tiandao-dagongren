@@ -825,16 +825,29 @@ const UI = {
     });
   },
 
-  /* 下凡过场层：全屏场景图淡入 + 题注，点击/按键淡出后进入剧情；结束即移除节点，不残留遮挡 */
+  /* 下凡过场层（两阶段）：
+     阶段一：纯场景图全屏渐显，无任何标题/故事文字，只留「轻触继续」；
+     点击后进入阶段二：题注 + 任务故事背景段落渐次浮现；再点击淡出进入剧情节点。
+     长单续办（act>=1）时，故事取 MISSION_INTRO[id].acts[act]（该幕故事）。 */
   showMissionIntro(m, bgKey, cb){
     const ml=$('modalLayer');
     const ov=h('div','m-intro');
     const ch=m.chapter||Game.s.chapter||1;
-    const tag=m.long ? `第 ${ch} 章 · 长差 · 第 ${(this.rt.order.act||0)+1}/${m.acts.length} 幕`
+    const actNo=this.rt&&this.rt.order?(this.rt.order.act||0):0;
+    const tag=m.long ? `第 ${ch} 章 · 长差 · 第 ${actNo+1}/${m.acts.length} 幕`
       : m.main ? `第 ${ch} 章 · 主线官遣`
       : `支线 · ${(m.side||'').toUpperCase()}`;
     const god=GODS[m.god];
-    const actTitle=m.long?`<div class="mi-act">${m.acts[Math.min(this.rt.order.act||0,m.acts.length-1)].title}</div>`:'';
+    const actTitle=(m.long&&actNo===0)?'':(m.long?`<div class="mi-act">${m.acts[Math.min(actNo,m.acts.length-1)].title}</div>`:'');
+    /* 取故事段落：普通单=数组；长单 act0=all，act>=1=acts[act]；缺数据时为空 */
+    let paras=[];
+    const intro=(typeof MISSION_INTRO!=='undefined')?MISSION_INTRO[m.id]:null;
+    if(intro){
+      if(Array.isArray(intro)) paras=intro;
+      else if(m.long) paras = actNo===0 ? (intro.all||[]) : ((intro.acts&&intro.acts[actNo])||[]);
+    }
+    const storyHtml=paras.length
+      ? `<div class="mi-story">${paras.map(p=>`<p>${p}</p>`).join('')}</div>` : '';
     ov.innerHTML=`
       <div class="m-intro-bg"></div>
       <div class="m-intro-shade"></div>
@@ -843,21 +856,34 @@ const UI = {
         ${actTitle}
         <div class="mi-name">${m.name}</div>
         <div class="mi-god">${god.name} · ${god.title} 委托</div>
+        ${storyHtml}
       </div>
-      <div class="mi-go">轻触继续 ▸</div>`;
+      <div class="mi-go"><span class="mi-go-1">轻触继续 ▸</span><span class="mi-go-2">轻触，前往办差 ▸</span></div>`;
     ml.appendChild(ov);
     ASSET.bg(ov.querySelector('.m-intro-bg'), bgKey, 1);
-    let done=false;
-    const finish=()=>{
-      if(done) return; done=true;
+
+    /* 阶段机：0=纯图（仅可翻到故事）；1=故事已显（点击结束过场） */
+    let stage=0, done=false;
+    const goNext=()=>{
+      if(done) return;
+      if(stage===0){
+        stage=1;
+        ov.classList.add('story');
+        const cap=ov.querySelector('.m-intro-cap');
+        /* 故事段落逐段延迟显现 */
+        cap.querySelectorAll('.mi-story p').forEach((p,i)=>{ p.style.transitionDelay=(0.25+i*0.18)+'s'; });
+        requestAnimationFrame(()=>cap.classList.add('show'));
+        return;
+      }
+      done=true;
       document.removeEventListener('keydown', onKey);
       ov.classList.add('out');
       setTimeout(()=>{ ov.remove(); cb&&cb(); }, 460);
     };
     const onKey=e=>{
-      if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); finish(); }
+      if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); goNext(); }
     };
-    ov.addEventListener('click', finish);
+    ov.addEventListener('click', goNext);
     document.addEventListener('keydown', onKey);
   },
 
