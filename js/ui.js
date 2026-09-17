@@ -806,8 +806,51 @@ const UI = {
     Game.save();
     this.view='mission';
     this.render();
-    this.renderMissionNode();
-    if(typeof Guide!=='undefined') Guide.act('startMission');
+    /* 下凡过场：工单专属场景图全屏渐显，点击后再进入剧情节点；
+       场景底图提前挂到 mission 页，新手引导延后到过场关闭，避免被遮挡 */
+    const m=this.mission();
+    const bgKey=ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1);
+    if(typeof FX!=='undefined'){ FX.setAmbient(null); FX.setScene(bgKey, .45); }
+    this.showMissionIntro(m, bgKey, ()=>{
+      this.renderMissionNode();
+      if(typeof Guide!=='undefined') Guide.act('startMission');
+    });
+  },
+
+  /* 下凡过场层：全屏场景图淡入 + 题注，点击/按键淡出后进入剧情；结束即移除节点，不残留遮挡 */
+  showMissionIntro(m, bgKey, cb){
+    const ml=$('modalLayer');
+    const ov=h('div','m-intro');
+    const ch=m.chapter||Game.s.chapter||1;
+    const tag=m.long ? `第 ${ch} 章 · 长差 · 第 ${(this.rt.order.act||0)+1}/${m.acts.length} 幕`
+      : m.main ? `第 ${ch} 章 · 主线官遣`
+      : `支线 · ${(m.side||'').toUpperCase()}`;
+    const god=GODS[m.god];
+    const actTitle=m.long?`<div class="mi-act">${m.acts[Math.min(this.rt.order.act||0,m.acts.length-1)].title}</div>`:'';
+    ov.innerHTML=`
+      <div class="m-intro-bg"></div>
+      <div class="m-intro-shade"></div>
+      <div class="m-intro-cap">
+        <div class="mi-tag">${tag}</div>
+        ${actTitle}
+        <div class="mi-name">${m.name}</div>
+        <div class="mi-god">${god.name} · ${god.title} 委托</div>
+      </div>
+      <div class="mi-go">轻触继续 ▸</div>`;
+    ml.appendChild(ov);
+    ASSET.bg(ov.querySelector('.m-intro-bg'), bgKey, 1);
+    let done=false;
+    const finish=()=>{
+      if(done) return; done=true;
+      document.removeEventListener('keydown', onKey);
+      ov.classList.add('out');
+      setTimeout(()=>{ ov.remove(); cb&&cb(); }, 460);
+    };
+    const onKey=e=>{
+      if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); finish(); }
+    };
+    ov.addEventListener('click', finish);
+    document.addEventListener('keydown', onKey);
   },
 
   mission(){ return MISSIONS.find(x=>x.id===this.rt.mid); },
