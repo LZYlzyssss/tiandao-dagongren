@@ -944,6 +944,8 @@ const UI = {
         wrap.appendChild(next);
       }
     }
+    if(node.type==='quiz') this.renderQuiz(wrap,node);
+    if(node.type==='game') this.renderGame(wrap,node);
     c.appendChild(wrap);
     /* 画质升级：下凡情景底图——优先本工单专属场景图全屏，无则退本章过场图；清页签氛围层避免叠图 */
     if(typeof FX!=='undefined'){
@@ -958,6 +960,121 @@ const UI = {
       c.appendChild(wrap);
       this.runBattleNode(node);
     }
+  },
+
+  /* 问答门槛节点：须逐题答对（答错可反复重选，不答出行不了路），全对方可继续 */
+  renderQuiz(wrap,node){
+    const qs=node.qs||[node];
+    let qi=0;
+    const box=h('div','quiz-box');
+    const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
+    quit.style.marginTop='10px';
+    quit.title='考校未完，工单留在工单架，之后可重新接案（本幕进度从头计）';
+    quit.onclick=()=>this.quitMission();
+    const draw=()=>{
+      box.innerHTML='';
+      if(node.text) box.appendChild(h('div','scroll-card',`<span class="ink-mark">▍</span>${node.text}`));
+      if(qi>=qs.length){
+        this.applyNodePass(node,1);
+        box.appendChild(h('div','quiz-done','✔ 对答如流，关隘已开'));
+        const rl=h('div','result-line','▸ '+(node.pass&&node.pass.log||'你应声过关，继续前行。'));
+        box.appendChild(rl);
+        const next=h('button','btn btn-primary btn-mish-next','继续前行');
+        next.style.marginTop='10px';
+        next.onclick=()=>this.nextNode();
+        box.appendChild(next);
+        box.appendChild(quit);
+        return;
+      }
+      const it=qs[qi];
+      const rightTxt=it.opts[it.a];
+      const opts=it.opts.slice();
+      for(let k=opts.length-1;k>0;k--){ const j=Math.floor(Math.random()*(k+1)); [opts[k],opts[j]]=[opts[j],opts[k]]; }
+      const head=h('div','quiz-head',
+        `<span class="quiz-who">${node.who?'【'+node.who+' · 考校】':'【考校】'}</span><span class="quiz-prog">第 ${qi+1} / ${qs.length} 问</span>`);
+      box.appendChild(head);
+      box.appendChild(h('div','quiz-q',it.q));
+      const list=h('div','quiz-opts');
+      let answered=false, tipEl=null;
+      opts.forEach(opt=>{
+        const b=h('button','quiz-opt',opt);
+        b.onclick=()=>{
+          if(answered) return;
+          if(opt===rightTxt){
+            answered=true;
+            b.classList.add('right');
+            [...list.children].forEach(x=>x.disabled=true);
+            box.appendChild(h('div','quiz-why','▸ '+it.why));
+            qi++;
+            const next=h('button','btn btn-primary btn-quiz-next', qi>=qs.length?'关隘已开，继续前行 ▸':'接下一问 ▸');
+            next.style.marginTop='10px';
+            next.onclick=()=>{ Game.save(); draw(); };
+            box.appendChild(next);
+          }else{
+            b.classList.add('wrong'); b.disabled=true;
+            if(!tipEl){ tipEl=h('div','quiz-tip','× 答岔了。再斟酌——此关答不过，前路行不得。'); box.appendChild(tipEl); }
+          }
+        };
+        list.appendChild(b);
+      });
+      box.appendChild(list);
+      box.appendChild(quit);
+    };
+    wrap.appendChild(box);
+    draw();
+  },
+
+  /* 益智关卡节点：小游戏通关（失败局内重来）后方可继续；rating 1 满赏 / .6 半赏 */
+  renderGame(wrap,node){
+    const sc=h('div','scroll-card',`<span class="ink-mark">▍</span>${node.text||'前方设下一道关卡。'}`);
+    wrap.appendChild(sc);
+    const arena=h('div','mg-arena');
+    wrap.appendChild(arena);
+    const startRow=h('div','mg-start-row');
+    const btn=h('button','btn btn-primary mg-btn','凝神 · 开始破局');
+    let started=false;
+    btn.onclick=()=>{
+      if(started) return; started=true; btn.disabled=true; btn.textContent='破局中……';
+      MiniGame.run(node.game, arena, {difficulty:node.difficulty||2}, (rating)=>{
+        this.applyNodePass(node,rating);
+        arena.innerHTML='';
+        const perfect=rating>=1;
+        const rl=h('div','result-line','▸ '+(node.pass&&node.pass.log||'机关已破，前行无碍。')+(perfect?' <span style="color:var(--gold)">（完美破局，赏罚从优）</span>':''));
+        wrap.appendChild(rl);
+        const next=h('button','btn btn-primary btn-mish-next','继续前行');
+        next.style.marginTop='10px';
+        next.onclick=()=>this.nextNode();
+        wrap.appendChild(next);
+      });
+    };
+    startRow.appendChild(btn);
+    const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
+    quit.style.marginLeft='10px';
+    quit.title='关卡未破，工单留在工单架，之后可重新接案（本幕进度从头计）';
+    quit.onclick=()=>this.quitMission();
+    startRow.appendChild(quit);
+    wrap.appendChild(startRow);
+  },
+
+  /* 通关/答对结算：字段同 event 选项 r；数值赏按 rating 折算，布尔效果（敌弱等）通关即有 */
+  applyNodePass(node,rating){
+    const r=node.pass||{}, k=rating>=1?1:0.6;
+    const num=v=>v?Math.max(1,Math.round(v*k)):0;
+    const st=Stats.cur();
+    if(r.heal) Game.s.hp=Math.min(st.maxHp, Game.s.hp+Math.round(st.maxHp*r.heal/100));
+    if(r.atkBuff) this.rt.ctx.atkBuff+=r.atkBuff*k;
+    if(r.shield) this.rt.ctx.shield=(this.rt.ctx.shield||0)+r.shield*k;
+    if(r.enemyVuln) this.rt.ctx.enemyVuln=true;
+    if(r.money) Game.s.money+=num(r.money);
+    if(r.merit) Game.s.merit+=num(r.merit);
+    if(r.renqing) Game.s.renqing+=num(r.renqing);
+    if(r.cleanse) Game.reduceErode(r.cleanse);
+    if(r.favor) Object.entries(r.favor).forEach(([g,n])=>Game.addFavor(g,num(n)));
+    if(r.flags) Object.entries(r.flags).forEach(([key,v])=>{
+      if(typeof v==='number' && typeof Game.s.flags[key]==='number') Game.s.flags[key]+=v;
+      else Game.s.flags[key]=(v===undefined?true:v);
+    });
+    Game.save(); this.renderTop();
   },
 
   chooseEvent(i){

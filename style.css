@@ -1301,3 +1301,218 @@ body::before{
   .mi-name{letter-spacing:3px;}
   .mi-story{margin-top:12px}
 }
+
+/* ================= 考校问答（quiz 门槛节点） ================= */
+.quiz-box{margin-top:12px;}
+.quiz-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:14px 2px 10px;
+}
+.quiz-who{
+  font-family:var(--font-brush);font-size:18px;letter-spacing:2px;
+  color:var(--cinnabar-deep);
+}
+.quiz-prog{font-size:12px;color:var(--ink-faint);letter-spacing:2px;}
+.quiz-q{
+  font-size:clamp(15px,1.7vw,17.5px);line-height:1.9;letter-spacing:1px;
+  color:var(--ink);
+  background:linear-gradient(180deg,rgba(255,250,238,.75),rgba(244,234,212,.55));
+  border-left:3px solid var(--cinnabar);
+  border-radius:8px;padding:14px 16px;margin-bottom:14px;
+  box-shadow:0 2px 10px rgba(60,45,25,.08);
+}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;}
+.quiz-opt{
+  text-align:left;cursor:pointer;
+  font-size:15px;letter-spacing:1px;line-height:1.6;
+  color:var(--ink);background:rgba(250,244,229,.82);
+  border:1.5px solid rgba(120,95,55,.28);border-radius:10px;
+  padding:12px 16px;
+  transition:border-color .18s ease,background .18s ease,transform .12s ease;
+}
+.quiz-opt:hover:not(:disabled){border-color:var(--gold);background:#fbf4e2;transform:translateX(4px);}
+.quiz-opt:disabled{cursor:default;opacity:.72;}
+.quiz-opt.right{
+  background:rgba(86,124,68,.16);border-color:#567c44;color:#3f5d33;opacity:1;
+  font-weight:bold;
+}
+.quiz-opt.wrong{
+  background:rgba(192,60,46,.13);border-color:var(--cinnabar);color:var(--cinnabar-deep);
+  animation:quizShake .4s ease;
+}
+@keyframes quizShake{
+  0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}
+  40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}
+}
+.quiz-why{
+  margin-top:12px;font-size:13.5px;line-height:1.85;color:#5d503c;
+  background:rgba(201,150,47,.1);border:1px dashed rgba(201,150,47,.55);
+  border-radius:8px;padding:10px 14px;
+  animation:quizFade .45s ease;
+}
+.quiz-tip{
+  margin-top:10px;font-size:13.5px;color:var(--cinnabar-deep);letter-spacing:1px;
+  animation:quizFade .3s ease;
+}
+.quiz-done{
+  font-family:var(--font-brush);font-size:22px;letter-spacing:4px;
+  color:#567c44;text-align:center;margin:18px 0 6px;
+  animation:quizFade .5s ease;
+}
+@keyframes quizFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ================= 益智关卡（game 节点） ================= */
+.mg-arena{
+  position:relative;margin-top:12px;
+  min-height:456px;border-radius:12px;overflow:hidden;
+  background:rgba(23,18,12,.06);
+}
+.mg-mask{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 50% 30%,rgba(40,31,19,.9),rgba(20,16,10,.96));
+}
+.mg-panel{
+  position:absolute;inset:0;z-index:2;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:22px 18px 18px;overflow-y:auto;
+  color:#e9ddc0;
+}
+.mg-tag{
+  font-size:12.5px;letter-spacing:8px;color:#b6a375;margin-bottom:8px;
+}
+.mg-title{
+  font-family:var(--font-brush);font-size:clamp(22px,3vw,30px);letter-spacing:5px;
+  color:#f0e4c8;margin-bottom:8px;text-align:center;
+}
+.mg-sub{
+  font-size:13px;line-height:1.8;color:#c9ba96;max-width:560px;text-align:center;margin-bottom:10px;
+}
+.mg-hud{
+  display:flex;gap:18px;flex-wrap:wrap;justify-content:center;
+  font-size:13px;color:#d6c7a3;margin-bottom:14px;
+}
+.mg-hud b{color:#f0d9a0;font-size:15px;margin:0 2px;}
+.mg-wintext{color:var(--gold)!important;letter-spacing:3px;font-weight:bold;}
+.mg-board{display:grid;gap:12px;width:100%;justify-content:center;}
+.mg-board-memory{
+  grid-template-columns:repeat(3,minmax(86px,104px));
+  max-width:360px;
+}
+.mg-board-lights{grid-template-columns:repeat(3,minmax(76px,96px));max-width:330px;}
+.mg-board-pairs{grid-template-columns:repeat(4,minmax(62px,80px));max-width:380px;gap:10px;}
+.mg-board-spot{gap:12px;}
+.mg-board-spot.n4{grid-template-columns:repeat(2,minmax(110px,150px));max-width:340px;}
+.mg-board-spot.n6{grid-template-columns:repeat(3,minmax(88px,120px));max-width:420px;}
+.mg-board-spot.n9{grid-template-columns:repeat(3,minmax(80px,108px));max-width:380px;}
+
+/* 记忆法坛 · 符钮 */
+.mg-rune{
+  height:84px;border-radius:12px;cursor:pointer;
+  font-size:34px;color:rgba(233,221,193,.55);
+  background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(201,180,130,.3);
+  transition:all .18s ease;
+}
+.mg-rune:hover:not(:disabled){border-color:var(--gold);color:#e9ddc1;}
+.mg-rune:disabled{cursor:default;}
+.mg-rune.lit{
+  background:radial-gradient(circle at 50% 40%,rgba(212,170,72,.95),rgba(150,105,30,.85));
+  border-color:#f0d9a0;color:#241a08;
+  box-shadow:0 0 22px rgba(212,170,72,.65);
+  transform:scale(1.06);
+}
+.mg-rune.ok{background:rgba(86,124,68,.55);border-color:#9cc083;color:#eaf6df;}
+.mg-rune.bad{background:rgba(192,60,46,.6);border-color:#e07a66;animation:quizShake .4s ease;}
+
+/* 魂灯踏明 */
+.mg-lamp{
+  height:80px;border-radius:50%;cursor:pointer;
+  font-size:0;
+  background:radial-gradient(circle at 50% 45%,#4a4033,#2c251b);
+  border:2px solid rgba(201,180,130,.22);
+  transition:all .25s ease;
+}
+.mg-lamp:hover{border-color:rgba(201,180,130,.6);}
+.mg-lamp.on{
+  background:radial-gradient(circle at 50% 42%,#ffe9b0,#d9a83f 58%,#8a5f1c);
+  border-color:#f0d9a0;
+  box-shadow:0 0 26px rgba(230,180,80,.8),0 0 60px rgba(230,180,80,.35);
+}
+
+/* 符牌配对 · 翻转 */
+.mg-card{
+  height:78px;cursor:pointer;position:relative;
+  background:transparent;border:none;padding:0;
+  perspective:600px;
+}
+.mg-card span{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  border-radius:10px;backface-visibility:hidden;
+  transition:transform .35s ease;
+  font-family:var(--font-brush);
+}
+.mg-card-back{
+  background:linear-gradient(145deg,#6b3b2e,#4a281d);
+  border:1.5px solid rgba(201,150,47,.5);
+  color:rgba(240,220,180,.7);font-size:24px;
+}
+.mg-card-face{
+  background:linear-gradient(145deg,#f4e8cc,#e3d2a8);
+  border:1.5px solid #b08d4b;color:#5a3d1c;font-size:28px;
+  transform:rotateY(180deg);
+}
+.mg-card.up .mg-card-back{transform:rotateY(180deg);}
+.mg-card.up .mg-card-face{transform:rotateY(0);}
+.mg-card.match .mg-card-face{
+  background:linear-gradient(145deg,#cfe3bf,#a8c892);border-color:#567c44;color:#3f5d33;
+  box-shadow:0 0 14px rgba(120,170,90,.5);
+}
+
+/* 辨真识假 · 印件 */
+.mg-seal{
+  height:84px;cursor:pointer;position:relative;
+  border-radius:10px;
+  background:linear-gradient(160deg,rgba(192,60,46,.28),rgba(150,48,31,.22));
+  border:1.5px solid rgba(201,150,47,.35);
+  transition:transform .15s ease,border-color .15s ease;
+}
+.mg-seal:hover{transform:translateY(-2px);border-color:rgba(201,150,47,.8);}
+.mg-seal b{
+  font-family:var(--font-brush);font-size:38px;color:rgba(214,120,100,.85);
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+}
+.mg-seal i{display:none;}
+/* 真件三种微差 */
+.mg-seal.real.diff-ink b{color:rgba(214,90,70,1);text-shadow:0 0 8px rgba(192,60,46,.55);}
+.mg-seal.real.diff-frame{border:3px double #e8c978;box-shadow:inset 0 0 0 1px rgba(232,201,120,.6);}
+.mg-seal.real.diff-notch i{
+  display:block;position:absolute;right:8px;bottom:8px;
+  width:8px;height:8px;border-radius:50%;
+  background:#f0d9a0;box-shadow:0 0 6px rgba(240,217,160,.9);
+}
+.mg-board.shake{animation:quizShake .42s ease;}
+.mg-timebar{
+  width:min(420px,86%);height:5px;border-radius:3px;
+  background:rgba(255,255,255,.12);overflow:hidden;margin-top:12px;
+}
+.mg-timebar i{display:block;height:100%;background:linear-gradient(90deg,#d9a83f,#c03c2e);}
+.mg-fail{
+  position:absolute;inset:0;z-index:5;
+  background:rgba(16,12,8,.82);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  font-size:18px;letter-spacing:3px;color:#e6c8b8;
+  animation:quizFade .3s ease;
+}
+.mg-ctrls{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;justify-content:center;}
+.mg-start-row{display:flex;align-items:center;margin-top:14px;flex-wrap:wrap;}
+.mg-btn{min-width:132px;}
+.mg-done .mg-mask{transition:opacity .4s ease;opacity:0;}
+.mg-done .mg-panel{transition:opacity .4s ease;opacity:0;}
+@media (max-width:640px){
+  .mg-arena{min-height:430px;}
+  .mg-rune{height:72px;font-size:28px;}
+  .mg-lamp{height:68px;}
+  .mg-card{height:66px;}
+  .mg-seal{height:72px;}
+}
