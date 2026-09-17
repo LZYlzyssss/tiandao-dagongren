@@ -1,10 +1,14 @@
 /* ================= 天道打工人 · 界面层（分页版） ================= */
 const $ = id => document.getElementById(id);
 const h = (tag, cls, html)=>{ const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
-/* 头像：本地 img/av_<gid>.jpg 真图优先；缺失则 onerror 移除 img，露出下层毛笔字（不再直连在线图床） */
+/* 头像：有立绘的神（GOD_ART 25 位）优先用 img/g_<gid>.jpg 圆裁，回退 av_<gid>.jpg；
+   缺失则 onerror 移除 img，露出下层毛笔字（不再直连在线图床） */
 function godAvatar(key,px){
   const g=GODS[key];
-  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${ASSET.avatarFile(key)}" onload="this.classList.add('loaded')" onerror="this.remove()"></span>`;
+  const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(key);
+  const src = hasArt ? 'img/g_'+key+'.jpg' : ASSET.avatarFile(key);
+  const onerr = hasArt ? `this.onerror=()=>this.remove();this.src='${ASSET.avatarFile(key)}'` : 'this.remove()';
+  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${src}" onload="this.classList.add('loaded')" onerror="${onerr}"></span>`;
 }
 /* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
 function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}">${ASSET.html('it_'+id,'item-img',txt)}<span class="ic-txt">${txt}</span></div>`; }
@@ -775,8 +779,12 @@ const UI = {
     /* 神明人脉 */
     const rp=h('div','panel');
     const metN=Object.keys(s.godsRel).filter(g=>s.godsRel[g].met && GODS[g]).length;
-    rp.innerHTML=`<h2>神明人脉 <span class="sub">已识 ${metN} 位 · 点头像可送礼</span></h2>
+    rp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h2 style="margin:0">神明人脉 <span class="sub">已识 ${metN} 位 · 点头像可送礼</span></h2>
+        <button class="btn btn-primary btn-sm" id="btnGodCodex">📖 神仙图鉴</button>
+      </div>
       <div class="section-tip">交情至「相熟」，战斗关键时刻可呼叫其援助。送礼偏好：挚爱 +18 / 喜欢 +8 / 无感 +4 / 忌讳 +1，每日一礼。</div>`;
+    rp.querySelector('#btnGodCodex').onclick=()=>this.openGodCodex();
     Object.entries(GODS).forEach(([g,gd])=>{
       const rel=s.godsRel[g], met=rel&&rel.met;
       /* 只渲染已结识的；未解锁/未结识的完全隐藏 */
@@ -1133,6 +1141,61 @@ const UI = {
     cancel.onclick=close;
     box.appendChild(ok); box.appendChild(cancel);
     ov.appendChild(box); ml.appendChild(ov);
+  },
+
+  /* ================= 神仙图鉴 ================= */
+  /* 已结识神仙的立绘墙：卡片=立绘+名字，点击放大纯图观摩 */
+  openGodCodex(){
+    const s=Game.s;
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box god-codex');
+    box.innerHTML=`
+      <div class="gg-head">
+        <h2>神仙图鉴</h2>
+        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
+      </div>
+      <div class="gg-tip">一面之缘亦入图鉴 · 点击立绘可放大观摩</div>
+      <div class="cx-grid"></div>`;
+    const grid=box.querySelector('.cx-grid');
+    const met=Object.keys(GODS).filter(g=>{ const r=s.godsRel[g]; return r&&r.met; });
+    if(!met.length){
+      grid.innerHTML='<div class="section-tip">尚未结识任何神仙。接下工单下凡办差，自有神仙与你打交道。</div>';
+    }
+    met.forEach(g=>{
+      const gd=GODS[g];
+      const rel=s.godsRel[g];
+      const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
+      const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
+      const card=h('div','cx-card');
+      card.innerHTML=`
+        <div class="cx-face${hasArt?'':' cx-round'}"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+        <div class="cx-name">${gd.name}</div>
+        <div class="cx-rel">${Game.favorName(Game.favorLevel(rel.favor))}</div>`;
+      card.onclick=()=>this.openCodexZoom(g);
+      grid.appendChild(card);
+    });
+    ov.appendChild(box); ml.appendChild(ov);
+    ml.classList.remove('hidden');
+  },
+
+  /* 图鉴放大：纯大图 + 名字，点击任意处合上 */
+  openCodexZoom(g){
+    const gd=GODS[g]; if(!gd) return;
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay cx-zoom-ov');
+    const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
+    const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
+    ov.innerHTML=`
+      <div class="cx-zoom">
+        <div class="cx-zoom-face"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+        <div class="cx-zoom-name">${gd.name}</div>
+        <div class="cx-zoom-hint">轻触任意处合上</div>
+      </div>`;
+    ov.onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openGodCodex(); };
+    ml.appendChild(ov);
+    ml.classList.remove('hidden');
   },
 
   /* ================= 剧情档案（卷宗架） ================= */

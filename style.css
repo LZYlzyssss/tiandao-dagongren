@@ -1090,6 +1090,26 @@ body::before{
 .gg-unknown:hover{background:transparent;box-shadow:none;transform:none}
 .gg-q{width:38px;height:38px;line-height:36px;border:1.5px dashed rgba(43,38,32,.45);border-radius:50%;font-size:17px;color:var(--ink-faint);text-align:center;background:rgba(255,255,255,.35)}
 
+/* ---- 神仙图鉴（已结识立绘墙 + 纯大图放大） ---- */
+.god-codex{width:780px;max-width:92vw;max-height:84vh;overflow-y:auto}
+.cx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cx-card{cursor:pointer;text-align:center;padding:8px 6px 9px;border-radius:8px;background:rgba(255,255,255,.55);border:1px solid rgba(43,38,32,.12);transition:all .2s}
+.cx-card:hover{background:rgba(255,255,255,.95);box-shadow:0 3px 10px rgba(0,0,0,.1);transform:translateY(-2px)}
+.cx-face{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;display:grid;place-items:center;border:1px solid rgba(43,38,32,.18);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
+.cx-face.cx-round{aspect-ratio:1/1;width:74%;margin:0 auto;border-radius:50%;border:1.5px solid var(--ink-soft)}
+.cx-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+.cx-face img.ok{opacity:1}
+.cx-char{font-family:var(--font-brush);color:var(--cinnabar-deep);font-size:34px}
+.cx-name{margin-top:7px;font-weight:bold;font-size:14px;letter-spacing:1px;color:var(--ink)}
+.cx-rel{font-size:11px;color:var(--ink-faint);margin-top:2px;letter-spacing:1px}
+.cx-zoom-ov{background:rgba(24,20,15,.9);cursor:pointer}
+.cx-zoom{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:92vw}
+.cx-zoom-face{position:relative;display:grid;place-items:center;min-width:180px;min-height:240px;border-radius:8px;overflow:hidden;border:1px solid rgba(247,234,210,.25);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
+.cx-zoom-face img{display:block;max-width:82vw;max-height:74vh;object-fit:contain}
+.cx-zoom-face img:not(.ok){width:180px;height:240px}
+.cx-zoom-name{font-family:var(--font-brush);font-size:26px;letter-spacing:4px;color:#f7ead2;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.cx-zoom-hint{font-size:12px;color:rgba(247,234,210,.45);letter-spacing:2px}
+
 /* ---- 剧情档案（卷宗架 + 卷宗详情） ---- */
 .story-entry{cursor:pointer}
 .story-entry:hover{box-shadow:0 2px 8px rgba(0,0,0,.06)}
