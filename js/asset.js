@@ -28,15 +28,20 @@ const ASSET = {
      三种结论：true=有本地图(已下载) / false=坐实缺失(404，永久水墨兜底) / undefined=本次网络失败(不坐实，下次还能再试) */
   _probe:{}, _probeQueue:[], _probeInflight:{}, _missing:{},
 
-  /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量） */
+  /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量）
+     带 18 秒硬超时：弱网下 socket 半死（onload/onerror 都不触发）不能无限挂住队列 */
   async _loadOnce(url){
-    const ok=await new Promise(res=>{
-      const im=new Image();
-      im.onload =()=>res(true);
-      im.onerror=()=>res(false);
-      im.src=url;
-    });
-    if(ok) return 'ok';
+    const done=await Promise.race([
+      new Promise(res=>{
+        const im=new Image();
+        im.onload =()=>res(true);
+        im.onerror=()=>res(false);
+        im.src=url;
+      }),
+      new Promise(res=>setTimeout(()=>res('timeout'),18000)),
+    ]);
+    if(done==='timeout') return 'fail';
+    if(done) return 'ok';
     try{
       const hr=await fetch(url,{method:'HEAD',cache:'no-store'});
       if(hr.status===404) return 'missing';
@@ -88,17 +93,19 @@ const ASSET = {
     const conc=opt.conc||8;
     const list=(keys||[]).filter((v,i,a)=>v&&a.indexOf(v)===i);
     let done=0, fail=0, missing=0;
-    const tick=()=>{ if(opt.onprogress) opt.onprogress(done+missing, list.length, {done,fail,missing}); };
+    const tick=()=>{ try{ if(opt.onprogress) opt.onprogress(done+missing, list.length, {done,fail,missing}); }catch(e){} };
     const q=list.slice();
     function worker(){
       const key=q.shift();
       if(key===undefined) return Promise.resolve();
+      /* 任何异常都只能计 fail，绝不允许 worker reject ——
+         否则 Promise.all 拒绝会让整道门以失败结算、后续动作被跳过（卡在原页面） */
       return ASSET._preloadOne(key).then(st=>{
         if(st==='fail'){ fail++; /* 不标记 warmDone，留给后续重试与预热 */ }
         else{ if(st==='missing') missing++; else done++; ASSET._warmDone[key]=1; }
         tick();
         return worker();
-      });
+      }).catch(()=>{ fail++; tick(); return worker(); });
     }
     tick();
     return Promise.all(Array.from({length:Math.min(conc,q.length)},worker))

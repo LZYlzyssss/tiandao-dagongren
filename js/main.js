@@ -26,19 +26,31 @@ function gate(keys, label){
   keys=uniq(keys);
   if(!keys.length) return Promise.resolve();
   const el=$('bootGate'), tip=$('bgTip');
-  tip.textContent=label||'研墨铺纸…';
-  el.classList.remove('hidden');
-  const run=()=>ASSET.preload(keys,{conc:8,onprogress:(d,t,st)=>{
-    tip.textContent=(label||'研墨铺纸…')+'（'+d+'/'+t+(st.fail?'，重拉 '+st.fail:'')+'）';
-  }});
-  /* 网络失败重拉两轮；30 秒保险（断网时每轮快速失败，不会死等） */
+  /* 遮罩或文案节点缺失也绝不能挡住进门 */
+  if(!el || !tip) return Promise.resolve();
+  try{ el.classList.remove('hidden'); }catch(e){ return Promise.resolve(); }
+  let cancelled=false;
+  const setTip=txt=>{ try{ tip.textContent=txt; }catch(e){} };
+  /* preload 已保证不 reject；外层再兜一层，run() 任何同步抛错都计 fail */
+  const run=()=>new Promise(res=>{
+    try{
+      ASSET.preload(keys,{conc:8,onprogress:(d,t,st)=>{
+        setTip((label||'研墨铺纸…')+'（'+d+'/'+t+(st.fail?'，重拉 '+st.fail:'')+'）');
+      }}).then(r=>res(r)).catch(()=>res({fail:1}));
+    }catch(e){ res({fail:1}); }
+  });
+  /* 网络失败重拉两轮；20 秒保险（断网时每轮快速失败，不会死等）
+     铁律：无论成功、失败还是超时，此 Promise 只 resolve 不 reject ——
+     点卯门是增强体验，永远不能成为「卡在原页面」的理由 */
   const job=(async()=>{
     let r=await run(), guard=0;
-    while(r.fail && guard<2){ tip.textContent='网络波动，重拉卷宗…'; r=await run(); guard++; }
+    while(r.fail && guard<2 && !cancelled){ setTip('网络波动，重拉卷宗…'); r=await run(); guard++; }
     await new Promise(r=>setTimeout(r,260));                    /* 给淡入留半拍 */
   })();
-  return Promise.race([job,new Promise(res=>setTimeout(res,30000))])
-    .finally(()=>el.classList.add('hidden'));
+  return Promise.race([
+    job,
+    new Promise(res=>setTimeout(()=>{ cancelled=true; res(); },20000)),
+  ]).catch(()=>{}).finally(()=>{ try{ el.classList.add('hidden'); }catch(e){} });
 }
 
 /* ================= 启动加载屏 ================= */

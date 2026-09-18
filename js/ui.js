@@ -818,14 +818,40 @@ const UI = {
   startMission(idx){
     /* 先点卯：过场场景图、委托神立绘、本单交手敌人全部到齐再下凡，不看空卷 */
     const o=Game.s.shelf[idx];
-    if(!o) return;
+    if(!o || Game.s.busy || this._missionLock) return;   /* 防忙中重复点 */
     const m=MISSIONS.find(x=>x.id===o.mid);
     if(!m) return;
     const keys=[];
     keys.push(ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1));
     keys.push((typeof GOD_ART!=='undefined'&&GOD_ART.includes(m.god))?'g_'+m.god:ASSET.avatarFile(m.god));
     (m.acts||[]).forEach(a=>{ if(a.enemy && ASSET.list['e_'+a.enemy]) keys.push('e_'+a.enemy); });
-    gate(keys,'架起遁光，下凡途中…').then(()=>this._startMissionRun(idx));
+    this._missionLock=true;
+    /* gate 已保证只 resolve 不 reject；再兜一层：任何意外都解锁并回滚，绝不死在工单架 */
+    gate(keys,'架起遁光，下凡途中…').then(()=>{
+      try{
+        this._startMissionRun(idx);
+        this._missionLock=false;
+      }catch(err){
+        this._abortMission(idx, err);
+      }
+    }).catch(err=>{
+      this._abortMission(idx, err);
+    });
+  },
+  /* 下凡流程任何环节炸掉时的兜底：复位状态、回案牍、给玩家可重试的提示 */
+  _abortMission(idx, err){
+    this._missionLock=false;
+    try{
+      Game.s.busy=false;
+      Game.save();
+      this.rt=null;
+      this.view='office'; this.tab='desk';
+      const ml=$('modalLayer'); if(ml) ml.innerHTML='';
+      $('bootGate').classList.add('hidden');
+      this.render();
+      this.toast('遁光不稳，没能下凡，请再点一次');
+      console.error('[mission] 下凡中止', err);
+    }catch(e){}
   },
   _startMissionRun(idx){
     const o=Game.s.shelf[idx];
