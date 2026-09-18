@@ -1135,7 +1135,7 @@ const UI = {
         </div>
         <div class="rp-hint">轻 触 续 进 ▸</div>`;
 
-      let stage=0, rushed=false, done=false;
+      let stage=0, done=false;
       const timers=[];
       const later=(fn,ms)=>{ timers.push(setTimeout(fn,ms)); };
       const clearTimers=()=>{ timers.forEach(clearTimeout); timers.length=0; };
@@ -1144,40 +1144,55 @@ const UI = {
         document.body.classList.add('rp-shake');
         later(()=>document.body.classList.remove('rp-shake'),460);
       };
-      /* 进入某一幕：单调推进；manual=用户点按，之后整体节奏加快 */
-      const enter=(n,manual)=>{
+      /* 每幕提示文案（末幕由「领旨谢恩」收束，不用提示条） */
+      const HINT_TXT={1:'轻 触 · 跪 迎 诏 书',2:'轻 触 · 恭 聆 敕 命',3:'轻 触 · 拜 受 金 印',4:'轻 触 · 承 此 新 身'};
+      /* 每幕最短停留：动画演足才可续进，既拉长仪式、又防误触/狂点跳幕。
+         降临1.8s｜展卷3.0s（诏书四行2.34s落定）｜落印1.6s｜换骨3.4s（金身名刺1.55s起）｜末幕0.9s */
+      const DWELL={1:1800,2:3000,3:1600,4:3400,5:900};
+      const hintEl=ov.querySelector('.rp-hint');
+      let ready=false;
+      const armReady=n=>{
+        ready=false;
+        ov.classList.remove('stage-ready');
+        later(()=>{
+          ready=true;
+          ov.classList.add('stage-ready');
+          if(HINT_TXT[n]) hintEl.textContent=HINT_TXT[n]+' ▸';
+        },DWELL[n]||800);
+      };
+      /* 进入某一幕：单调推进；五幕全程只由玩家点击/按键驱动，不再自动连播 */
+      const enter=(n)=>{
         if(done||n<=stage||n>5) return;
         clearTimers();
-        if(manual&&!rushed){ rushed=true; ov.classList.add('rp-rush'); }
         while(stage<n){ stage++; ov.classList.add('s'+stage); }
         if(n===3) slam();
-        if(stage<5){
-          /* 正常：降临5s / 展卷3.9s / 落印1.8s / 变身4.6s；快节奏相应压缩 */
-          const gap = rushed
-            ? (n===1?1600:n===2?1000:n===3?800:3100)
-            : (n===1?5000:n===2?3900:n===3?1800:4600);
-          later(()=>enter(stage+1),gap);
-        }
+        armReady(stage);
       };
-      later(()=>enter(1),300);
+      /* 开场景片渐显，略作停顿再开第一幕，仪式更沉 */
+      later(()=>enter(1),900);
 
       /* 闭合 */
       const finish=()=>{
-        if(done) return; done=true;
+        if(done||!ready) return; done=true;
+        while(stage<5){ stage++; ov.classList.add('s'+stage); }
         clearTimers();
         document.body.classList.remove('rp-shake');
         document.removeEventListener('keydown',onKey);
         ov.classList.add('rp-out');
         later(()=>{ ov.remove(); resolve(); },380);
       };
-      /* 点按/按键：播放中逐拍推进，末幕闭合 */
+      /* 点按/按键：每幕必须显式点击续进，末幕「领旨谢恩」收尾；最短停留内点击忽略 */
+      const advance=()=>{
+        if(done||!ready) return;
+        if(stage<5) enter(stage+1); else finish();
+      };
       const onKey=ev=>{
         if(ev.key==='Enter'||ev.key===' '||ev.key==='Escape'){
           ev.preventDefault();
-          if(stage>=5) finish(); else enter(stage+1,true);
+          advance();
         }
       };
-      ov.addEventListener('click',()=>{ if(stage>=5) finish(); else enter(stage+1,true); });
+      ov.addEventListener('click',advance);
       document.addEventListener('keydown',onKey);
       ml.appendChild(ov);
     });

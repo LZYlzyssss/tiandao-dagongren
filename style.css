@@ -2065,14 +2065,14 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   100%{opacity:0;transform:translateY(106vh) translateX(var(--sx))}
 }
 
-/* ---- 轻触提示（一至四幕可见，末幕由按钮收束） ---- */
+/* ---- 轻触提示（每幕最短停留演足后点亮；末幕由「领旨谢恩」收束） ---- */
 .rp-hint{
   position:absolute;left:0;right:0;bottom:4.5%;z-index:8;text-align:center;pointer-events:none;
   font-size:14px;letter-spacing:7px;text-indent:7px;color:#e6d3a8;opacity:0;
 }
-.rp-on.s1 .rp-hint,.rp-on.s2 .rp-hint,.rp-on.s3 .rp-hint,.rp-on.s4 .rp-hint{
-  opacity:.82;transition:opacity .6s ease 1s;
-  animation:rpGoPulse 2s ease-in-out 1.4s infinite;
+.rp-on.stage-ready .rp-hint{
+  opacity:.82;transition:opacity .45s ease;
+  animation:rpGoPulse 2s ease-in-out .3s infinite;
 }
 .rp-on.s5 .rp-hint{display:none}
 
