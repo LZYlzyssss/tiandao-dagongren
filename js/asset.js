@@ -85,14 +85,75 @@ const ASSET = {
     const worker=()=>{
       const k=q[i++];
       if(k===undefined) return Promise.resolve();
-      return this._pull(fileOf(k)).then(()=>{ this._warmDone[k]=1; return worker(); });
+      const f=fileOf(k);
+      return this._pull(f).then(()=>{
+        /* 关键修复：只有确实缓存成功才标记完成；弱网失败(_probe!==true)绝不能标 done，
+           否则全量 warm 兜底会跳过它，该图沦为永久字牌 */
+        if(f && this._probe[f]===true) this._warmDone[k]=1;
+        return worker();
+      });
     };
     for(let w=0;w<Math.min(conc||3,q.length);w++) worker();
   },
 
+  /* ==================================================================
+     可见驱动高优队列（demand）——解决"进去后还是字牌"的核心
+     - 元素进入视口即入队，4 并发直拉，不受 warm 单线程/让路影响
+     - 弱网失败自动指数退避重试（1.2s/3s/6s），当前看到的图一定追到成功
+     - 多次仍失败则交回全量 warm 做最终兜底，绝不永久漏图
+     ================================================================== */
+  _demandQ:[], _demandSet:{}, _demandRunning:false, _demandTries:{},
+  demand(keys){
+    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
+      if(!k || this._demandSet[k]) return;
+      const f=this.list[k]?this.file(k):(/^img\//.test(k)?k:null);
+      if(!f) return;
+      if(this._probe[f]===true || this._missing[f]) return;  /* 已成功 / 坐实缺图：无需再拉 */
+      this._demandSet[k]=1;
+      this._demandQ.push(k);
+    });
+    this._demandStart();
+  },
+  _demandStart(){
+    if(this._demandRunning) return;
+    this._demandRunning=true;
+    const CONC=4; let active=0, idx=0;
+    const pump=()=>{
+      while(active<CONC && idx<this._demandQ.length){
+        const k=this._demandQ[idx++]; active++;
+        this._demandOne(k).catch(()=>{}).finally(()=>{ active--; pump(); });
+      }
+    };
+    pump();
+  },
+  async _demandOne(k){
+    const f=this.list[k]?this.file(k):k;
+    if(this._probe[f]===true){ this._warmDone[k]=1; return; }
+    if(this._missing[f]){ this._demandSet[k]=0; return; }
+    const st=await this._loadOnce(f,30000);   /* 可见大图给足 30s，弱网不误伤 */
+    if(st==='ok'){
+      this._probe[f]=true; this._warmDone[k]=1; this._flushWaiters(f); return;
+    }
+    if(st==='missing'){
+      this._probe[f]=false; this._missing[f]=1;
+      (this._waiters[f]||[]).splice(0).forEach(cb=>{ try{cb(null);}catch(e){} });
+      return;
+    }
+    /* 网络抖动：可见图退避重试最多 4 次；仍失败交还 warm 全量兜底 */
+    const n=this._demandTries[k]||0;
+    if(n<3){
+      this._demandTries[k]=n+1;
+      await new Promise(r=>setTimeout(r,[1200,3000,6000][n]));
+      return this._demandOne(k);
+    }
+    this._demandTries[k]=0; this._warmDone[k]=0; this._demandSet[k]=0;
+    this.warm(k);
+  },
+
   /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量）
-     带 18 秒硬超时：弱网下 socket 半死（onload/onerror 都不触发）不能无限挂住队列 */
-  async _loadOnce(url){
+     硬超时 ms（默认 20s，可见大图 demand 传 30s）：弱网下 socket 半死不能无限挂住队列 */
+  async _loadOnce(url, ms){
+    const TO=ms||20000;
     const done=await Promise.race([
       new Promise(res=>{
         const im=new Image();
@@ -100,7 +161,7 @@ const ASSET = {
         im.onerror=()=>res(false);
         im.src=url;
       }),
-      new Promise(res=>setTimeout(()=>res('timeout'),18000)),
+      new Promise(res=>setTimeout(()=>res('timeout'),TO)),
     ]);
     if(done==='timeout') return 'fail';
     if(done) return 'ok';
@@ -198,7 +259,7 @@ const ASSET = {
     return 'fail';
   },
 
-  /* ---- 后台预热队列：单并发，绝与玩家抢图；真实请求后让路 12 秒 ---- */
+  /* ---- 后台预热队列：单并发兜底全量；可见图由 demand 独立高优拉，互不抢连接 ---- */
   _warmQ:[], _warmDone:{}, _warmBusy:0, _warmStarted:false, _warmPauseUntil:0,
   warm(keys, front){
     if(!keys) return;
@@ -213,17 +274,23 @@ const ASSET = {
     this._warmStarted=true;
     const idle=cb=>{ (window.requestIdleCallback||setTimeout)(cb,{timeout:2000}); };
     const loop=()=>idle(()=>{
-      if(Date.now()<this._warmPauseUntil || this._warmBusy>=1){ setTimeout(loop,800); return; }
+      if(Date.now()<this._warmPauseUntil || this._warmBusy>=1){ setTimeout(loop,500); return; }
       const k=this._warmQ.shift();
-      if(k===undefined){ setTimeout(loop,1500); return; }
+      if(k===undefined){ setTimeout(loop,1200); return; }
       this._warmBusy++;
       this._preloadOne(k)
-        .then(st=>{ if(st!=='fail') this._warmDone[k]=1; else this._warmQ.push(k); /* 网络失败重新排队 */ })
+        .then(st=>{
+          if(st!=='fail'){ this._warmDone[k]=1; }
+          else if(!this._warmDone[k] && !this._warmQ.includes(k)){
+            /* 弱网失败：冷却 12s 再回队尾，先让其它图走，避免一张坏图反复堵队首 */
+            setTimeout(()=>{ if(!this._warmDone[k] && !this._warmQ.includes(k)) this._warmQ.push(k); },12000);
+          }
+        })
         .catch(()=>{})
-        .then(()=>{ this._warmBusy--; setTimeout(loop,500); });
+        .then(()=>{ this._warmBusy--; setTimeout(loop,250); });
       loop();
     });
-    setTimeout(loop, 8000);                               /* 进门 8 秒、首屏稳定后再悄悄开始 */
+    setTimeout(loop, 4000);                               /* 进门 4 秒、首屏稳定后开始兜底补齐 */
   },
 
   /* ---- <img> 标签：html() 出骨架，scan() 挂载回退链 ---- */
@@ -234,6 +301,7 @@ const ASSET = {
   mount(img, key){
     if(!key || !this.list[key]){ img.style.display='none'; return; }
     img.classList.add('asset-fade');
+    this.watchVis(img,[key]);          /* 进入视口即高优直拉并失败重试 */
     const f=this.file(key);
     /* 快路径：真图已在缓存，直接挂，无闪烁 */
     if(this._probe[f]===true){
@@ -253,6 +321,39 @@ const ASSET = {
       im.src=url;
     });
   },
+  /* ---- 视口感知：元素进入屏幕（含提前 240px）即 demand 高优拉取 ----
+     玩家翻到哪页/哪张卡，眼前的图永远最先拉，不必等全局预热队列 */
+  _visObs:null,
+  initVisObserver(){
+    if(this._visObs!==null) return;
+    if(typeof IntersectionObserver==='undefined'){ this._visObs=false; return; }
+    this._visObs=new IntersectionObserver(entries=>{
+      const ks=[];
+      entries.forEach(en=>{
+        if(!en.isIntersecting) return;
+        const el=en.target;
+        if(el._visKeys) ks.push.apply(ks,el._visKeys);
+        this._visObs.unobserve(el);   /* 进入过一次即可：拉到由订阅自动换图，失败 demand 内部重试 */
+      });
+      if(ks.length) this.demand(ks);
+    },{rootMargin:'240px 0px',threshold:0.01});
+  },
+  watchVis(el, keys){
+    if(!el) return;
+    el._visKeys=(Array.isArray(keys)?keys:[keys]).filter(Boolean);
+    this.initVisObserver();
+    /* 同步兜底：挂载时已在视口（含上下各 240px 预拉带）的元素立即 demand，
+       不依赖 IO 的首拍回调（个别内核首拍延迟；也让第一眼工单图零等待） */
+    const r=el.getBoundingClientRect();
+    const vh=window.innerHeight||document.documentElement.clientHeight||0;
+    const vw=window.innerWidth||document.documentElement.clientWidth||0;
+    const inView=r.width>0 && r.height>0 &&
+      r.bottom>-240 && r.top<vh+240 && r.right>-240 && r.left<vw+240;
+    if(inView){ this.demand(el._visKeys); return; }
+    /* 视口外（弹窗未展开/下方未滚到）：交 IO，进入视口即触发 */
+    if(this._visObs) this._visObs.observe(el);
+  },
+
   scan(root){
     (root||document).querySelectorAll('img[data-asset]').forEach(img=>{
       if(img.classList.contains('asseted')) return;
@@ -272,6 +373,7 @@ const ASSET = {
     const target=(opacity!=null?opacity:1);
     if(el._assetKey===key){ el.style.opacity=target; return; }
     el._assetKey=key;
+    this.watchVis(el,[key]);          /* 卡片/场景进入视口即高优直拉 */
     const f=this.file(key);
     /* 快路径：真图已缓存 */
     if(this._probe[f]===true){
@@ -304,6 +406,8 @@ const ASSET = {
     if(!g){ img.remove(); return; }
     const hasArt=(typeof GOD_ART!=='undefined')&&GOD_ART.includes(gid);
     const av=this.avatarFile(gid);
+    /* 视口内：av 小头像立拉，有真绘的神同时排队 g_ 大立绘 */
+    this.watchVis(img, hasArt?[av,'g_'+gid]:[av]);
     const swap=(url,tag)=>{
       const im=new Image();
       im.onload=()=>{

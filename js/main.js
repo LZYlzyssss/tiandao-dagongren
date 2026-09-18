@@ -34,7 +34,7 @@ function gate(keys, label){
   /* preload 已保证不 reject；外层再兜一层，run() 任何同步抛错都计 fail */
   const run=()=>new Promise(res=>{
     try{
-      ASSET.preload(keys,{conc:8,onprogress:(d,t,st)=>{
+      ASSET.preload(keys,{conc:6,onprogress:(d,t,st)=>{
         setTip((label||'研墨铺纸…')+'（'+d+'/'+t+(st.fail?'，重拉 '+st.fail:'')+'）');
       }}).then(r=>res(r)).catch(()=>res({fail:1}));
     }catch(e){ res({fail:1}); }
@@ -73,17 +73,15 @@ const BOOT={
     });
     return ks;
   },
-  /* 进门硬门骨架（约 4-5MB）：玩家立绘 + 四栏底图 + 数值/营造/阴兵小图。
-     保证进门瞬间界面完整、不空白；其余所有图（含工单大图/神格道具图标）
-     一律进门后分级后台拉，靠"骨架→真图原地替换"渐进出现 */
+  /* 进门硬门骨架（约 3MB）：玩家立绘 + 四栏底图 + 数值小图。
+     保证进门瞬间顶栏/框架完整；营造/阴兵/工单/神格等所有其余图一律进门后
+     由"视口 demand（看到即拉）+ warm 兜底"渐进出现，绝不挡进门 */
   smallKeys(rk){
     return [
       'p_r'+rk,
       'ui_main','ui_desk','ui_yamen','ui_hero',
       'stat_rank','stat_calendar','stat_cult','stat_money','stat_favor',
       'stat_erode','stat_merit','stat_hp','stat_mp',
-      'fac_shrine','fac_desk','fac_incense','fac_banner',
-      'sol_xiaojiang','sol_duwei',
     ];
   },
   /* 硬门只保骨架；在架工单大图不再挡门 */
@@ -99,19 +97,22 @@ const BOOT={
     let finished=false, skip=false;
     const finish=()=>{
       if(finished) return; finished=true;
+      clearTimeout(skipTimer); clearTimeout(autoTimer);
       bar.style.width='100%'; pct.textContent='100%';
       tip.textContent='朱砂已干，请进——';
       setTimeout(()=>{ loader.classList.add('done'); setTimeout(()=>loader.remove(),600); },350);
     };
-    /* 网络实在太差时的人道出口：60 秒后可主动进门，未到卷宗后台继续拉 */
+    /* 网络实在太差时的人道出口：手动跳过 */
     const skipBtn=document.createElement('button');
     skipBtn.className='btn btn-ghost btn-sm';
     skipBtn.textContent='网络太慢，先进衙（图片随后就到）';
     skipBtn.style.cssText='margin-top:14px;opacity:0;transition:opacity .4s;pointer-events:none';
     skipBtn.onclick=()=>{ skip=true; };
     loader.appendChild(skipBtn);
-    /* 硬门只剩约 5MB 骨架，12 秒还没拉完说明网络极差：先进衙，图后台补 */
-    const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },12000);
+    /* 硬门只剩约 3MB 骨架：6 秒可手动先进衙；9 秒仍未完则自动放行，
+       没拉到的图全部交给进门后的"视口 demand + warm 兜底"，绝不让进度条卡死 */
+    const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },6000);
+    const autoTimer=setTimeout(()=>finish(),9000);
 
     const onprog=(d,t,st)=>{
       const p=t?d/t:1;
@@ -121,27 +122,29 @@ const BOOT={
       if(line && !st.fail) tip.textContent=line[1];
       if(st.fail) tip.textContent='南天门驿道拥堵，正在重拉掉队的卷宗…';
     };
-    const run=()=>ASSET.preload(keys,{conc:8,onprogress:onprog});
+    const run=()=>ASSET.preload(keys,{conc:6,onprogress:onprog});
     /* 引擎/字体并行，各自超时放行，不拖图的后腿 */
     const engine=waitUntil(()=>window.PIXI,8000);
     const fonts=(document.fonts&&document.fonts.ready)?withTimeout(document.fonts.ready,3000):Promise.resolve();
-    /* 图集必须真实到齐；网络失败整轮重拉（已到/已缺项秒回，只补掉队的） */
+    /* 图集到齐即进；网络失败最多补拉一轮（已到/已缺项秒回）。
+       9 秒自动放行后立即停开新轮，把连接让给进门后的视口 demand，不在这里空耗 */
     (async()=>{
       let r=await run(), guard=0;
-      while(r.fail && !skip && guard<4){ r=await run(); guard++; }
+      while(r.fail && !skip && !finished && guard<2){ r=await run(); guard++; }
+      if(finished) return;
       await Promise.all([engine,fonts]);
-      clearTimeout(skipTimer);
       finish();
     })();
   },
 };
 
-/* ================= 进门后：素材分级后台预热 =================
-   P0  进门即刻，高优并发：在架工单大图 + 在架神头像（案牍页第一眼）
-   P1  1.2s：本章升官单（章末晋升任务全套）+ 本章战场过场 + 在架敌人
-   P2  2.5s：道具/神格小图标（切商铺/修行时即有真图）
-   P3  低优先级 warm 队列：已结识神真绘、技能、本章其余工单、全量补齐
-   所有图未到时界面先出水墨骨架，真图一到原地替换淡入，不空白、不挡玩 */
+/* ================= 进门后：视口优先的素材加载 =================
+   1) demand 第一眼：案牍页在架工单/神 + 神衙营造，4 并发独立池直拉、失败自动重试
+   2) warm 升官先行：本章章末晋升任务全套插队
+   3) warm 本章战场/过场，随后单池全量兜底
+   玩家滚动/切页时，进入视口的任何图（道具/神格/图鉴/他章场景）由
+   IntersectionObserver 立即提到 demand 最前——看到才拉、看到必到。
+   所有图未到时先出水墨骨架，真图一到原地替换淡入，不空白、不挡玩 */
 function missionEnemyKeys(m){
   const ks=[];
   (m&&m.acts||[]).forEach(a=>{ if(a.enemy) ks.push('e_'+a.enemy); });
@@ -155,45 +158,38 @@ function warmAll(){
   if(typeof ASSET==='undefined') return;
   const s=Game.s;
   const ch=Math.min(5,Math.max(1,s.chapter||1));
-
-  /* ---- P0：在架工单卡 + 在架神（真绘大图 + 小头像） ---- */
   const shelfMissions=(s.shelf||[]).map(o=>MISSIONS.find(x=>x.id===o.mid)).filter(Boolean);
-  const p0=BOOT.shelfKeys();
-  shelfMissions.forEach(m=>{ const av=m.god&&avatarPath(m.god); if(av) p0.push(av); });
-  ASSET.priority(uniq(p0),4);
 
-  /* ---- P1：升官单（本章章末晋升）+ 本章战场/过场 + 在架敌人 ---- */
-  setTimeout(()=>{
-    const p1=['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch];
-    shelfMissions.forEach(m=>missionEnemyKeys(m).forEach(k=>p1.push(k)));
-    /* 升官：本章 chapterEnd 任务的工单图/敌人/委托神全套优先 */
-    MISSIONS.forEach(m=>{
-      if(m.chapterEnd && (m.chapter||1)===ch){
-        if(ASSET.list['task_'+m.id]) p1.push('task_'+m.id);
-        if(m.god){
-          if(ASSET.list['g_'+m.god]) p1.push('g_'+m.god);
-          const av=avatarPath(m.god); if(av) p1.push(av);
-        }
-        missionEnemyKeys(m).forEach(k=>p1.push(k));
+  /* ---- 第一眼高优 demand（4 并发独立池，失败自动重试）：案牍页在架工单/神，
+          以及从硬门移出的神衙营造与阴兵——这些都在进门画面，看到就拉，不抢全量 ---- */
+  const eye=BOOT.shelfKeys();
+  shelfMissions.forEach(m=>{ const av=m.god&&avatarPath(m.god); if(av) eye.push(av); });
+  ['fac_shrine','fac_desk','fac_incense','fac_banner','sol_xiaojiang','sol_duwei']
+    .forEach(k=>{ if(ASSET.list[k]) eye.push(k); });
+  ASSET.demand(uniq(eye));
+
+  /* ---- 升官先行（硬要求）：本章章末晋升任务 工单/神/敌人/头像 全套，warm 队首插队 ---- */
+  const promote=[];
+  MISSIONS.forEach(m=>{
+    if(m.chapterEnd && (m.chapter||1)===ch){
+      if(ASSET.list['task_'+m.id]) promote.push('task_'+m.id);
+      if(m.god){
+        if(ASSET.list['g_'+m.god]) promote.push('g_'+m.god);
+        const av=avatarPath(m.god); if(av) promote.push(av);
       }
-    });
-    ASSET.priority(uniq(p1),3);
-  },1200);
+      missionEnemyKeys(m).forEach(k=>promote.push(k));
+    }
+  });
+  ASSET.warm(uniq(promote),true);
 
-  /* ---- P2：道具 + 五系神格小图标（单张小，约 11MB） ---- */
-  setTimeout(()=>{
-    ASSET.priority(Object.keys(ASSET.list).filter(k=>/^(it_|gh_)/.test(k)),3);
-  },2500);
+  /* ---- 本章战场/昼夜/过场：下凡战斗前预备 ---- */
+  setTimeout(()=>ASSET.warm(['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch],true),1500);
 
-  /* ---- P3：低优 warm 队列（单线程让路） ---- */
-  const met=Object.keys(GODS).filter(g=>Game.isGodUnlocked(g));
-  const gKeys=met.filter(g=>ASSET.list['g_'+g]).map(g=>'g_'+g);
-  const avKeys=met.map(avatarPath).filter(Boolean);
-  /* 本章其余工单（含支线）真绘，边玩边到 */
-  const chTasks=MISSIONS.filter(m=>(m.chapter||1)===ch).map(m=>'task_'+m.id).filter(k=>ASSET.list[k]);
-  ASSET.warm(uniq(gKeys.concat(chTasks)),true);
-  ASSET.warm(Object.keys(ASSET.list).filter(k=>/^sk_/.test(k)).concat(avKeys));
-  setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),5000);
+  /* ---- 单池全量兜底：其余所有图（道具/神格/技能/他章工单/全部神与敌人）。
+          不再像旧版那样进门就抢拉 11MB 道具图标；玩家切到商铺/图鉴/某工单时，
+          视口 demand 会把当屏图立即提到最前，warm 只在空闲时补齐未看到的 ---- */
+  setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),3000);
+  setTimeout(()=>ASSET.warm(Object.keys(GODS).map(avatarPath).filter(Boolean)),3200);
 }
 
 /* ================= 封面氛围微尘 ================= */
