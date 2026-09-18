@@ -2722,3 +2722,124 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   /* 安装条避让矮导航 */
   .pwa-bar{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 }
+
+/* ================================================================
+   APK / 触屏手感强化（为打包手机应用准备，仅作用于触屏设备）
+   ================================================================ */
+/* 去掉点击高亮灰块、双击缩放延迟；阻止整页橡皮筋下拉刷新 */
+html{-webkit-tap-highlight-color:transparent}
+body{
+  overscroll-behavior-y:none;
+  -webkit-text-size-adjust:100%;
+}
+/* 可点元素：立即响应点击，无 300ms 延迟、无双击放大 */
+button,.btn,.task-card,.nav-item,.login-cover,.ce-txt,.sheet,.slot,.skill-pick,
+.chip,.char-action,.opt,.m-actions,.g-chip,[data-click]{
+  touch-action:manipulation;
+}
+/* 游戏区禁止误触长按选中文字/弹出系统菜单（输入框除外） */
+#app,.login-screen{
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+}
+input,textarea,.login-input,.name-input{
+  -webkit-user-select:text;user-select:text;-webkit-touch-callout:default;
+}
+img{ -webkit-user-drag:none;user-select:none; }
+
+/* 触屏设备（手机/APK）专用增强，不影响电脑鼠标 */
+@media (hover:none) and (pointer:coarse){
+  /* 按压反馈：手机没有 hover，用 :active 给明确"按下了"手感 */
+  .btn:active,.nav-item:active,.task-card:active,.skill-pick:active,.opt:active{
+    transform:scale(.97);
+    filter:brightness(.92);
+    transition:transform .06s,filter .06s;
+  }
+  .btn-primary:active{background:var(--cinnabar-deep)}
+  .nav-item:active{background:rgba(255,255,255,.08)}
+  /* 底部导航当前项按下不回弹错位 */
+  .nav-item{transition:background .1s}
+
+  /* 战斗关键时刻：主操作与危险操作分组，防止拇指误触"拼命/遁走" */
+  .m-actions{
+    display:flex;flex-direction:column;gap:10px;margin-top:12px;
+  }
+  .m-actions .btn{width:100%;flex:none;min-height:46px;font-size:15px}
+  /* 拼命：警示描边，与主操作拉开 */
+  #mBurn{
+    margin-top:14px;border-color:var(--cinnabar);
+    color:var(--cinnabar-deep);
+    box-shadow:inset 0 0 0 1px rgba(192,60,46,.25);
+  }
+  /* 遁走：最底部、弱化、与上方分隔，避免误点 */
+  #mFlee{
+    margin-top:4px;min-height:40px;opacity:.75;
+    font-size:13px;letter-spacing:1px;
+  }
+  #mFlee::before{content:'———　';opacity:.4}
+  #mFlee::after{content:'　———';opacity:.4}
+  /* 遁走二次确认态 */
+  #mFlee.confirm-flee{
+    opacity:1;color:#fff;background:var(--cinnabar);
+    border-color:var(--cinnabar-deep);font-weight:bold;
+    animation:fleePulse 1s ease-in-out infinite;
+  }
+  @keyframes fleePulse{0%,100%{box-shadow:0 0 0 0 rgba(192,60,46,.5)}50%{box-shadow:0 0 0 6px rgba(192,60,46,0)}}
+  #mFlee.confirm-flee::before,#mFlee.confirm-flee::after{content:none}
+
+  /* 战报：手机竖屏给足阅读高度并内部滚动，不挤压立绘 */
+  .battle-log{min-height:96px;max-height:30vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+  /* 横屏战斗提示横幅 */
+  .rotate-tip{
+    position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%);z-index:600;
+    display:flex;align-items:center;gap:8px;
+    padding:9px 14px;border-radius:20px;
+    background:rgba(20,16,10,.86);border:1px solid var(--gold-dim,rgba(212,175,100,.5));
+    color:#f0e2c0;font-size:12.5px;letter-spacing:1px;
+    backdrop-filter:blur(4px);
+    animation:tipRise .3s ease;max-width:90vw;
+  }
+  .rotate-tip button{
+    background:none;border:none;color:var(--gold);font-size:16px;
+    padding:0 2px;line-height:1;cursor:pointer;
+  }
+  @keyframes tipRise{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+}
+
+/* 视口高度：手机地址栏伸缩时用 dvh 兜底，APK 全屏下等价，避免内容跳动 */
+@supports (height:100dvh){
+  body,#app{min-height:100dvh}
+}
+
+/* ================================================================
+   登场/过场/登录：手机安全区与矮屏细节（实测后微调）
+   ================================================================ */
+/* 底部"轻触"提示避让 iPhone 手势条/APK 导航栏 */
+.mi-go{bottom:calc(4.4% + env(safe-area-inset-bottom,0px))}
+.db-go{bottom:calc(4.2% + env(safe-area-inset-bottom,0px))}
+
+@media (max-width:640px){
+  /* 知底卷轴正文手机上略放大，更易读 */
+  .db-sec p{font-size:15px;line-height:1.95}
+  /* 敌人登场底部信息避让手势条 */
+  .em-cap{bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .eq-name{bottom:calc(clamp(70px,11vh,104px) + env(safe-area-inset-bottom,0px))}
+  .eq-stars{bottom:calc(clamp(44px,7vh,72px) + env(safe-area-inset-bottom,0px))}
+  /* 故事卷最后一段不被底部提示压住 */
+  .m-intro-cap{padding-bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+}
+
+/* 手机横屏：神明照面立绘上移 8px，避免头顶被裁 */
+@media (max-height:500px) and (orientation:landscape){
+  .debut:not(.story) .db-face{top:45%;height:min(80vh,860px)}
+}
+
+/* 矮屏/键盘弹起：登录卡可滚动且从顶部排，保证输入框不被键盘挡住 */
+@media (hover:none) and (pointer:coarse){
+  .login-overlay.is-login{overflow-y:auto;-webkit-overflow-scrolling:touch}
+}
+@supports (height:100dvh){
+  .login-wrap{max-height:94dvh}
+}

@@ -316,6 +316,8 @@ const Login={
     const inp=h('input','login-input');
     inp.type='text'; inp.maxLength=8; inp.placeholder='写下你的名号（1–8 字）';
     inp.setAttribute('aria-label','名号');
+    /* 手机键盘弹起时，确保输入框滚到可视区中部，不被键盘挡住 */
+    inp.addEventListener('focus',()=>{ setTimeout(()=>{ try{ inp.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){ inp.scrollIntoView(); } },300); });
     const go=h('button','btn btn-primary','点卯进入');
     field.appendChild(inp); field.appendChild(go);
     card.appendChild(field);

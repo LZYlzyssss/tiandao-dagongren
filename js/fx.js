@@ -159,6 +159,8 @@ const FX = {
   /* ================= 战斗特效 ================= */
   shake(){
     const field=document.getElementById('battleField');
+    /* 手机轻震动反馈（安卓支持，iPhone 自动忽略，无害） */
+    try{ if(navigator.vibrate) navigator.vibrate(28); }catch(e){}
     if(!field) return;
     field.classList.remove('shake');
     void field.offsetWidth;

@@ -2135,6 +2135,7 @@ const UI = {
       FX.setBattleBG(ASSET.bfKey(chapter,night));
     }
     this.updateBattle(B);
+    this.maybeRotateTip();
     if(typeof Guide!=='undefined') Guide.act('battle');
   },
 
@@ -2200,6 +2201,22 @@ const UI = {
   floatFoe(t,color){ floatNum('#fFoe',t,color); },
   floatPlayer(t,color){ floatNum('#fPlayer',t,color); },
 
+  /* 手机竖屏首次进战斗：轻提示横屏更佳（仅一次，可关，绝不强制） */
+  maybeRotateTip(){
+    try{
+      if(!window.matchMedia||!window.matchMedia('(pointer:coarse)').matches)return;
+      if(window.innerHeight<=window.innerWidth)return; /* 已横屏，不打扰 */
+      if(localStorage.getItem('tiandao_rot_tip'))return;
+      if($('rotateTip'))return;
+      const t=h('div','rotate-tip');t.id='rotateTip';
+      t.innerHTML='<span>横屏战斗，视野更舒展</span><button aria-label="知道了">×</button>';
+      document.body.appendChild(t);
+      const close=()=>{ t.remove(); try{localStorage.setItem('tiandao_rot_tip','1')}catch(e){} };
+      t.querySelector('button').onclick=close;
+      setTimeout(()=>{ if(t.parentNode){ t.style.transition='opacity .5s'; t.style.opacity='0'; setTimeout(()=>t.remove(),600); } },6000);
+    }catch(e){}
+  },
+
   /* 关键时刻：等待玩家抉择（v3：援助五档 / 技能冷却 / 读招克制提示） */
   battleMoment(B){
     return new Promise(resolve=>{
@@ -2225,7 +2242,22 @@ const UI = {
       const gdone=v=>{ slot.innerHTML=''; if(typeof Guide!=='undefined') Guide.act('momentDone'); resolve(v); };
 
       $('mWait').onclick=()=>gdone({act:'wait'});
-      $('mFlee').onclick=()=>gdone({act:'flee'});
+      /* 遁走：手机端二次确认，防拇指误触（委托失败） */
+      let fleeArmed=false,fleeTimer=null;
+      $('mFlee').onclick=()=>{
+        const btn=$('mFlee');
+        if(!fleeArmed){
+          fleeArmed=true;btn.classList.add('confirm-flee');
+          btn.textContent='再点一次确认遁走（委托将失败）';
+          fleeTimer=setTimeout(()=>{
+            fleeArmed=false;btn.classList.remove('confirm-flee');
+            btn.textContent='遁走（保命，委托失败）';
+          },2500);
+          return;
+        }
+        clearTimeout(fleeTimer);
+        gdone({act:'flee'});
+      };
       if($('mAid')) $('mAid').onclick=()=>gdone({act:'aid'});
       $('mCast').onclick=()=>{
         const sub=$('mSub'); sub.innerHTML='<div class="skill-list"></div>';
