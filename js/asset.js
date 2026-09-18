@@ -28,6 +28,62 @@ const ASSET = {
      三种结论：true=有本地图(已下载) / false=坐实缺失(404，永久水墨兜底) / undefined=本次网络失败(不坐实，下次还能再试) */
   _probe:{}, _probeQueue:[], _probeInflight:{}, _missing:{},
 
+  /* ---- 真图到达订阅（渐进挂载核心） ----
+     页面挂载点先显示 SVG 骨架并订阅；真图在任意时刻（挂载直拉 / priority / warm）下载成功后，
+     统一经 _flushWaiters 通知所有挂载点自动换成真图，无需重新 render。
+     cb(url)：成功→真图地址；坐实 404→null（终态，保持骨架）；网络失败→暂不回调，订阅保留，后台补到后再通知 */
+  _waiters:{}, _pullInflight:{},
+  _flushWaiters(file){
+    const list=this._waiters[file]; if(!list||!list.length) return;
+    list.splice(0).forEach(cb=>{ try{ cb(file); }catch(e){} });
+  },
+  /* 按文件 URL 订阅（av_ 等不在 list 中的直接路径也走这里） */
+  onFile(file,cb){
+    if(!file) return;
+    if(this._probe[file]===true){ cb(file); return; }
+    if(this._probe[file]===false||this._missing[file]){ cb(null); return; }
+    (this._waiters[file]=this._waiters[file]||[]).push(cb);
+    this._pull(file);
+  },
+  /* 按资产 key 订阅 */
+  onKeyReady(key,cb){
+    if(!key||!this.list[key]){ cb(null); return; }
+    this.onFile(this.file(key),cb);
+  },
+  /* 高优先级直拉（页面正在看的图）：自带在途去重，不走 warm 的单线程/让路节流；
+     成功后坐实缓存结论、通知挂载点、标记 warm 已完成避免后台重复劳动 */
+  _pull(file){
+    if(this._pullInflight[file]||this._probe[file]!==undefined||this._missing[file]) return this._pullInflight[file]||Promise.resolve();
+    const p=(async()=>{
+      let st=await this._loadOnce(file);
+      if(st==='fail') st=await this._loadOnce(file);
+      if(st==='ok'){
+        this._probe[file]=true;
+        this._flushWaiters(file);
+      }else if(st==='missing'){
+        this._probe[file]=false; this._missing[file]=1;
+        (this._waiters[file]||[]).splice(0).forEach(cb=>{ try{cb(null);}catch(e){} });
+      }
+      /* st==='fail'：网络抖动，不坐实，waiters 保留；后台 warm 会再试，拉到后再通知 */
+      this._pullInflight[file]=null;
+    })();
+    this._pullInflight[file]=p;
+    return p;
+  },
+  /* 批量高优先级：小并发池主动拉取一组 key（用于进门后在架工单图等） */
+  priority(keys,conc){
+    const q=(keys||[]).filter((v,i,a)=>v&&a.indexOf(v)===i && this.list[v]
+      && this._probe[this.file(v)]===undefined && !this._missing[this.file(v)]);
+    if(!q.length) return;
+    let i=0;
+    const worker=()=>{
+      const k=q[i++];
+      if(k===undefined) return Promise.resolve();
+      return this._pull(this.file(k)).then(()=>{ this._warmDone[k]=1; return worker(); });
+    };
+    for(let w=0;w<Math.min(conc||3,q.length);w++) worker();
+  },
+
   /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量）
      带 18 秒硬超时：弱网下 socket 半死（onload/onerror 都不触发）不能无限挂住队列 */
   async _loadOnce(url){
@@ -60,6 +116,7 @@ const ASSET = {
       if(st==='fail') st=await this._loadOnce(f);
       if(st==='ok'){
         this._probe[f]=true;
+        this._flushWaiters(f);   /* 后台预热补到真图：通知所有已挂骨架的元素原地换图 */
       }else if(st==='missing'){
         this._probe[f]=false; this._missing[f]=1;
       }
@@ -124,8 +181,9 @@ const ASSET = {
     if(/^(img\/|https?:\/\/)/.test(key||'')) url=key;
     else url=this.file(key);
     const st=await this._loadOnce(url);
-    if(st==='ok') return 'ok';
-    if(st==='missing'){ this._missing[url]=1; return 'missing'; }
+    if(st==='ok'){ this._probe[url]=true; this._flushWaiters(url); return 'ok'; }
+    if(st==='missing'){ this._missing[url]=1; this._probe[url]=false;
+      (this._waiters[url]||[]).splice(0).forEach(cb=>{ try{cb(null);}catch(e){} }); return 'missing'; }
     /* 网络抖动：退避后重试，最多 2 次 */
     if(tries<2){
       await new Promise(r=>setTimeout(r,600*(tries+1)));
@@ -170,11 +228,23 @@ const ASSET = {
   mount(img, key){
     if(!key || !this.list[key]){ img.style.display='none'; return; }
     img.classList.add('asset-fade');
-    this.src(key).then(finalUrl=>{
-      if(!finalUrl){ img.classList.add('img-failed'); return; }
+    const f=this.file(key);
+    /* 快路径：真图已在缓存，直接挂，无闪烁 */
+    if(this._probe[f]===true){
       img.addEventListener('load',()=>img.classList.add('loaded'),{once:true});
-      img.addEventListener('error',()=>img.classList.add('img-failed'),{once:true});
-      img.src=finalUrl;
+      img.src=f; return;
+    }
+    /* 渐进：先挂水墨骨架并立即可见（绝不空白），真图到达后替换并保持可见 */
+    const svg=this.svg(key);
+    if(svg){
+      img.addEventListener('load',()=>img.classList.add('loaded'),{once:true});
+      img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+    }
+    this.onKeyReady(key,url=>{
+      if(!url) return;                       /* 坐实 404：骨架即终态 */
+      const im=new Image();
+      im.onload=()=>{ img.src=url; img.classList.add('loaded'); };
+      im.src=url;
     });
   },
   scan(root){
@@ -183,20 +253,65 @@ const ASSET = {
       img.classList.add('asseted');
       this.mount(img, img.dataset.asset);
     });
+    (root||document).querySelectorAll('img[data-gava]').forEach(img=>{
+      if(img.classList.contains('avaed')) return;
+      img.classList.add('avaed');
+      this.mountAvatar(img, img.dataset.gava);
+    });
   },
 
-  /* ---- 背景图：淡入设置 el 的 background-image（本地真图 → 水墨 SVG） ---- */
+  /* ---- 背景图：渐进挂载（水墨骨架立显 → 真图到达原地淡入替换，无需重渲染） ---- */
   bg(el, key, opacity){
     if(!el || !this.list[key]){ if(el) el.style.opacity=0; return; }
-    if(el._assetKey===key){ el.style.opacity=(opacity!=null?opacity:1); return; }
-    el._assetKey=key;
-    el.style.opacity=0;
     const target=(opacity!=null?opacity:1);
-    this.src(key).then(finalUrl=>{
-      if(el._assetKey!==key || !finalUrl){ if(el._assetKey===key) el.style.opacity=0; return; }
-      el.style.backgroundImage=`url("${finalUrl}")`;
+    if(el._assetKey===key){ el.style.opacity=target; return; }
+    el._assetKey=key;
+    const f=this.file(key);
+    /* 快路径：真图已缓存 */
+    if(this._probe[f]===true){
+      el.style.backgroundImage=`url("${f}")`;
       el.style.opacity=target;
+      return;
+    }
+    el.style.transition='opacity .5s ease';
+    /* 1) 水墨骨架立即铺满：卡片任何时刻都有内容，不空白 */
+    const svg=this.svg(key);
+    if(svg) el.style.backgroundImage=`url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
+    el.style.opacity=target;
+    /* 2) 真图到达后淡出骨架、换真图、淡入（SW 已缓存时这一拍几乎不可察觉） */
+    this.onKeyReady(key,url=>{
+      if(!url || el._assetKey!==key) return;
+      const im=new Image();
+      im.onload=()=>{
+        if(el._assetKey!==key) return;
+        el.style.opacity=0;
+        el.style.backgroundImage=`url("${url}")`;
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.opacity=target; }));
+      };
+      im.src=url;
     });
+  },
+
+  /* ---- 神头像（gh-ava）：墨字垫底 → av 小图 → g 大立绘两级渐进 ---- */
+  mountAvatar(img, gid){
+    const g=(typeof GODS!=='undefined')&&GODS[gid];
+    if(!g){ img.remove(); return; }
+    const hasArt=(typeof GOD_ART!=='undefined')&&GOD_ART.includes(gid);
+    const av=this.avatarFile(gid);
+    const swap=(url,tag)=>{
+      const im=new Image();
+      im.onload=()=>{
+        /* g 大图优先级最高，已显示后不被 av 小图覆盖 */
+        if(tag==='av' && img.dataset.art==='g') return;
+        if(tag==='g') img.dataset.art='g';
+        img.src=url; img.classList.add('loaded');
+      };
+      im.src=url;
+    };
+    /* 先上 av 小图（均 200KB 级，很快）；坐实没有 av 就移除 img 露底层墨字 */
+    this.onFile(av,url=>{ if(url) swap(url,'av'); else if(!hasArt) img.remove(); });
+    /* 有真立绘的神：大图到达后压过小图；大图坐实缺失且小图也没成，则露墨字 */
+    if(hasArt) this.onKeyReady('g_'+gid,url=>{ if(url) swap(url,'g'); else if(!img.getAttribute('src')) img.remove(); });
   },
 
   /* ---- 便捷取 key ---- */

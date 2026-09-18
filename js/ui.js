@@ -5,10 +5,9 @@ const h = (tag, cls, html)=>{ const e=document.createElement(tag); if(cls)e.clas
    缺失则 onerror 移除 img，露出下层毛笔字（不再直连在线图床） */
 function godAvatar(key,px){
   const g=GODS[key];
-  const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(key);
-  const src = hasArt ? 'img/g_'+key+'.jpg' : ASSET.avatarFile(key);
-  const onerr = hasArt ? `this.onerror=()=>this.remove();this.src='${ASSET.avatarFile(key)}'` : 'this.remove()';
-  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" src="${src}" onload="this.classList.add('loaded')" onerror="${onerr}"></span>`;
+  /* 渐进挂载：底层墨字常驻，ASSET.mountAvatar 先补 av 小图、g 大立绘到了自动替换；
+     不再写 onerror 一次性移除——弱网下后台补到真图也能自己长出来 */
+  return `<span class="gh-ava" style="width:${px}px;height:${px}px;font-size:${Math.round(px*.5)}px"><span>${g.icon}</span><img alt="${g.name}" data-gava="${key}"></span>`;
 }
 /* 物品/法宝图标：文字兜底 + ASSET 挂载图片 */
 function ic(id,txt,big){ return `<div class="item-ic${big?' big':''}">${ASSET.html('it_'+id,'item-img',txt)}<span class="ic-txt">${txt}</span></div>`; }
@@ -888,8 +887,6 @@ const UI = {
     if(!gd){ cb&&cb(); return; }
     const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
     const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
-    const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
-    const onerr = hasArt ? `this.onerror=()=>this.remove();this.src='${ASSET.avatarFile(g)}'` : 'this.remove()';
     const quoteHtml = gd.quote ? `<div class="db-quote">「${gd.quote}」</div>` : '';
     const sec=(cls,label,text)=> text ? `<div class="db-sec ${cls}"><label>${label}</label><p>${text}</p></div>` : '';
     const go2 = opts.review ? '轻触，合上仙录 ▸' : (opts.mid ? '轻触，继续 ▸' : '轻触，接卷办差 ▸');
@@ -899,7 +896,7 @@ const UI = {
       <div class="db-seal"><span>${opts.review?'仙录重温':'仙驾初临'}</span></div>
       <div class="db-body">
         <div class="db-stage">
-          <div class="db-face"><span class="db-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="${onerr}"></div>
+          <div class="db-face"><span class="db-char">${gd.icon}</span><img alt="${gd.name}" data-gava="${g}"></div>
           <div class="db-id">
             <div class="db-title">${gd.title}</div>
             <div class="db-name">${gd.name}</div>
@@ -915,6 +912,7 @@ const UI = {
       </div>
       <div class="db-go"><span class="db-go-1">轻触，拜见 ▸</span><span class="db-go-2">${go2}</span></div>`;
     ml.appendChild(ov);
+    if(typeof ASSET!=='undefined'){ ASSET.scan(ov); ASSET.priority(['g_'+g,'av_'+g],2); }
 
     let stage=0, done=false;
     const goNext=()=>{
@@ -961,7 +959,6 @@ const UI = {
       const INTENT={qiang:'强攻',xu:'蓄力',shou:'守势',mixed:'游斗'};
       const DREAD_T={3:'凶焰炽盛',4:'大凶临身',5:'劫数临头'};
       const kd=KIND[e.kind]||['祟','邪祟'];
-      const src='img/e_'+e.id+'.jpg';
       const stars='✦'.repeat(e.tier)+'✧'.repeat(Math.max(0,5-e.tier));
       const dread=(typeof ENEMY_DREAD!=='undefined'&&ENEMY_DREAD[e.id])||'';
       /* 登场瞬间震屏一次 */
@@ -989,7 +986,7 @@ const UI = {
         ov=h('div','em-debut tier'+e.tier);
         ov.innerHTML=`
           <div class="em-wash"></div><div class="em-glow"></div>
-          <div class="em-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+          <div class="em-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" data-asset="e_${e.id}"></div>
           <div class="em-cap">
             <div class="em-kind">${kd[1]} · ${DREAD_T[e.tier]||'凶焰炽盛'} <span class="em-stars">${stars}</span></div>
             <div class="em-name" data-name="${e.name}">${e.name}</div>
@@ -1007,7 +1004,7 @@ const UI = {
         ov=h('div','em-quick tier'+e.tier);
         ov.innerHTML=`
           <div class="em-wash"></div><div class="em-glow"></div>
-          <div class="eq-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+          <div class="eq-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" data-asset="e_${e.id}"></div>
           <div class="eq-name">${e.name}</div>
           <div class="eq-stars">${stars}</div>`;
         setTimeout(finish,1500);
@@ -1015,6 +1012,8 @@ const UI = {
       ov.addEventListener('click',finish);
       document.addEventListener('keydown',onKey);
       ml.appendChild(ov);
+      /* 敌人登场立绘高优先直拉，不依赖 MutationObserver 时序 */
+      if(typeof ASSET!=='undefined'){ ASSET.scan(ov); ASSET.priority(['e_'+e.id],1); }
     });
   },
 
@@ -1698,10 +1697,9 @@ const UI = {
       const gd=GODS[g];
       const rel=s.godsRel[g];
       const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
-      const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
       const card=h('div','cx-card');
       card.innerHTML=`
-        <div class="cx-face${hasArt?'':' cx-round'}"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+        <div class="cx-face${hasArt?'':' cx-round'}"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" data-gava="${g}"></div>
         <div class="cx-name">${gd.name}</div>
         <div class="cx-rel">${Game.favorName(Game.favorLevel(rel.favor))}</div>`;
       card.onclick=()=>this.openCodexZoom(g);
@@ -1717,10 +1715,9 @@ const UI = {
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay cx-zoom-ov');
     const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
-    const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
     ov.innerHTML=`
       <div class="cx-zoom">
-        <div class="cx-zoom-face"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+        <div class="cx-zoom-face"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" data-gava="${g}"></div>
         <div class="cx-zoom-name">${gd.name}</div>
         <button class="cx-zoom-book" type="button">翻开仙录</button>
         <div class="cx-zoom-hint">轻触任意处合上</div>
@@ -2087,13 +2084,18 @@ const UI = {
       <div class="battle-log" id="battleLog"></div>
       <div id="momentSlot"></div>`;
     c.appendChild(wrap);
+    /* 战场元信息：章节 + 是否夜战（高危任务） */
+    const mm=(this.rt&&this.rt.mid)?this.mission():null;
+    const chapter=(mm&&mm.chapter)||Game.s.chapter||1;
+    const night=!!(mm&&mm.danger>=4);
     /* 显式挂载所有战斗内资产图（立绘 + 背景图），不依赖 MutationObserver 时序 */
-    if(typeof ASSET!=='undefined') ASSET.scan(wrap);
+    if(typeof ASSET!=='undefined'){
+      ASSET.scan(wrap);
+      /* 战斗中正在看的立绘拉到最优先：玩家 p_r{rank} + 敌人 e_{id} + 战场背景 */
+      ASSET.priority([pKey,eKey,ASSET.bfKey(chapter,night)],3);
+    }
     /* 画质升级：战场图（按章 + 高危任务为夜战）与章节墨雾 */
     if(typeof FX!=='undefined'){
-      const mm=(this.rt&&this.rt.mid)?this.mission():null;
-      const chapter=(mm&&mm.chapter)||Game.s.chapter||1;
-      const night=!!(mm&&mm.danger>=4);
       FX.setChapter(chapter);
       FX.setBattleBG(ASSET.bfKey(chapter,night));
     }
@@ -2137,24 +2139,11 @@ const UI = {
     /* 先清掉上一个残留的 */
     field.querySelectorAll('.aid-god').forEach(n=>n.remove());
     const box=h('div','aid-god');
-    const gid='g_'+gkey;
-    const hasAsset=typeof ASSET!=='undefined' && ASSET.list && ASSET.list[gid];
-    let img;
-    if(hasAsset){
-      img=h('img','aid-img');
-      img.alt=gd.name;
-      box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
-      box.insertBefore(img, box.firstChild);
-      ASSET.mount(img, gid);
-    }else{
-      /* 兜底：本地头像 av_<gid>.jpg，再失败则仅留名号（不请求在线图床） */
-      img=h('img','aid-img');
-      img.alt=gd.name;
-      img.src=ASSET.avatarFile(gkey);
-      img.onerror=()=>{ img.remove(); };
-      box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
-      box.insertBefore(img, box.firstChild);
-    }
+    box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
+    const img=h('img','aid-img');
+    img.alt=gd.name;
+    img.dataset.gava=gkey;
+    box.insertBefore(img, box.firstChild);
     field.appendChild(box);
     setTimeout(()=>box.remove(), 3000);
   },

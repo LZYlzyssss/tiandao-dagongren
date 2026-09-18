@@ -1099,7 +1099,7 @@ body::before{
 .cx-face{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;display:grid;place-items:center;border:1px solid rgba(43,38,32,.18);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
 .cx-face.cx-round{aspect-ratio:1/1;width:74%;margin:0 auto;border-radius:50%;border:1.5px solid var(--ink-soft)}
 .cx-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
-.cx-face img.ok{opacity:1}
+.cx-face img.ok,.cx-face img.loaded{opacity:1}
 .cx-char{font-family:var(--font-brush);color:var(--cinnabar-deep);font-size:34px}
 .cx-name{margin-top:7px;font-weight:bold;font-size:14px;letter-spacing:1px;color:var(--ink)}
 .cx-rel{font-size:11px;color:var(--ink-faint);margin-top:2px;letter-spacing:1px}
@@ -1107,7 +1107,7 @@ body::before{
 .cx-zoom{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:92vw}
 .cx-zoom-face{position:relative;display:grid;place-items:center;min-width:180px;min-height:240px;border-radius:8px;overflow:hidden;border:1px solid rgba(247,234,210,.25);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
 .cx-zoom-face img{display:block;max-width:82vw;max-height:74vh;object-fit:contain}
-.cx-zoom-face img:not(.ok){width:180px;height:240px}
+.cx-zoom-face img:not(.ok):not(.loaded){width:180px;height:240px}
 .cx-zoom-name{font-family:var(--font-brush);font-size:26px;letter-spacing:4px;color:#f7ead2;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 .cx-zoom-hint{font-size:12px;color:rgba(247,234,210,.45);letter-spacing:2px}
 
@@ -1598,7 +1598,7 @@ body::before{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
   opacity:0;transition:opacity .8s ease;
 }
-.db-face img.ok{opacity:1;}
+.db-face img.ok,.db-face img.loaded{opacity:1;}
 .db-id{text-align:left;max-width:24em;}
 /* 首幕：名号信息叠于立绘下方暗场居中 */
 .debut:not(.story) .db-id{
@@ -1749,7 +1749,7 @@ body.em-shake #app{animation:emShake .38s cubic-bezier(.36,.07,.19,.97) both}
   100%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:brightness(.9)}
 }
 .em-debut .em-face img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
-.em-debut .em-face img:not(.ok){opacity:0}
+.em-debut .em-face img:not(.ok):not(.loaded){opacity:0}
 /* 立绘脚下暗影压地、底部墨幕遮字 */
 .em-debut::before{
   content:'';position:absolute;left:0;right:0;top:0;height:64%;pointer-events:none;
@@ -1834,7 +1834,7 @@ body.em-shake #app{animation:emShake .38s cubic-bezier(.36,.07,.19,.97) both}
   100%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:brightness(.92)}
 }
 .em-quick .eq-face img{width:100%;height:100%;object-fit:cover;object-position:center top}
-.em-quick .eq-face img:not(.ok){opacity:0}
+.em-quick .eq-face img:not(.ok):not(.loaded){opacity:0}
 .em-quick .em-char{font-size:clamp(90px,16vw,150px)}
 .eq-name{
   position:absolute;left:0;right:0;bottom:clamp(70px,11vh,104px);z-index:2;text-align:center;
