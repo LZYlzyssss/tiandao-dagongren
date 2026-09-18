@@ -126,6 +126,9 @@ const UI = {
 
   renderTop(){
     const s=Game.s, st=Stats.cur(), rk=RANKS[s.rank];
+    /* 顶栏玩家立绘随品阶换装（立绘共五档，高品复用 r4） */
+    const sealImg=$('brandSealImg');
+    if(sealImg) sealImg.src='img/p_r'+Math.min(s.rank||0,4)+'.jpg';
     const target=monthTarget(s.month);
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
@@ -677,11 +680,12 @@ const UI = {
     const idp=h('div','panel me-head');
     idp.innerHTML=`
       <h2>身份卷宗</h2>
-      <div class="me-seal">衙</div>
+      <div class="me-seal"><img src="img/p_r${Math.min(s.rank||0,4)}.jpg" alt="你"></div>
       <div class="me-id">
         <div class="me-rank">${rk.name}</div>
         <div class="sr-d">第 ${s.month} 月 ${s.day} 日 ｜ 修为 <b>${s.cult}</b> ｜ 香火钱 <b style="color:var(--gold)">${s.money} 文</b> ｜ 人情 <b>${s.renqing}</b></div>
       </div>`;
+    idp.querySelector('.me-seal').onclick=()=>this.openPlayerPortrait();
     c.appendChild(idp);
 
     /* 战力 */
@@ -810,18 +814,272 @@ const UI = {
     const o=Game.s.shelf[idx];
     this.rt={ order:o, mid:o.mid, node:0, ctx:{atkBuff:0,shield:0,enemyAtk:0,enemyVuln:false}, result:null };
     Game.s.busy=true;
-    Game.meetGod(this.mission().god);   // 接单即结识
+    const isNew=Game.meetGod(this.mission().god);   // 接单即结识；首次结识在故事过场之后展「仙驾初临」
     Game.save();
     this.view='mission';
     this.render();
-    /* 下凡过场：工单专属场景图全屏渐显，点击后再进入剧情节点；
-       场景底图提前挂到 mission 页，新手引导延后到过场关闭，避免被遮挡 */
+    /* 顺序：下凡过场（场景图 → 任务故事）→ 委托神初见登场卷 → 进入剧情节点；
+       场景底图提前挂到 mission 页，新手引导延后到进入节点后，避免被遮挡 */
     const m=this.mission();
     const bgKey=ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1);
     if(typeof FX!=='undefined'){ FX.setAmbient(null); FX.setScene(bgKey, .45); }
-    this.showMissionIntro(m, bgKey, ()=>{
+    const enterNode=()=>{
       this.renderMissionNode();
       if(typeof Guide!=='undefined') Guide.act('startMission');
+    };
+    this.showMissionIntro(m, bgKey, ()=>{
+      /* 长单续办等已结识情形：故事讲完直接办差；初见：故事之后拜见委托神 */
+      if(isNew) this.showGodDebut(m.god, enterNode, {first:true});
+      else enterNode();
+    });
+  },
+
+  /* 仙驾初临 · 神仙登场卷（两阶段，复用下凡过场的水墨语言）
+     阶段一 照面：立绘/字牌 + 尊号名号 + 品阶阵营 + 亲笔开场白 quote；
+     阶段二 知底：司职小传 intro、民间典故 story、典籍出处 sources 逐段展开。
+     opts.first=接单首遇（末幕接下凡过场）；opts.review=图鉴重温（末幕回大图页）。
+     每位神仙仅首遇自动展一次；重温入口在神仙图鉴。 */
+  showGodDebut(g, cb, opts){
+    opts=opts||{};
+    const gd=GODS[g];
+    if(!gd){ cb&&cb(); return; }
+    const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
+    const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
+    const src = hasArt ? 'img/g_'+g+'.jpg' : ASSET.avatarFile(g);
+    const onerr = hasArt ? `this.onerror=()=>this.remove();this.src='${ASSET.avatarFile(g)}'` : 'this.remove()';
+    const quoteHtml = gd.quote ? `<div class="db-quote">「${gd.quote}」</div>` : '';
+    const sec=(cls,label,text)=> text ? `<div class="db-sec ${cls}"><label>${label}</label><p>${text}</p></div>` : '';
+    const go2 = opts.review ? '轻触，合上仙录 ▸' : (opts.mid ? '轻触，继续 ▸' : '轻触，接卷办差 ▸');
+    const ov=h('div','debut'+(opts.review?' is-review':''));
+    ov.innerHTML=`
+      <div class="db-wash"></div>
+      <div class="db-seal"><span>${opts.review?'仙录重温':'仙驾初临'}</span></div>
+      <div class="db-body">
+        <div class="db-stage">
+          <div class="db-face"><span class="db-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="${onerr}"></div>
+          <div class="db-id">
+            <div class="db-title">${gd.title}</div>
+            <div class="db-name">${gd.name}</div>
+            <div class="db-tags"><i>${gd.tier}品</i><i>${gd.camp}</i></div>
+            ${quoteHtml}
+          </div>
+        </div>
+        <div class="db-scroll">
+          ${sec('db-sec-intro','司职小传',gd.intro)}
+          ${sec('db-sec-story','民间典故',gd.story)}
+          ${sec('db-sec-src','典籍出处',gd.sources)}
+        </div>
+      </div>
+      <div class="db-go"><span class="db-go-1">轻触，拜见 ▸</span><span class="db-go-2">${go2}</span></div>`;
+    ml.appendChild(ov);
+
+    let stage=0, done=false;
+    const goNext=()=>{
+      if(done) return;
+      if(stage===0){
+        stage=1;
+        ov.classList.add('story');
+        const sc=ov.querySelector('.db-scroll');
+        ov.querySelectorAll('.db-scroll .db-sec').forEach((el,i)=>{ el.style.transitionDelay=(0.18+i*0.22)+'s'; });
+        requestAnimationFrame(()=>sc.classList.add('show'));
+        /* 兜底：标签恰在后台时 rAF 可能挂起，setTimeout 补一次 */
+        setTimeout(()=>{ if(ov.isConnected && !sc.classList.contains('show')) sc.classList.add('show'); }, 160);
+        return;
+      }
+      done=true;
+      document.removeEventListener('keydown', onKey);
+      ov.classList.add('out');
+      setTimeout(()=>{ ov.remove(); cb&&cb(); }, 460);
+    };
+    const onKey=e=>{
+      if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); goNext(); }
+    };
+    ov.addEventListener('click', goNext);
+    document.addEventListener('keydown', onKey);
+  },
+
+  /* 冲洗「剧情中首次结识」队列：选项/通关/结案结算后调用，依次补播登场卷，播完执行 cb */
+  flushDebut(cb){
+    const q=Game.s.pendingDebut;
+    if(!q || !q.length){ cb&&cb(); return; }
+    const g=q.shift();
+    Game.save();
+    this.showGodDebut(g, ()=>this.flushDebut(cb), {mid:true});
+  },
+
+  /* ================= 敌人登场（杀气压迫） =================
+     tier 1-2 杂兵：黑红场快切，立绘+名号压屏，约1.4s自动隐去（可点掉）；
+     tier 3+ 精英/Boss：全屏登场卷——立绘压顶→名号墨裂劈入→判语/特性/血量杀机，
+     点击或按键「迎战」方揭幕开打。返回 Promise，由战斗引擎 await。 */
+  showEnemyDebut(e){
+    return new Promise(resolve=>{
+      const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
+      const KIND={hun:['魂','游魂野魄'],gui:['鬼','阴司鬼类'],yao:['妖','山野妖修'],xiong:['凶','上古凶兽'],zhan:['战','战魂英灵'],ke:['壳','空壳神僚']};
+      const INTENT={qiang:'强攻',xu:'蓄力',shou:'守势',mixed:'游斗'};
+      const DREAD_T={3:'凶焰炽盛',4:'大凶临身',5:'劫数临头'};
+      const kd=KIND[e.kind]||['祟','邪祟'];
+      const src='img/e_'+e.id+'.jpg';
+      const stars='✦'.repeat(e.tier)+'✧'.repeat(Math.max(0,5-e.tier));
+      const dread=(typeof ENEMY_DREAD!=='undefined'&&ENEMY_DREAD[e.id])||'';
+      /* 登场瞬间震屏一次 */
+      document.body.classList.add('em-shake');
+      setTimeout(()=>document.body.classList.remove('em-shake'),380);
+
+      let done=false;
+      const finish=()=>{
+        if(done) return; done=true;
+        document.removeEventListener('keydown',onKey);
+        ov.classList.add('em-out');
+        setTimeout(()=>{ ov.remove(); resolve(); },320);
+      };
+      const onKey=ev=>{
+        if(ev.key==='Enter'||ev.key===' '||ev.key==='Escape'){ ev.preventDefault(); finish(); }
+      };
+
+      let ov;
+      if(e.tier>=3){
+        /* —— Boss 档：全屏杀机登场卷 —— */
+        const weak=(e.weak||[]).map(p=>(typeof PATHS!=='undefined'&&PATHS[p])?PATHS[p].name:p).join(' / ')||'无显豁';
+        const tags=(e.traits&&e.traits.tags?e.traits.tags:[]).slice(0,3)
+          .map(t=>`<i>${t}</i>`).join('');
+        const intentTxt=INTENT[e.intentNext]||'游斗';
+        ov=h('div','em-debut tier'+e.tier);
+        ov.innerHTML=`
+          <div class="em-wash"></div><div class="em-glow"></div>
+          <div class="em-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+          <div class="em-cap">
+            <div class="em-kind">${kd[1]} · ${DREAD_T[e.tier]||'凶焰炽盛'} <span class="em-stars">${stars}</span></div>
+            <div class="em-name" data-name="${e.name}">${e.name}</div>
+            ${dread?`<div class="em-dread">「${dread}」</div>`:''}
+            <div class="em-tags">${tags}</div>
+            <div class="em-data">
+              <span><label>${e.hpLabel}</label><b>${e.maxHp}</b></span>
+              <span><label>杀意倾向</label><b>${intentTxt}</b></span>
+              <span><label>克星</label><b>${weak}</b></span>
+            </div>
+            <div class="em-go">拔 刀 迎 战 ▸</div>
+          </div>`;
+      }else{
+        /* —— 杂兵档：快切压屏 —— */
+        ov=h('div','em-quick tier'+e.tier);
+        ov.innerHTML=`
+          <div class="em-wash"></div><div class="em-glow"></div>
+          <div class="eq-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
+          <div class="eq-name">${e.name}</div>
+          <div class="eq-stars">${stars}</div>`;
+        setTimeout(finish,1500);
+      }
+      ov.addEventListener('click',finish);
+      document.addEventListener('keydown',onKey);
+      ml.appendChild(ov);
+    });
+  },
+
+  /* ================= 晋升敕封仪式（章末 rank 提升时播放） =================
+     破墨→圣旨天降展开→敕曰/封号/敕词逐行浮现→朱印砸落（震屏+金尘）→
+     诏书收卷→新官衣立绘换装、旧阶→新阶、恩典清单逐条点亮→「领旨谢恩」收束。
+     自动播放（约5.5s）；播放中点击/按键直接跳到末幕；末幕再点或按键闭合。返回 Promise。 */
+  showRankPromotion(fromRank,toRank){
+    return new Promise(resolve=>{
+      const oldR=RANKS[fromRank], newR=RANKS[toRank];
+      const ed=(typeof RANK_EDICT!=='undefined'&&RANK_EDICT[toRank])||
+        {seal:'敕命',hao:'加官进禄',edict:`敕封「${newR.name}」，神格盘与工单容量随品阶扩充。`};
+      const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
+
+      /* 恩典增量 */
+      const gifts=[];
+      if(newR.slots>oldR.slots) gifts.push(['神格盘槽位',`${oldR.slots} → ${newR.slots}`]);
+      if(newR.shelf>oldR.shelf) gifts.push(['法宝货架',`${oldR.shelf} → ${newR.shelf}`]);
+      if(newR.soldiers>oldR.soldiers) gifts.push(['阴兵编制',`${oldR.soldiers} → ${newR.soldiers}`]);
+      if(newR.facCap>oldR.facCap) gifts.push(['设施上限',`${oldR.facCap} → ${newR.facCap}`]);
+      if((typeof TIER_ORDER!=='undefined') && TIER_ORDER[newR.tierCap]>TIER_ORDER[oldR.tierCap])
+        gifts.push(['可遣神格档位',`${oldR.tierCap} 档 → ${newR.tierCap} 档`]);
+
+      /* 御印：四字排2×2，两字居中 */
+      const sc=(ed.seal||'敕命').slice(0,4);
+      const sealHtml=sc.length>=4
+        ? `<i>${sc[0]}</i><i>${sc[1]}</i><i>${sc[2]}</i><i>${sc[3]}</i>`
+        : `<i>${sc[0]||'敕'}</i><i>${sc[1]||'命'}</i>`;
+
+      /* 金尘粒子（盖印炸起） */
+      let dustHtml='';
+      for(let i=0;i<18;i++){
+        const l=48+Math.random()*36, t=62+Math.random()*22;
+        const dx=(Math.random()-0.5)*360, dy=-(80+Math.random()*260);
+        const d=0.9+Math.random()*0.9, delay=Math.random()*0.25;
+        dustHtml+=`<span style="left:${l}%;top:${t}%;--dx:${dx}px;--dy:${dy}px;--d:${d}s;--dl:${delay}s"></span>`;
+      }
+
+      const robeI=Math.min(fromRank||0,4), robeJ=Math.min(toRank||0,4);
+      const ov=h('div','rp-on');
+      ov.innerHTML=`
+        <div class="rp-ink"></div>
+        <div class="rp-slit"></div>
+        <div class="rp-dust">${dustHtml}</div>
+        <div class="rp-act-a">
+          <div class="rp-scroll">
+            <div class="rp-roller rp-r-top"></div>
+            <div class="rp-paper">
+              <div class="rp-pre rp-l1">奉天承运&nbsp;&nbsp;幽冥帝君&nbsp;&nbsp;敕曰</div>
+              <div class="rp-rname rp-l2">敕封 <b>${newR.name}</b></div>
+              <div class="rp-hao rp-l3">赐封号「<b>${ed.hao}</b>」</div>
+              <div class="rp-edict rp-l4">${ed.edict}</div>
+              <div class="rp-sign rp-l5">幽冥帝君　敕</div>
+              <div class="rp-seal rp-l5"><span class="${sc.length>=4?'rp-seal4':'rp-seal2'}">${sealHtml}</span></div>
+            </div>
+            <div class="rp-roller rp-r-bot"></div>
+          </div>
+        </div>
+        <div class="rp-act-b">
+          <div class="rp-rays"><i></i><i></i><i></i></div>
+          <div class="rp-robe">
+            <img class="rp-robe-old" src="img/p_r${robeI}.jpg" alt="旧品官衣" onerror="this.remove()">
+            <img class="rp-robe-new" src="img/p_r${robeJ}.jpg" alt="新品官衣" onerror="this.remove()">
+          </div>
+          <div class="rp-ranks"><span class="rp-old">${oldR.name}</span><i class="rp-arrow">▶</i><span class="rp-new">${newR.name}</span></div>
+          <div class="rp-hao-big">「${ed.hao}」</div>
+          <div class="rp-gifts">${gifts.map(g=>`<i><label>${g[0]}</label><b>${g[1]}</b></i>`).join('')}</div>
+          <div class="rp-go">领 旨 谢 恩 ▸</div>
+        </div>`;
+
+      let stage=0, done=false;
+      const timers=[];
+      const later=(fn,ms)=>{ timers.push(setTimeout(fn,ms)); };
+      const reach=n=>{ while(stage<n){ stage++; ov.classList.add('s'+stage); } };
+      /* 盖印：震屏一次 */
+      const slam=()=>{
+        document.body.classList.add('rp-shake');
+        later(()=>document.body.classList.remove('rp-shake'),460);
+      };
+      later(()=>{ reach(1); }, 320);                 /* 破墨 + 圣旨垂落展开 */
+      later(()=>{ reach(2); }, 1300);                /* 诏文逐行 */
+      later(()=>{ reach(3); slam(); }, 3050);        /* 朱印砸落 + 金尘 */
+      later(()=>{ reach(4); }, 3950);                /* 收诏 + 换装 */
+      later(()=>{ reach(5); }, 5050);                /* 恩典 + 领旨 */
+
+      /* 播放中点击/按键：跳到末幕；末幕：闭合 */
+      const finish=()=>{
+        if(done) return; done=true;
+        timers.forEach(clearTimeout);
+        document.removeEventListener('keydown',onKey);
+        ov.classList.add('rp-out');
+        later(()=>{ ov.remove(); resolve(); },380);
+      };
+      const skip=()=>{
+        timers.forEach(clearTimeout);
+        document.body.classList.remove('rp-shake');
+        ov.classList.add('rp-skip');
+        reach(5);
+      };
+      const onKey=ev=>{
+        if(ev.key==='Enter'||ev.key===' '||ev.key==='Escape'){
+          ev.preventDefault();
+          if(stage>=5) finish(); else skip();
+        }
+      };
+      ov.addEventListener('click',()=>{ if(stage>=5) finish(); else skip(); });
+      document.addEventListener('keydown',onKey);
+      ml.appendChild(ov);
     });
   },
 
@@ -1075,6 +1333,8 @@ const UI = {
       else Game.s.flags[key]=(v===undefined?true:v);
     });
     Game.save(); this.renderTop();
+    /* 过关赏中首次结识的神仙：补播登场卷（与结果行同帧，卷落即见结果） */
+    this.flushDebut();
   },
 
   chooseEvent(i){
@@ -1107,6 +1367,8 @@ const UI = {
     this.rt.result=r.log||'你继续前行。';
     Game.save(); this.renderTop(); this.renderMissionNode();
     if(typeof Guide!=='undefined') Guide.act('chooseEvent');
+    /* 抉择中首次结识的神仙：结果落定后补播「仙驾初临」 */
+    this.flushDebut();
   },
 
   nextNode(){
@@ -1196,12 +1458,13 @@ const UI = {
     /* 主线幕 / 支线结案落 flag（防重复上架）；章末任务推进章节并敕封 */
     if(m.main) s.mainDone[m.main]=true;
     if(m.side) s.sideDone[m.side]=true;
-    let mainMsg='';
+    let mainMsg='', promoFrom=null, promoTo=null;
     if(m.chapterEnd){
       if(s.chapter<=(m.chapter||1)) s.chapter=(m.chapter||1)+1;
-      Game.promoteRank();
+      const oldRank=s.rank;
+      if(Game.promoteRank()){ promoFrom=oldRank; promoTo=s.rank; }
       mainMsg=`<div style="color:var(--cinnabar);margin-top:8px"><b>—— 第 ${m.chapter} 章终 ——</b><br>
-        敕封「${RANKS[s.rank].name}」！神格盘与工单容量随品阶扩充。</div>`;
+        一道明黄敕命自九霄直坠神衙——跪听封赏。</div>`;
     }else if(m.main){
       mainMsg=`<div style="color:var(--cinnabar);margin-top:6px"><b>—— 主线推进 ——</b></div>`;
     }
@@ -1210,11 +1473,10 @@ const UI = {
     s.busy=false;
     this.view='settle';
     Game.save();
-    /* 画质升级：结算用本章情景图（清页签氛围层）；章末水墨转场 + 墨雾换色 */
+    /* 画质升级：结算用本章情景图（清页签氛围层）；章末的水墨换色等敕封仪式落幕后再转 */
     if(typeof FX!=='undefined'){
       FX.setAmbient(null);
       FX.setScene(ASSET.sceneKey(m.chapter||Game.s.chapter||1), .4);
-      if(m.chapterEnd) FX.inkWipe(()=>FX.setChapter(Game.s.chapter||1));
     }
 
     const c=$('pageStage'); c.innerHTML='';
@@ -1257,6 +1519,17 @@ const UI = {
     c.appendChild(wrap);
     this.renderTop();
     if(typeof Guide!=='undefined') Guide.act('settle');
+    /* 结案赏中首次结识的神仙先补播「仙驾初临」；若为章末，卷落后再降敕封诏书、做章节水墨转场 */
+    const runPromo=()=>{
+      if(promoTo!=null && this.showRankPromotion){
+        setTimeout(()=>{
+          this.showRankPromotion(promoFrom,promoTo).then(()=>{
+            if(typeof FX!=='undefined') FX.inkWipe(()=>FX.setChapter(Game.s.chapter||1));
+          });
+        },800);
+      }
+    };
+    this.flushDebut(runPromo);
   },
 
   openNotice(title,html,onClose){
@@ -1323,7 +1596,7 @@ const UI = {
     ml.classList.remove('hidden');
   },
 
-  /* 图鉴放大：纯大图 + 名字，点击任意处合上 */
+  /* 图鉴放大：纯大图 + 名字，点击任意处合上；「翻开仙录」可重温该神登场卷 */
   openCodexZoom(g){
     const gd=GODS[g]; if(!gd) return;
     const ml=$('modalLayer'); ml.innerHTML='';
@@ -1334,9 +1607,34 @@ const UI = {
       <div class="cx-zoom">
         <div class="cx-zoom-face"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" src="${src}" onload="this.classList.add('ok')" onerror="this.remove()"></div>
         <div class="cx-zoom-name">${gd.name}</div>
+        <button class="cx-zoom-book" type="button">翻开仙录</button>
         <div class="cx-zoom-hint">轻触任意处合上</div>
       </div>`;
     ov.onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openGodCodex(); };
+    ov.querySelector('.cx-zoom-book').onclick=(e)=>{
+      e.stopPropagation();
+      this.showGodDebut(g, ()=>this.openCodexZoom(g), {review:true});
+    };
+    ml.appendChild(ov);
+    ml.classList.remove('hidden');
+  },
+
+  /* 玩家自身立绘卷：点头像查看当前品阶立绘与身份，轻触合上 */
+  openPlayerPortrait(){
+    if(!Game||!Game.s) return;
+    const s=Game.s, rk=RANKS[s.rank];
+    const robeIdx=Math.min(s.rank||0,4);
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay cx-zoom-ov');
+    ov.innerHTML=`
+      <div class="cx-zoom pp-zoom">
+        <div class="cx-zoom-face"><img alt="${rk.name}" src="img/p_r${robeIdx}.jpg" onload="this.classList.add('ok')"></div>
+        <div class="cx-zoom-name">你 · ${rk.name}</div>
+        <div class="pp-line">地府考公落榜，按了一纸《阴阳两界劳务契》，发配两界交界的破神衙——无编制的阴神，工单照接，香火照挣，转正遥遥。</div>
+        <div class="pp-meta">第 ${s.month} 月 ${s.day} 日 ｜ 修为 ${s.cult} ｜ 神格位 ${rk.slots} ｜ 可领 ${rk.tierCap} 品神格</div>
+        <div class="cx-zoom-hint">轻触任意处合上</div>
+      </div>`;
+    ov.onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); };
     ml.appendChild(ov);
     ml.classList.remove('hidden');
   },

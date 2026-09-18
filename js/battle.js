@@ -438,7 +438,10 @@ const Battle = {
     /* ============ 开打 ============ */
     addLog(`你截住了「${e.name}」。${ctx.intro||''}`,'');
     UI.renderBattle(B);
-    await sleep(500);
+    await sleep(350);
+    /* 敌人登场：黑红杀气层盖住战场，演完揭幕（杂兵自动快切，Boss 点击迎战） */
+    if(UI.showEnemyDebut) await UI.showEnemyDebut(e);
+    await sleep(120);
 
     while(e.hp>0 && p.hp>0 && !B.fled){
       B.round++;

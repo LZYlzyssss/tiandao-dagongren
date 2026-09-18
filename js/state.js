@@ -68,6 +68,7 @@ const Game = {
     def('refining',null); def('recipes',{}); def('godsRel',{}); def('flags',{});
     def('chapter',1); def('mainDone',{}); def('sideDone',{}); def('storyChoices',{}); def('gameOver',false);
     def('wear',{weapon:null,armor:null,trinket:null}); def('bag',{});
+    def('pendingDebut',[]);   // 剧情中首次结识、待补播登场卷的神仙
     (s.shelf||[]).forEach(o=>{ if(o.act===undefined) o.act=0; });
     return true;
   },
@@ -78,19 +79,26 @@ const Game = {
   /* ---------------- 神明人脉：结识 / 好感 / 解锁 / 送礼 ---------------- */
   meetGod(g){
     const rel=this.s.godsRel[g];
-    if(rel && rel.met) return;
+    if(rel && rel.met) return false;
     this.s.godsRel[g]={ met:1, favor: rel?rel.favor:0 };
+    return true;
   },
   favorOf(g){ const r=this.s.godsRel[g]; return r?r.favor:0; },
   favorLevel(f){ let l=0; for(let i=0;i<FAVOR_LEVELS.length;i++){ if(f>=FAVOR_LEVELS[i].v) l=i; } return l; },
   favorName(l){ return FAVOR_LEVELS[l]?FAVOR_LEVELS[l].name:'相识'; },
   addFavor(g,n){
+    const first=!(this.s.godsRel[g]&&this.s.godsRel[g].met);
     const r=this.s.godsRel[g]||(this.s.godsRel[g]={met:1,favor:0});
     r.met=1;
     const oldLv=this.favorLevel(r.favor);
     r.favor=Math.max(0, Math.min(FAVOR_LEVELS[FAVOR_LEVELS.length-1].v, r.favor+n));
     const newLv=this.favorLevel(r.favor);
     if(newLv>oldLv) this.toast(`「${GODS[g].name}」与你的交情升至【${FAVOR_LEVELS[newLv].name}】！`);
+    /* 非接单途径（剧情抉择/关卡/结案赏）首次结识：排入待登场队列，由 UI 在结算后补播「仙驾初临」 */
+    if(first && typeof GODS!=='undefined' && GODS[g]){
+      this.s.pendingDebut=this.s.pendingDebut||[];
+      if(this.s.pendingDebut.indexOf(g)<0) this.s.pendingDebut.push(g);
+    }
   },
   /** 援助档位 0~4（0 不可唤；1 神念25% / 2 分身45% / 3 完整分身75% / 4 本体100%） */
   aidLevelOf(g){ return this.favorLevel(this.favorOf(g)); },

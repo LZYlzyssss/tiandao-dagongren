@@ -1,6 +1,9 @@
 /* ================= 天道打工人 · 启动 ================= */
 window.addEventListener('DOMContentLoaded', ()=>{
 
+  /* 顶栏头像：点开玩家自身立绘卷 */
+  document.querySelector('.brand-seal').addEventListener('click', ()=>UI.openPlayerPortrait());
+
   /* 开场 / 续玩 */
   const hasSave = Game.load();
   if(hasSave){

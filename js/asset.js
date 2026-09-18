@@ -122,7 +122,7 @@ Object.entries(SCENE_DESC).forEach(([k,d])=>{
   ASSET.list['scene_'+k]=[`${ASSET.INK} of ${d}, cinematic establishing shot, story illustration`, 'landscape_16_9'];
 });
 
-/* ---------- 工单专属场景图（38） ---------- */
+/* ---------- 工单专属场景图（48） ---------- */
 const TASK_SCENES = {
   /* 章一 · 两界文书房 */
   'c1m1':'a dilapidated district office at dawn, paper talismans pasted on walls, a broken gong hanging crooked, ghostly mist hovering above the roof tiles',
@@ -170,6 +170,17 @@ const TASK_SCENES = {
   's22':'a mercy boat on a sea of clouds, a Buddhist figure in white, lotus flowers floating, golden light from the heavens',
   's23':'a celestial merit-recording hall, glowing plaques on the wall, a figure picking up a fallen tablet, golden aura',
   's24':'a single lamp in the dark, faint glow, an old paper with a name written, ghostly shadows watching from corners, mist rolling',
+  /* 天曹外包化系列 支线（s25-s34） */
+  's25':'a village stone well at dusk, a thick black iron pipe rammed into the well mouth sucking water upward into the sky, a new printed official notice pasted on the well curb, a tiny barefoot child spirit sitting on the well rim, a clay bowl beside it, bitter dark ripples',
+  's26':'the massive bronze-studded gate of the underworld prison ajar at midnight, a crowd of translucent ghosts crowding the gap holding gilded official documents, a bull-headed armored guard bracing a steel trident across the doorway, flickering torches',
+  's27':'a desolate yin mountain road through a wild graveyard at night, crooked gravestones and green ghost fires, a horse-faced underworld guard in black robes crouching on a stone milestone with an iron chain coiled on his arm, a fleeing ghost silhouette in the distance, pale moon',
+  's28':'a sunlit old chinese town street, a crimson-robed day patrol deity standing rigidly holding an open ledger with faded blank entries, his own cast shadow shaped like a second smiling robed figure, shopfronts, harsh daylight',
+  's29':'a ruined general temple outside the city on a moonless night, collapsed roof beams and broken statues, one tiny green spirit lantern floating three feet above the ground, faint huddled silhouettes of forgotten old gods in weak incense glow, tall weeds',
+  's30':'the worn wooden threshold of a dilapidated spirit yamen at night, a fierce leopard-headed bearded scholar in a tattered blue robe squatting on the doorsill gnawing a ghost bone, an account room doorway behind him glowing with false official light, scattered paper money',
+  's31':'a vast underworld reward-of-virtue tribunal hall, two long queues of souls, ragged ghosts clutching yellowed receipts and a broken half tile, silk-robed ghosts holding gilded certificates, a stern austere chancellor behind a desk piled high with ledgers, cold candlelight',
+  's32':'a midnight charity mortuary courtyard, a thin coffin with only half its nails driven in, a green-faced red-whiskered underworld judge squatting on the coffin lid tossing a thin autopsy blade, white paper money drifting, cold moonlight, faint mist',
+  's33':'an endless construction yard of identical newly built small deity shrines stretching to the horizon under moonlight, an elderly carpenter crouching before a sample shrine holding an ink line marker, snapped chalk lines all askew, lumber stacks, carts hauling materials skyward',
+  's34':'a half-dried village lotus pond with cracked mud and sparse withered pink lotus, a barefoot young female immortal in pale robes seated on a broken stone at pond center holding a lotus petal, a queue of village women along the bank, a giant wooden water wheel in the clouds siphoning water upward',
 };
 Object.entries(TASK_SCENES).forEach(([id,sc])=>{
   ASSET.list['task_'+id]=[`${ASSET.INK} of ${sc}, story scene illustration, medium-wide composition`, 'landscape_16_9'];
@@ -225,8 +236,10 @@ Object.keys(ENEMY_DESC).forEach(k=>{
   ASSET.list['e_'+k]=[`${ASSET.INK} character portrait of ${ENEMY_DESC[k]}, menacing aura, ink splashes, full body character key art`, 'portrait_4_3'];
 });
 
-/* ---------- 神明立绘（B/A/S 共 25，复用 GODS.img 提示词） ---------- */
-const GOD_ART=['zhao_gongming','wen_chang','ma_zu','guan_yu','wang_lingguan','zeng_zhang','duo_wen','qin_guang','yan_luo','zhuan_lun','ao_guang','zhong_yue','er_lang','ne_zha','zhen_wu','lei_zu','xi_yue','xuan_nv','guan_yin','di_zang','wei_tuo','sun_wukong','feng_du','dong_yue','xi_wangmu'];
+/* ---------- 神明立绘（47 位，复用 GODS.img 提示词） ---------- */
+const GOD_ART=['zhao_gongming','wen_chang','ma_zu','guan_yu','wang_lingguan','zeng_zhang','duo_wen','qin_guang','yan_luo','zhuan_lun','ao_guang','zhong_yue','er_lang','ne_zha','zhen_wu','lei_zu','xi_yue','xuan_nv','guan_yin','di_zang','wei_tuo','sun_wukong','feng_du','dong_yue','xi_wangmu',
+/* 第二批 22 位（本地真图，文件为 PNG 内容沿用 .jpg 命名管线） */
+'tudi_gong','zao_jun','men_shen','jing_shen','cheng_huang','bai_wuchang','hei_wuchang','niu_tou','ma_mian','meng_po','ri_youshen','ye_youshen','cui_jue','wei_zheng','zhong_kui','lu_zhidao','bi_gan','sun_simiao','lu_ban','lv_dongbin','he_xiangu','dian_mu'];
 if(typeof GODS!=='undefined'){
   GOD_ART.forEach(k=>{
     if(GODS[k] && GODS[k].img) ASSET.list['g_'+k]=[GODS[k].img, 'portrait_4_3'];
@@ -637,12 +650,15 @@ const INKSVG=(()=>{
     s04:'indoor',s06:'fire',s08:'fire',s09:'indoor',s10:'water',
     s11:'temple',s12:'water',s13:'indoor',s14:'indoor',s15:'mountain',
     s16:'mountain',s17:'mountain',s18:'indoor',s19:'indoor',s20:'night',
-    s21:'fire',s22:'water',s23:'temple',s24:'night'
+    s21:'fire',s22:'water',s23:'temple',s24:'night',
+    /* s25-s34 天曹外包化系列 */
+    s25:'mountain',s26:'temple',s27:'night',s28:'mountain',s29:'night',
+    s30:'indoor',s31:'indoor',s32:'night',s33:'mountain',s34:'water'
   };
   function task(k){
     const id=k.slice(5);
     const tpl=TASK_TPL[id]||'mountain';
-    const ch=id[0]==='c'?+id[1]:(id>='s12'&&id<='s17'?4:id>='s21'?5:3);
+    const ch=id[0]==='c'?+id[1]:(id>='s12'&&id<='s17'?4:(id>='s21'&&id<='s24')?5:(id>='s25'&&id<='s27')?1:(id>='s28'&&id<='s29')?2:3);
     if(tpl==='mountain') return landscape('mt_'+id,ch,false,id);
     if(tpl==='night') return landscape('nt_'+id,ch,true,id);
     let s=head(1600,900,PAPER);
