@@ -1856,7 +1856,7 @@ body.em-shake #app{animation:emShake .38s cubic-bezier(.36,.07,.19,.97) both}
   .em-cap{bottom:14px}
 }
 
-/* ================= 晋升敕封仪式（奉天敕命 · 圣旨压顶） ================= */
+/* ================= 晋升敕封仪式（圣旨降临 · 跪接天恩） ================= */
 .rp-on{
   position:fixed;inset:0;z-index:2500;overflow:hidden;cursor:pointer;user-select:none;
   background:#0b0705;opacity:1;transition:opacity .38s ease;
@@ -1868,95 +1868,123 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   animation-duration:.001s!important;animation-delay:0s!important;
   transition-duration:.001s!important;transition-delay:0s!important;
 }
+/* 快节奏（用户点按后）：只压缩展卷/文字/遮罩延迟，实景交叉淡化保留 */
+.rp-on.rp-rush .rp-decree-inner{transition-duration:.32s!important;transition-delay:.05s!important}
+.rp-on.rp-rush .rp-l1,.rp-on.rp-rush .rp-l2,.rp-on.rp-rush .rp-l3,.rp-on.rp-rush .rp-l4{
+  transition-duration:.28s!important;transition-delay:.1s!important;
+}
+.rp-on.rp-rush .rp-cap{transition-duration:.32s!important}
+.rp-on.rp-rush .rp-veil,.rp-on.rp-rush .rp-veil-deep{transition-duration:.32s!important}
 
-/* 破墨暗场 + 朱金光缝 */
-.rp-ink{
+/* ---- 两层电影实景（降下圣旨 / 接下圣旨） ---- */
+.rp-photo{
   position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(80% 60% at 50% 38%, rgba(120,82,26,.26), transparent 70%),
-    radial-gradient(90% 72% at 50% 116%, rgba(120,30,18,.30), transparent 62%),
-    linear-gradient(180deg,#120b07 0%,#1b0e08 55%,#0a0605 100%);
-  animation:rpFade .5s ease both;
+  background-size:cover;background-position:center;
+  opacity:0;transform:scale(1.12);
+  will-change:transform,opacity;
 }
-@keyframes rpFade{from{opacity:0}}
-.rp-slit{
-  position:absolute;left:50%;top:-8%;width:5px;height:0;transform:translateX(-50%);
-  background:linear-gradient(180deg,#fff0c0,#e8a93f 60%,rgba(232,169,63,0));
-  box-shadow:0 0 26px 6px rgba(255,210,120,.6);opacity:0;pointer-events:none;
+.rp-on.s1 .rp-photo-down{opacity:1;animation:rpKbDown 5.6s cubic-bezier(.25,.65,.3,1) forwards}
+.rp-on.s2 .rp-photo-down{animation:none;opacity:0;transition:opacity 1.1s ease}
+.rp-on.s2 .rp-photo-up{opacity:1;animation:rpKbUp 5.2s cubic-bezier(.25,.65,.3,1) forwards}
+.rp-on.s3 .rp-photo-up{animation:rpKbUp 5.2s cubic-bezier(.25,.65,.3,1) forwards}
+.rp-on.s4 .rp-photo,.rp-on.s5 .rp-photo{animation:none!important;opacity:0!important;transition:opacity 1s ease!important}
+@keyframes rpKbDown{
+  0%{transform:scale(1.10) translateY(1.2%)}
+  100%{transform:scale(1.23) translateY(-1.6%)}
 }
-.rp-on.s1 .rp-slit{animation:rpSlit .8s ease both}
-@keyframes rpSlit{
-  0%{height:0;opacity:0}
-  18%{opacity:1}
-  55%{height:118%;opacity:.95}
-  100%{height:124%;opacity:0}
+@keyframes rpKbUp{
+  0%{transform:scale(1.06) translateY(1.6%)}
+  100%{transform:scale(1.19) translateY(-.4%)}
 }
 
-/* ---- 第一幕：圣旨 ---- */
-.rp-act-a{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  opacity:0;transition:opacity .4s ease;
+/* ---- 暗角与遮罩（保证文字可读 + 末幕沉底） ---- */
+.rp-veil{
+  position:absolute;inset:0;pointer-events:none;opacity:0;z-index:1;
+  background:
+    linear-gradient(180deg,rgba(9,5,3,.66) 0%,rgba(9,5,3,.10) 26%,rgba(9,5,3,.18) 58%,rgba(9,5,3,.80) 100%),
+    radial-gradient(72% 56% at 50% 42%, rgba(40,26,10,0),rgba(8,5,3,.42));
+  transition:opacity .9s ease;
 }
-.rp-on.s1 .rp-act-a{opacity:1}
-.rp-on.s4 .rp-act-a{
-  opacity:0;transform:translateY(-46px) scale(.96);
-  transition:all .5s ease;pointer-events:none;
+.rp-on.s1 .rp-veil{opacity:1}
+.rp-veil-deep{
+  position:absolute;inset:0;pointer-events:none;opacity:0;z-index:1;
+  background:radial-gradient(60% 52% at 50% 46%,rgba(10,6,3,.20),rgba(8,5,3,.62));
+  transition:opacity 1s ease;
 }
-.rp-scroll{
-  position:relative;width:min(660px,88vw);
-  transform:translateY(-112vh);
-  transition:transform .72s cubic-bezier(.22,.85,.28,1.02);
-  filter:drop-shadow(0 30px 60px rgba(0,0,0,.55));
+.rp-on.s2 .rp-veil-deep,.rp-on.s3 .rp-veil-deep{opacity:1}
+.rp-on.s4 .rp-veil,.rp-on.s5 .rp-veil{
+  opacity:1;transition:none;
+  background:radial-gradient(86% 72% at 50% 42%,#241608 0%,#160d06 52%,#0a0604 100%);
 }
-.rp-on.s1 .rp-scroll{transform:translateY(0)}
-.rp-roller{
-  height:24px;border-radius:12px;margin:0 -6px;position:relative;
-  background:linear-gradient(180deg,#7c4f27,#43260f 60%,#2e1a08);
-  box-shadow:0 2px 10px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,222,150,.5);
+.rp-on.s4 .rp-veil-deep,.rp-on.s5 .rp-veil-deep{opacity:0}
+
+/* ---- 幕次标题（金字书法） ---- */
+.rp-cap{
+  position:absolute;left:0;right:0;top:7.5%;z-index:3;pointer-events:none;
+  text-align:center;opacity:0;transform:translateY(-20px);
+  transition:opacity .9s ease,transform .9s cubic-bezier(.2,.8,.3,1);
 }
-.rp-roller::before,.rp-roller::after{
-  content:'';position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#ffe9ad,#b07f2e);
-  box-shadow:0 1px 4px rgba(0,0,0,.6);
+.rp-on.s1 .rp-cap-a{opacity:1;transform:none}
+.rp-on.s2 .rp-cap-a{opacity:0;transform:translateY(-28px);transition-duration:.55s}
+.rp-on.s2 .rp-cap-b{opacity:1;transform:none}
+.rp-on.s4 .rp-cap-b,.rp-on.s5 .rp-cap-b{opacity:0;transform:translateY(-20px);transition-duration:.5s}
+.rp-cap-title{
+  font-family:var(--font-brush);
+  font-size:clamp(40px,7.4vw,70px);letter-spacing:16px;text-indent:16px;
+  color:#f6e3b2;text-shadow:0 0 26px rgba(255,205,110,.6),0 2px 8px rgba(0,0,0,.7);
 }
-.rp-roller::before{left:-8px}
-.rp-roller::after{right:-8px}
-.rp-paper{
-  transform:scaleY(0);transform-origin:top center;
-  transition:transform .55s cubic-bezier(.3,.8,.3,1) .34s;
+.rp-cap-sub{margin-top:12px;font-size:15px;letter-spacing:9px;text-indent:9px;color:#dec493}
+.rp-cap-b .rp-cap-title{font-size:clamp(30px,5vw,46px);letter-spacing:12px;text-indent:12px}
+.rp-cap-b .rp-cap-sub{letter-spacing:6px;text-indent:6px}
+
+/* ---- 第二幕：展卷诏文（浮于接旨实景之上） ---- */
+.rp-decree{
+  position:absolute;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;
+  padding:18px;opacity:0;pointer-events:none;
+}
+.rp-on.s2 .rp-decree{opacity:1;transition:opacity .55s ease .35s}
+.rp-on.s4 .rp-decree,.rp-on.s5 .rp-decree{opacity:0;transition:opacity .85s ease}
+.rp-decree-inner{
+  position:relative;width:min(572px,90vw);
   background:
     radial-gradient(120% 60% at 50% 0%, rgba(180,130,50,.10), transparent 60%),
     linear-gradient(176deg,#f7e8bf 0%,#efdca8 55%,#e7cd92 100%);
   border-left:1px solid rgba(120,80,20,.3);
   border-right:1px solid rgba(120,80,20,.3);
-  box-shadow:0 18px 60px rgba(0,0,0,.55),inset 0 0 60px rgba(150,100,30,.12);
-  padding:30px 44px 96px;color:#53341a;position:relative;min-height:300px;
+  box-shadow:0 22px 70px rgba(0,0,0,.62),inset 0 0 60px rgba(150,100,30,.12);
+  padding:28px 42px 92px;color:#53341a;
+  transform:scaleY(.04) translateY(70px);transform-origin:center 62%;
+  transition:transform .72s cubic-bezier(.3,.85,.3,1) .85s;
 }
-.rp-on.s1 .rp-paper{transform:scaleY(1)}
-.rp-pre{text-align:center;font-size:15px;letter-spacing:5px;color:#7a4b1d;padding-top:4px}
-.rp-rname{
-  text-align:center;font-size:26px;margin:16px 0 8px;letter-spacing:2px;color:#6b4417;
-  font-weight:700;
+.rp-on.s2 .rp-decree-inner{transform:scaleY(1) translateY(0)}
+.rp-decree-inner::before,.rp-decree-inner::after{
+  content:'';position:absolute;left:-7px;right:-7px;height:22px;border-radius:11px;
+  background:linear-gradient(180deg,#7c4f27,#43260f 60%,#2e1a08);
+  box-shadow:0 2px 10px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,222,150,.5);
 }
+.rp-decree-inner::before{top:-11px}
+.rp-decree-inner::after{bottom:-11px}
+.rp-pre{text-align:center;font-size:15px;letter-spacing:5px;color:#7a4b1d;padding-top:2px}
+.rp-rname{text-align:center;font-size:26px;margin:14px 0 8px;letter-spacing:2px;color:#6b4417;font-weight:700}
 .rp-rname b{
   font-family:var(--font-brush);font-size:34px;letter-spacing:4px;
   color:#a02c1c;text-shadow:0 1px 0 rgba(120,30,20,.15);
 }
-.rp-hao{text-align:center;font-size:16.5px;color:#6b4417;margin-bottom:18px;letter-spacing:1px}
+.rp-hao{text-align:center;font-size:16.5px;color:#6b4417;margin-bottom:16px;letter-spacing:1px}
 .rp-hao b{color:#9a5a14;font-weight:700;letter-spacing:2px}
-.rp-edict{font-size:16.5px;line-height:2.15;text-indent:2em;text-align:justify;color:#4a2f14}
+.rp-edict{font-size:16px;line-height:2.1;text-indent:2em;text-align:justify;color:#4a2f14}
 .rp-sign{
-  position:absolute;right:128px;bottom:40px;font-size:14px;letter-spacing:3px;color:#7a4b1d;
+  position:absolute;right:126px;bottom:36px;font-size:14px;letter-spacing:3px;color:#7a4b1d;
   opacity:0;transform:translateY(14px);
 }
 .rp-on.s3 .rp-sign{opacity:1;transform:none;transition:all .4s ease .02s}
 
-/* 诏文逐行 */
+/* 诏文逐行（展卷之后） */
 .rp-l1,.rp-l2,.rp-l3,.rp-l4{opacity:0;transform:translateY(14px)}
-.rp-on.s2 .rp-l1{opacity:1;transform:none;transition:all .55s ease .05s}
-.rp-on.s2 .rp-l2{opacity:1;transform:none;transition:all .55s ease .28s}
-.rp-on.s2 .rp-l3{opacity:1;transform:none;transition:all .55s ease .5s}
-.rp-on.s2 .rp-l4{opacity:1;transform:none;transition:all .7s ease .72s}
+.rp-on.s2 .rp-l1{opacity:1;transform:none;transition:all .55s ease 1.62s}
+.rp-on.s2 .rp-l2{opacity:1;transform:none;transition:all .55s ease 1.86s}
+.rp-on.s2 .rp-l3{opacity:1;transform:none;transition:all .55s ease 2.1s}
+.rp-on.s2 .rp-l4{opacity:1;transform:none;transition:all .7s ease 2.34s}
 
 /* 朱印砸落 */
 .rp-seal{position:absolute;right:30px;bottom:22px;width:92px;height:92px;opacity:0;z-index:2}
@@ -2000,13 +2028,7 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.15)}
 }
 
-/* ---- 第二幕：换装加封 ---- */
-.rp-act-b{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:12px;padding:20px;
-  opacity:0;pointer-events:none;
-}
-.rp-on.s4 .rp-act-b{opacity:1;transition:opacity .55s ease .12s}
+/* ---- 末幕圣光轮 ---- */
 .rp-rays{
   position:absolute;left:50%;top:40%;width:min(680px,112vw);height:min(680px,112vw);
   transform:translate(-50%,-50%);pointer-events:none;
@@ -2024,34 +2046,180 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   content:'';position:absolute;inset:30%;border-radius:50%;
   background:radial-gradient(circle,rgba(255,224,150,.26),transparent 70%);filter:blur(10px);
 }
-.rp-on.s4 .rp-rays i{opacity:1;animation:rpSpin 32s linear infinite}
+.rp-on.s4 .rp-rays i{opacity:1;animation:rpSpin 32s linear infinite .4s}
 .rp-on.s4 .rp-rays i:nth-child(2){animation-duration:48s;animation-direction:reverse}
 .rp-on.s4 .rp-rays i:nth-child(3){animation-duration:22s}
 @keyframes rpSpin{to{transform:rotate(360deg)}}
 
-.rp-robe{
-  position:relative;width:172px;height:232px;border-radius:4px;z-index:1;
-  border:2px solid rgba(232,188,102,.75);
-  box-shadow:0 0 46px rgba(255,202,96,.35),0 14px 40px rgba(0,0,0,.6);
+/* 第一幕飘降的细金粒 */
+.rp-snow{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.rp-snow i{
+  position:absolute;top:-3%;width:3px;height:3px;border-radius:50%;
+  background:radial-gradient(circle,#fff0c0,rgba(215,162,60,.2) 75%);
+  opacity:0;animation:rpSnow var(--sd) linear var(--sl) infinite;
 }
-.rp-robe img{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;object-position:center top;display:block;
+@keyframes rpSnow{
+  0%{opacity:0;transform:translateY(-6vh) translateX(0)}
+  12%{opacity:.75}
+  88%{opacity:.5}
+  100%{opacity:0;transform:translateY(106vh) translateX(var(--sx))}
 }
-.rp-robe-old{transition:all .5s ease}
-.rp-robe-new{opacity:0;transform:scale(1.14);filter:brightness(2.4)}
-.rp-on.s4 .rp-robe-new{
-  opacity:1;transform:scale(1);filter:brightness(1);
-  transition:all .85s ease .22s;
+
+/* ---- 轻触提示（一至四幕可见，末幕由按钮收束） ---- */
+.rp-hint{
+  position:absolute;left:0;right:0;bottom:4.5%;z-index:8;text-align:center;pointer-events:none;
+  font-size:14px;letter-spacing:7px;text-indent:7px;color:#e6d3a8;opacity:0;
 }
-.rp-on.s4 .rp-robe-old{
-  opacity:0;transform:scale(.92);filter:blur(8px) grayscale(1);
+.rp-on.s1 .rp-hint,.rp-on.s2 .rp-hint,.rp-on.s3 .rp-hint,.rp-on.s4 .rp-hint{
+  opacity:.82;transition:opacity .6s ease 1s;
+  animation:rpGoPulse 2s ease-in-out 1.4s infinite;
 }
+.rp-on.s5 .rp-hint{display:none}
+
+/* ================= 第四幕：脱胎换骨（旧像 → 金身） ================= */
+.rp-morph{
+  position:absolute;inset:0;z-index:5;
+  display:flex;align-items:center;justify-content:center;
+  gap:min(5vw,66px);padding:6vh 5vw 10vh;
+  opacity:0;pointer-events:none;
+}
+.rp-on.s4 .rp-morph{opacity:1;transition:opacity .55s ease}
+.rp-on.s5 .rp-morph{opacity:0;transition:opacity .75s ease}
+.rp-morph .rp-rays{top:47%;width:min(620px,100vw);height:min(620px,100vw)}
+.rp-on.s4 .rp-morph .rp-rays i{opacity:1;animation:rpSpin 32s linear infinite .3s}
+.rp-on.s4 .rp-morph .rp-rays i:nth-child(2){animation-duration:48s;animation-direction:reverse}
+.rp-on.s4 .rp-morph .rp-rays i:nth-child(3){animation-duration:22s}
+/* 顶部点题 */
+.rp-morph-tag{
+  position:absolute;top:7%;left:0;right:0;text-align:center;z-index:3;
+  font-family:var(--font-brush);font-size:clamp(26px,4vw,38px);letter-spacing:14px;text-indent:14px;
+  color:#f3d79a;text-shadow:0 0 22px rgba(255,200,90,.55);
+  opacity:0;transform:translateY(-14px);
+}
+.rp-on.s4 .rp-morph-tag{animation:rpMTag 4.2s ease .15s both}
+@keyframes rpMTag{
+  0%{opacity:0;transform:translateY(-14px)}
+  14%,100%{opacity:1;transform:none}
+}
+/* 金光柱 */
+.rp-beam{
+  position:absolute;left:50%;top:-12%;width:min(300px,44vw);height:124%;z-index:1;
+  transform:translateX(-50%) scaleY(0);transform-origin:top center;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,238,180,0) 0%,rgba(255,225,150,.32) 30%,rgba(255,246,212,.62) 52%,rgba(255,225,150,.3) 74%,rgba(255,238,180,0) 100%);
+  filter:blur(6px);mix-blend-mode:screen;
+}
+.rp-on.s4 .rp-beam{animation:rpBeam 4.2s ease .12s both}
+@keyframes rpBeam{
+  0%{transform:translateX(-50%) scaleY(0);opacity:0}
+  16%{transform:translateX(-50%) scaleY(1);opacity:1}
+  62%{opacity:.9}
+  100%{opacity:.3}
+}
+/* 立绘框：旧像与金身同位叠化 */
+.rp-figure{
+  position:relative;z-index:2;height:min(79vh,780px);aspect-ratio:3/4;flex:none;
+}
+.rp-figure img{
+  position:absolute;left:50%;bottom:0;height:100%;max-width:82vw;
+  object-fit:contain;object-position:center bottom;
+}
+.rp-fig-old{opacity:0}
+.rp-fig-new{opacity:0}
+.rp-on.s4 .rp-fig-old{animation:rpFigOld 4.2s ease both}
+@keyframes rpFigOld{
+  0%{opacity:0;transform:translateX(-50%) scale(.97);filter:grayscale(.55) brightness(.65)}
+  12%{opacity:1;transform:translateX(-50%) scale(1);filter:grayscale(.35) brightness(.8)}
+  52%{opacity:1;transform:translateX(-50%) scale(1)}
+  68%{opacity:0;transform:translateX(-50%) scale(.92);filter:grayscale(1) blur(12px) brightness(.35)}
+  100%{opacity:0}
+}
+.rp-on.s4 .rp-fig-new{animation:rpFigNew 4.2s cubic-bezier(.22,.8,.3,1) .95s both}
+@keyframes rpFigNew{
+  0%{opacity:0;transform:translateX(-50%) scale(1.22);filter:brightness(3.4) blur(16px)}
+  34%{opacity:1;transform:translateX(-50%) scale(1.09);filter:brightness(2.3) blur(4px)}
+  64%{transform:translateX(-50%) scale(1.02);filter:brightness(1.3)}
+  100%{opacity:1;transform:translateX(-50%) scale(1);
+      filter:brightness(1) drop-shadow(0 0 46px rgba(255,210,130,.4))}
+}
+/* 金身脚下光晕 */
+.rp-figure::after{
+  content:'';position:absolute;left:50%;bottom:-4%;width:78%;height:46px;z-index:-1;
+  transform:translateX(-50%);border-radius:50%;opacity:0;
+  background:radial-gradient(ellipse,rgba(255,214,130,.5),rgba(255,214,130,0) 70%);filter:blur(8px);
+}
+.rp-on.s4 .rp-figure::after{animation:rpFigGlow 4.2s ease 1.5s both}
+@keyframes rpFigGlow{
+  0%{opacity:0}
+  40%,100%{opacity:1}
+}
+/* 白金闪光 */
+.rp-flash{
+  position:absolute;inset:0;z-index:6;pointer-events:none;opacity:0;
+  background:radial-gradient(58% 58% at 38% 46%,rgba(255,247,222,.96),rgba(255,230,160,.42) 44%,rgba(255,230,160,0) 72%);
+}
+.rp-on.s4 .rp-flash{animation:rpFlash 4.2s ease .92s both}
+@keyframes rpFlash{
+  0%,53%{opacity:0}
+  60%{opacity:1}
+  100%{opacity:0}
+}
+/* 新身名牌 · 介绍 */
+.rp-idcard{
+  position:relative;z-index:2;width:min(336px,36vw);flex:none;
+  opacity:0;transform:translateX(36px);
+}
+.rp-on.s4 .rp-idcard{animation:rpCard 4.2s ease 1.55s both}
+@keyframes rpCard{
+  0%{opacity:0;transform:translateX(36px)}
+  20%,100%{opacity:1;transform:none}
+}
+.rp-id-kicker{
+  font-size:13.5px;letter-spacing:8px;text-indent:8px;color:#c9ad7d;margin-bottom:12px;
+}
+.rp-id-name{
+  font-size:clamp(25px,2.7vw,35px);font-weight:700;line-height:1.38;letter-spacing:2px;
+  background:linear-gradient(180deg,#ffeeba,#ddaa44);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 26px rgba(255,200,90,.22);
+}
+.rp-id-line{
+  width:118px;height:1px;margin:14px 0;
+  background:linear-gradient(90deg,rgba(224,178,92,.9),rgba(224,178,92,0));
+}
+.rp-id-hao{
+  font-family:var(--font-brush);font-size:clamp(30px,3.4vw,44px);letter-spacing:8px;
+  color:#f4dc9f;text-shadow:0 0 20px rgba(255,200,90,.45);margin-bottom:12px;
+}
+.rp-id-duty{font-size:15px;line-height:1.9;letter-spacing:1.5px;color:#cdb78b}
+/* 快节奏：压缩变身幕各段延迟与时长 */
+.rp-on.rp-rush .rp-morph-tag{animation-duration:2s!important;animation-delay:.05s!important}
+.rp-on.rp-rush .rp-beam{animation-duration:2s!important;animation-delay:.05s!important}
+.rp-on.rp-rush .rp-fig-old{animation-duration:2s!important;animation-delay:0s!important}
+.rp-on.rp-rush .rp-fig-new{animation-duration:2s!important;animation-delay:.42s!important}
+.rp-on.rp-rush .rp-flash{animation-duration:2s!important;animation-delay:.4s!important}
+.rp-on.rp-rush .rp-figure::after{animation-duration:2s!important;animation-delay:.7s!important}
+.rp-on.rp-rush .rp-idcard{animation-duration:2s!important;animation-delay:.72s!important}
+
+/* ================= 末幕：领旨谢恩 ================= */
+.rp-final{
+  position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:13px;padding:20px;
+  opacity:0;pointer-events:none;
+}
+.rp-on.s5 .rp-final{opacity:1;pointer-events:auto;transition:opacity .7s ease .3s}
+.rp-on.s5 .rp-final .rp-rays i{opacity:1;animation:rpSpin 32s linear infinite .4s}
+.rp-on.s5 .rp-final .rp-rays i:nth-child(2){animation-duration:48s;animation-direction:reverse}
+.rp-on.s5 .rp-final .rp-rays i:nth-child(3){animation-duration:22s}
+.rp-final-tag{
+  z-index:1;font-size:14px;letter-spacing:10px;text-indent:10px;color:#cbb184;
+  opacity:0;transform:translateY(12px);
+}
+.rp-on.s5 .rp-final-tag{opacity:1;transform:none;transition:all .6s ease .45s}
 .rp-ranks{
   display:flex;align-items:center;gap:18px;z-index:1;
   opacity:0;transform:translateY(16px);
 }
-.rp-on.s4 .rp-ranks{opacity:1;transform:none;transition:all .6s ease .5s}
+.rp-on.s5 .rp-ranks{opacity:1;transform:none;transition:all .6s ease .5s}
 .rp-ranks .rp-old{color:#b9a78c;text-decoration:line-through;font-size:16px;letter-spacing:1px}
 .rp-arrow{color:#d8a74e;font-style:normal;font-size:14px;animation:rpArrow 1.4s ease-in-out infinite}
 .rp-ranks .rp-new{
@@ -2069,7 +2237,7 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   color:#f3d79a;text-shadow:0 0 18px rgba(255,200,90,.4);
   opacity:0;transform:translateY(12px);
 }
-.rp-on.s4 .rp-hao-big{opacity:1;transform:none;transition:all .6s ease .72s}
+.rp-on.s5 .rp-hao-big{opacity:1;transform:none;transition:all .6s ease .72s}
 .rp-gifts{
   display:flex;flex-wrap:wrap;justify-content:center;gap:10px;
   max-width:640px;z-index:1;margin-top:4px;
@@ -2081,20 +2249,20 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   opacity:0;transform:translateY(12px);
 }
 .rp-on.s5 .rp-gifts i{opacity:1;transform:none;transition:all .45s ease}
-.rp-on.s5 .rp-gifts i:nth-child(1){transition-delay:.02s}
-.rp-on.s5 .rp-gifts i:nth-child(2){transition-delay:.14s}
-.rp-on.s5 .rp-gifts i:nth-child(3){transition-delay:.26s}
-.rp-on.s5 .rp-gifts i:nth-child(4){transition-delay:.38s}
-.rp-on.s5 .rp-gifts i:nth-child(5){transition-delay:.5s}
+.rp-on.s5 .rp-gifts i:nth-child(1){transition-delay:1s}
+.rp-on.s5 .rp-gifts i:nth-child(2){transition-delay:1.12s}
+.rp-on.s5 .rp-gifts i:nth-child(3){transition-delay:1.24s}
+.rp-on.s5 .rp-gifts i:nth-child(4){transition-delay:1.36s}
+.rp-on.s5 .rp-gifts i:nth-child(5){transition-delay:1.48s}
 .rp-gifts label{color:#b79d73;font-size:13px;letter-spacing:1px}
 .rp-gifts b{color:#f0cf8a;font-size:14.5px;font-weight:600;white-space:nowrap}
 .rp-go{
   z-index:1;margin-top:10px;font-size:16px;letter-spacing:8px;text-indent:8px;
-  color:#f5e2b4;opacity:0;pointer-events:none;
+  color:#f5e2b4;opacity:0;
 }
 .rp-on.s5 .rp-go{
-  opacity:1;transition:opacity .5s ease .55s;
-  animation:rpGoPulse 1.8s ease-in-out 1.2s infinite;
+  opacity:1;transition:opacity .5s ease 1.55s;
+  animation:rpGoPulse 1.8s ease-in-out 2s infinite;
 }
 @keyframes rpGoPulse{
   0%,100%{text-shadow:0 0 8px rgba(255,210,120,.25)}
@@ -2102,16 +2270,27 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
 }
 
 @media (max-width:640px){
-  .rp-paper{padding:22px 22px 78px;min-height:0}
+  .rp-decree-inner{padding:20px 20px 76px}
   .rp-pre{font-size:13px;letter-spacing:3px}
   .rp-rname{font-size:20px;margin:10px 0 6px}
   .rp-rname b{font-size:26px}
-  .rp-edict{font-size:14.5px;line-height:2}
-  .rp-seal{width:72px;height:72px;right:18px;bottom:14px}
+  .rp-edict{font-size:14.5px;line-height:1.95}
+  .rp-seal{width:72px;height:72px;right:16px;bottom:14px}
   .rp-seal span.rp-seal4{font-size:20px}
   .rp-seal span.rp-seal2{font-size:24px}
-  .rp-sign{right:104px;bottom:30px;font-size:12px}
-  .rp-robe{width:132px;height:180px}
+  .rp-sign{right:100px;bottom:26px;font-size:12px}
+  .rp-cap{top:6%}
+  .rp-cap-sub{font-size:13px;letter-spacing:5px;text-indent:5px}
+  /* 变身幕：上立绘、下名牌 */
+  .rp-morph{flex-direction:column;gap:10px;padding:9vh 5vw 9vh}
+  .rp-morph-tag{top:3.5%;font-size:24px;letter-spacing:10px;text-indent:10px}
+  .rp-figure{height:50vh}
+  .rp-idcard{width:92vw;text-align:center;transform:translateY(20px)}
+  .rp-id-kicker{margin-bottom:6px;letter-spacing:6px;text-indent:6px}
+  .rp-id-line{margin:8px auto}
+  .rp-id-name{font-size:22px}
+  .rp-id-hao{font-size:27px;letter-spacing:6px;margin-bottom:5px}
+  .rp-id-duty{font-size:13.5px;line-height:1.7}
   .rp-ranks{gap:12px}
   .rp-ranks .rp-old{font-size:13px}
   .rp-hao-big{font-size:19px;letter-spacing:8px}

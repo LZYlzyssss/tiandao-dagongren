@@ -976,15 +976,37 @@ const UI = {
   },
 
   /* ================= 晋升敕封仪式（章末 rank 提升时播放） =================
-     破墨→圣旨天降展开→敕曰/封号/敕词逐行浮现→朱印砸落（震屏+金尘）→
-     诏书收卷→新官衣立绘换装、旧阶→新阶、恩典清单逐条点亮→「领旨谢恩」收束。
-     自动播放（约5.5s）；播放中点击/按键直接跳到末幕；末幕再点或按键闭合。返回 Promise。 */
+     实景电影五幕：
+     一「圣旨降临」：降下圣旨全屏实景缓推 + 金字标题 + 金粒飘降；
+     二「跪接天恩」：交叉淡化至第一人称接旨实景，金旨展卷、诏文逐行；
+     三「落印」：朱印砸落（震屏+金尘）；
+     四「脱胎换骨」：金光柱临身，旧品官身灰化散去，新金身自光中升起，全屏展示新阶立绘与名号/封号/职司；
+     五「领旨谢恩」：旧阶→新阶、封号、恩典逐项亮起。
+     自动播放约 15s；播放中点击/空格逐拍推进（首次点按进入快节奏），末幕再点闭合。返回 Promise。 */
   showRankPromotion(fromRank,toRank){
+    /* 各品阶职司一句话（变身幕介绍用；不入 data.js） */
+    const RANK_DUTY=[
+      '两界杂差，按件计功',
+      '职司两界跑腿、昼夜勾魂',
+      '职司巡按地界、查访庙祀',
+      '职司文案簿册、佐理刑名',
+      '职司笔下判生死、定赏罚',
+      '职司推勘疑狱、覆审旧案',
+      '职司执律行刑、秋审定谳',
+      '职司佐理酆都、纠察百司',
+      '职司摄理一司、九卿之副'
+    ];
     return new Promise(resolve=>{
       const oldR=RANKS[fromRank], newR=RANKS[toRank];
+      const duty=RANK_DUTY[toRank]||'神职一新，恪恭厥职';
       const ed=(typeof RANK_EDICT!=='undefined'&&RANK_EDICT[toRank])||
         {seal:'敕命',hao:'加官进禄',edict:`敕封「${newR.name}」，神格盘与工单容量随品阶扩充。`};
       const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
+
+      /* 预载实景与新旧官身立绘，保证变身幕不断流 */
+      const figI=Math.min(fromRank||0,4), figJ=Math.min(toRank||0,4);
+      ['img/rp_descend.jpg','img/rp_receive.jpg',`img/p_r${figI}.jpg`,`img/p_r${figJ}.jpg`]
+        .forEach(u=>{ const im=new Image(); im.src=u; });
 
       /* 恩典增量 */
       const gifts=[];
@@ -1001,83 +1023,118 @@ const UI = {
         ? `<i>${sc[0]}</i><i>${sc[1]}</i><i>${sc[2]}</i><i>${sc[3]}</i>`
         : `<i>${sc[0]||'敕'}</i><i>${sc[1]||'命'}</i>`;
 
-      /* 金尘粒子（盖印炸起） */
+      /* 落印金尘（围绕诏纸中下部炸开） */
       let dustHtml='';
       for(let i=0;i<18;i++){
-        const l=48+Math.random()*36, t=62+Math.random()*22;
+        const l=32+Math.random()*36, t=52+Math.random()*22;
         const dx=(Math.random()-0.5)*360, dy=-(80+Math.random()*260);
         const d=0.9+Math.random()*0.9, delay=Math.random()*0.25;
         dustHtml+=`<span style="left:${l}%;top:${t}%;--dx:${dx}px;--dy:${dy}px;--d:${d}s;--dl:${delay}s"></span>`;
       }
+      /* 第一幕飘降金粒 */
+      let snowHtml='';
+      for(let i=0;i<16;i++){
+        const l=Math.random()*100, sd=5+Math.random()*6, sl=Math.random()*8;
+        const sx=(Math.random()-0.5)*120;
+        snowHtml+=`<i style="left:${l}%;--sd:${sd}s;--sl:${sl}s;--sx:${sx}px"></i>`;
+      }
 
-      const robeI=Math.min(fromRank||0,4), robeJ=Math.min(toRank||0,4);
       const ov=h('div','rp-on');
       ov.innerHTML=`
-        <div class="rp-ink"></div>
-        <div class="rp-slit"></div>
-        <div class="rp-dust">${dustHtml}</div>
-        <div class="rp-act-a">
-          <div class="rp-scroll">
-            <div class="rp-roller rp-r-top"></div>
-            <div class="rp-paper">
-              <div class="rp-pre rp-l1">奉天承运&nbsp;&nbsp;幽冥帝君&nbsp;&nbsp;敕曰</div>
-              <div class="rp-rname rp-l2">敕封 <b>${newR.name}</b></div>
-              <div class="rp-hao rp-l3">赐封号「<b>${ed.hao}</b>」</div>
-              <div class="rp-edict rp-l4">${ed.edict}</div>
-              <div class="rp-sign rp-l5">幽冥帝君　敕</div>
-              <div class="rp-seal rp-l5"><span class="${sc.length>=4?'rp-seal4':'rp-seal2'}">${sealHtml}</span></div>
-            </div>
-            <div class="rp-roller rp-r-bot"></div>
+        <div class="rp-photo rp-photo-down" style="background-image:url('img/rp_descend.jpg')"></div>
+        <div class="rp-photo rp-photo-up" style="background-image:url('img/rp_receive.jpg')"></div>
+        <div class="rp-veil"></div>
+        <div class="rp-veil-deep"></div>
+        <div class="rp-snow">${snowHtml}</div>
+        <div class="rp-cap rp-cap-a">
+          <div class="rp-cap-title">圣旨降临</div>
+          <div class="rp-cap-sub">九 天 纶 音 &nbsp;·&nbsp; 降 恩 于 尔</div>
+        </div>
+        <div class="rp-cap rp-cap-b">
+          <div class="rp-cap-title">跪 接 天 恩</div>
+          <div class="rp-cap-sub">整 衣 敛 容 &nbsp;·&nbsp; 俯 首 恭 迎</div>
+        </div>
+        <div class="rp-decree">
+          <div class="rp-decree-inner">
+            <div class="rp-pre rp-l1">奉天承运&nbsp;&nbsp;幽冥帝君&nbsp;&nbsp;敕曰</div>
+            <div class="rp-rname rp-l2">敕封 <b>${newR.name}</b></div>
+            <div class="rp-hao rp-l3">赐封号「<b>${ed.hao}</b>」</div>
+            <div class="rp-edict rp-l4">${ed.edict}</div>
+            <div class="rp-sign">幽冥帝君　敕</div>
+            <div class="rp-seal"><span class="${sc.length>=4?'rp-seal4':'rp-seal2'}">${sealHtml}</span></div>
           </div>
         </div>
-        <div class="rp-act-b">
+        <div class="rp-dust">${dustHtml}</div>
+        <div class="rp-morph">
           <div class="rp-rays"><i></i><i></i><i></i></div>
-          <div class="rp-robe">
-            <img class="rp-robe-old" src="img/p_r${robeI}.jpg" alt="旧品官衣" onerror="this.remove()">
-            <img class="rp-robe-new" src="img/p_r${robeJ}.jpg" alt="新品官衣" onerror="this.remove()">
+          <div class="rp-morph-tag">脱 胎 换 骨</div>
+          <div class="rp-beam"></div>
+          <div class="rp-figure">
+            <img class="rp-fig-old" src="img/p_r${figI}.jpg" alt="旧品官身" onerror="this.remove()">
+            <img class="rp-fig-new" src="img/p_r${figJ}.jpg" alt="新品官身" onerror="this.remove()">
           </div>
+          <div class="rp-flash"></div>
+          <div class="rp-idcard">
+            <div class="rp-id-kicker">天 曹 换 骨 · 新 授 官 身</div>
+            <div class="rp-id-name">${newR.name}</div>
+            <div class="rp-id-line"></div>
+            <div class="rp-id-hao">「${ed.hao}」</div>
+            <div class="rp-id-duty">${duty}</div>
+          </div>
+        </div>
+        <div class="rp-final">
+          <div class="rp-rays"><i></i><i></i><i></i></div>
+          <div class="rp-final-tag">幽 冥 敕 封</div>
           <div class="rp-ranks"><span class="rp-old">${oldR.name}</span><i class="rp-arrow">▶</i><span class="rp-new">${newR.name}</span></div>
           <div class="rp-hao-big">「${ed.hao}」</div>
           <div class="rp-gifts">${gifts.map(g=>`<i><label>${g[0]}</label><b>${g[1]}</b></i>`).join('')}</div>
           <div class="rp-go">领 旨 谢 恩 ▸</div>
-        </div>`;
+        </div>
+        <div class="rp-hint">轻 触 续 进 ▸</div>`;
 
-      let stage=0, done=false;
+      let stage=0, rushed=false, done=false;
       const timers=[];
       const later=(fn,ms)=>{ timers.push(setTimeout(fn,ms)); };
-      const reach=n=>{ while(stage<n){ stage++; ov.classList.add('s'+stage); } };
-      /* 盖印：震屏一次 */
+      const clearTimers=()=>{ timers.forEach(clearTimeout); timers.length=0; };
+      /* 落印震屏 */
       const slam=()=>{
         document.body.classList.add('rp-shake');
         later(()=>document.body.classList.remove('rp-shake'),460);
       };
-      later(()=>{ reach(1); }, 320);                 /* 破墨 + 圣旨垂落展开 */
-      later(()=>{ reach(2); }, 1300);                /* 诏文逐行 */
-      later(()=>{ reach(3); slam(); }, 3050);        /* 朱印砸落 + 金尘 */
-      later(()=>{ reach(4); }, 3950);                /* 收诏 + 换装 */
-      later(()=>{ reach(5); }, 5050);                /* 恩典 + 领旨 */
+      /* 进入某一幕：单调推进；manual=用户点按，之后整体节奏加快 */
+      const enter=(n,manual)=>{
+        if(done||n<=stage||n>5) return;
+        clearTimers();
+        if(manual&&!rushed){ rushed=true; ov.classList.add('rp-rush'); }
+        while(stage<n){ stage++; ov.classList.add('s'+stage); }
+        if(n===3) slam();
+        if(stage<5){
+          /* 正常：降临5s / 展卷3.9s / 落印1.8s / 变身4.6s；快节奏相应压缩 */
+          const gap = rushed
+            ? (n===1?1600:n===2?1000:n===3?800:3100)
+            : (n===1?5000:n===2?3900:n===3?1800:4600);
+          later(()=>enter(stage+1),gap);
+        }
+      };
+      later(()=>enter(1),300);
 
-      /* 播放中点击/按键：跳到末幕；末幕：闭合 */
+      /* 闭合 */
       const finish=()=>{
         if(done) return; done=true;
-        timers.forEach(clearTimeout);
+        clearTimers();
+        document.body.classList.remove('rp-shake');
         document.removeEventListener('keydown',onKey);
         ov.classList.add('rp-out');
         later(()=>{ ov.remove(); resolve(); },380);
       };
-      const skip=()=>{
-        timers.forEach(clearTimeout);
-        document.body.classList.remove('rp-shake');
-        ov.classList.add('rp-skip');
-        reach(5);
-      };
+      /* 点按/按键：播放中逐拍推进，末幕闭合 */
       const onKey=ev=>{
         if(ev.key==='Enter'||ev.key===' '||ev.key==='Escape'){
           ev.preventDefault();
-          if(stage>=5) finish(); else skip();
+          if(stage>=5) finish(); else enter(stage+1,true);
         }
       };
-      ov.addEventListener('click',()=>{ if(stage>=5) finish(); else skip(); });
+      ov.addEventListener('click',()=>{ if(stage>=5) finish(); else enter(stage+1,true); });
       document.addEventListener('keydown',onKey);
       ml.appendChild(ov);
     });
