@@ -266,25 +266,53 @@ body::before{
 .order .o-actions{display:flex;gap:6px}
 .shelf-empty{color:var(--ink-faint);text-align:center;padding:24px 0;font-size:14px;line-height:2}
 
-/* ============ 按钮 ============ */
+/* ============ 按钮（柔和木牌质感 · 快按下 Q 弹回弹） ============ */
 .btn{
   font-family:var(--font-body);font-size:14px;letter-spacing:2px;cursor:pointer;
   border:1px solid var(--ink-soft);background:#f5ecd7;color:var(--ink);
-  padding:6px 14px;border-radius:4px;transition:all .12s;flex:1;
+  padding:7px 16px;border-radius:10px;flex:1;position:relative;
+  box-shadow:0 2px 0 rgba(60,45,28,.16),0 3px 9px rgba(40,30,16,.10),inset 0 1px 0 rgba(255,255,255,.55);
+  transition:
+    transform .18s cubic-bezier(.34,1.56,.64,1),
+    background-color .18s ease,box-shadow .18s ease,
+    border-color .18s ease,filter .12s ease,color .18s ease;
+  -webkit-tap-highlight-color:transparent;
 }
-.btn:hover{background:#e8dcc0}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn-primary{background:var(--cinnabar);border-color:var(--cinnabar-deep);color:#f9efd8}
-.btn-primary:hover{background:var(--cinnabar-deep)}
-.btn-indigo{background:var(--indigo);border-color:#23556e;color:#eef6fb}
-.btn-indigo:hover{background:#255d78}
-.btn-ghost{background:transparent}
-.btn-sell{background:transparent;color:var(--cinnabar);border-color:var(--cinnabar)}
-.btn-sell:hover{background:rgba(192,60,46,.1)}
-.btn-primary.btn-sell{background:var(--cinnabar);color:#f9efd8}
-.btn-sm{padding:3px 10px;font-size:12px;flex:none}
-.btn-lg{padding:12px 30px;font-size:18px;margin-top:10px}
+.btn:hover{background:#ecdfc2;transform:translateY(-1px);
+  box-shadow:0 3px 0 rgba(60,45,28,.16),0 7px 16px rgba(40,30,16,.16),inset 0 1px 0 rgba(255,255,255,.55);}
+.btn:active{transform:translateY(1px) scale(.985);
+  box-shadow:0 1px 0 rgba(60,45,28,.16),0 2px 5px rgba(40,30,16,.12),inset 0 1px 0 rgba(255,255,255,.4);
+  transition-duration:.06s;}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:0 1px 0 rgba(60,45,28,.10);}
+.btn-primary{
+  background:linear-gradient(180deg,#c64a39 0%,#a83426 100%);
+  border-color:var(--cinnabar-deep);color:#fbeeda;
+  box-shadow:0 3px 0 #7c251a,0 6px 15px rgba(150,40,28,.34),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.btn-primary:hover{background:linear-gradient(180deg,#d15341 0%,#b3392a 100%);
+  box-shadow:0 4px 0 #7c251a,0 9px 20px rgba(150,40,28,.42),inset 0 1px 0 rgba(255,255,255,.24);}
+.btn-primary:active{box-shadow:0 1px 0 #7c251a,0 2px 6px rgba(150,40,28,.32),inset 0 1px 0 rgba(255,255,255,.18);}
+.btn-indigo{
+  background:linear-gradient(180deg,#35718f 0%,#265b75 100%);
+  border-color:#1f4c63;color:#eef6fb;
+  box-shadow:0 3px 0 #183c50,0 6px 15px rgba(30,70,95,.32),inset 0 1px 0 rgba(255,255,255,.20);
+}
+.btn-indigo:hover{background:linear-gradient(180deg,#3c7c9c 0%,#2b6480 100%);
+  box-shadow:0 4px 0 #183c50,0 9px 20px rgba(30,70,95,.40),inset 0 1px 0 rgba(255,255,255,.22);}
+.btn-indigo:active{box-shadow:0 1px 0 #183c50,0 2px 6px rgba(30,70,95,.30),inset 0 1px 0 rgba(255,255,255,.16);}
+.btn-ghost{background:transparent;box-shadow:none;border-color:transparent;color:var(--ink-soft)}
+.btn-ghost:hover{background:rgba(60,45,28,.07);box-shadow:none}
+.btn-ghost:active{box-shadow:none}
+.btn-sell{background:transparent;color:var(--cinnabar);border-color:var(--cinnabar);
+  box-shadow:0 2px 0 rgba(150,48,31,.12),inset 0 1px 0 rgba(255,255,255,.4);}
+.btn-sell:hover{background:rgba(192,60,46,.10);box-shadow:0 3px 0 rgba(150,48,31,.12),0 6px 12px rgba(150,48,31,.12);}
+.btn-sell:active{box-shadow:0 1px 0 rgba(150,48,31,.12);}
+.btn-primary.btn-sell{
+  background:linear-gradient(180deg,#c64a39 0%,#a83426 100%);color:#fbeeda;
+  box-shadow:0 3px 0 #7c251a,0 6px 15px rgba(150,40,28,.34),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.btn-sm{padding:4px 12px;font-size:12px;border-radius:8px;flex:none}
+.btn-lg{padding:13px 32px;font-size:18px;margin-top:10px;border-radius:12px;letter-spacing:4px}
 
 /* ============ 神衙中栏 ============ */
 .yamen{
@@ -410,10 +438,16 @@ body::before{
 .moment .m-actions{display:flex;gap:8px;flex-wrap:wrap}
 .skill-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .skill-pick{
- text-align:left;padding:8px 12px;border:1px solid var(--purple);border-radius:5px;
- background:#f8f1fb;cursor:pointer;font-family:var(--font-body);font-size:14px}
-.skill-pick:hover{background:#efe2f6}
-.skill-pick:disabled{opacity:.4;cursor:not-allowed}
+ text-align:left;padding:9px 13px;border:1px solid var(--purple);border-radius:10px;
+ background:linear-gradient(180deg,#faf5fd,#f3e9fa);cursor:pointer;font-family:var(--font-body);font-size:14px;
+ box-shadow:0 2px 0 rgba(90,55,120,.14),0 3px 8px rgba(70,40,100,.10),inset 0 1px 0 rgba(255,255,255,.6);
+ transition:transform .18s cubic-bezier(.34,1.56,.64,1),background-color .18s ease,box-shadow .18s ease;
+ -webkit-tap-highlight-color:transparent;}
+.skill-pick:hover{background:linear-gradient(180deg,#f2e6f9,#ebdcf4);transform:translateY(-1px);
+ box-shadow:0 3px 0 rgba(90,55,120,.14),0 7px 15px rgba(70,40,100,.16),inset 0 1px 0 rgba(255,255,255,.6);}
+.skill-pick:active{transform:translateY(1px) scale(.985);
+ box-shadow:0 1px 0 rgba(90,55,120,.14),0 2px 5px rgba(70,40,100,.12);transition-duration:.06s;}
+.skill-pick:disabled{opacity:.4;cursor:not-allowed;transform:none;}
 .skill-pick .sp-cost{float:right;color:var(--indigo);font-size:12px}
 
 /* 飘字 */
@@ -2749,16 +2783,14 @@ img{ -webkit-user-drag:none;user-select:none; }
 
 /* 触屏设备（手机/APK）专用增强，不影响电脑鼠标 */
 @media (hover:none) and (pointer:coarse){
-  /* 按压反馈：手机没有 hover，用 :active 给明确"按下了"手感 */
-  .btn:active,.nav-item:active,.task-card:active,.skill-pick:active,.opt:active{
-    transform:scale(.97);
-    filter:brightness(.92);
-    transition:transform .06s,filter .06s;
+  /* 底部导航 / 名册 / 返回圆钮：快按下 + Q 弹回弹（.btn/.skill-pick 已自带细腻按压） */
+  #tabbar .tab,.roster-chip,.login-back{
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),background .15s ease,color .15s ease;
   }
-  .btn-primary:active{background:var(--cinnabar-deep)}
-  .nav-item:active{background:rgba(255,255,255,.08)}
-  /* 底部导航当前项按下不回弹错位 */
-  .nav-item{transition:background .1s}
+  #tabbar .tab:active{transform:scale(.90)}
+  .roster-chip:active{transform:scale(.93);filter:brightness(.96)}
+  .login-back:active{transform:scale(.88);background:rgba(150,60,40,.85)}
+  .btn-primary:active{background:linear-gradient(180deg,#c64a39 0%,#a83426 100%)}
 
   /* 战斗关键时刻：主操作与危险操作分组，防止拇指误触"拼命/遁走" */
   .m-actions{
