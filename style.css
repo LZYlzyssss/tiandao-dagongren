@@ -2258,11 +2258,88 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   z-index:2400;overflow:hidden;
 }
 .login-bg{
-  position:absolute;inset:0;z-index:0;
+  position:absolute;inset:-4%;z-index:0;
   background:#1a1510 url('img/cover.png') center/cover no-repeat;
-  animation:loginBgIn 1.2s ease-out both;
+  will-change:transform;
+  animation:
+    loginBgIn 1.4s ease-out both,
+    bgKenburns 46s ease-in-out 1.4s infinite alternate;
 }
-@keyframes loginBgIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+@keyframes loginBgIn{from{opacity:0;transform:scale(1.04)}to{opacity:1}}
+/* 缓慢推拉摇移：电影感，不露边（inset -4% + scale 兜底） */
+@keyframes bgKenburns{
+  0%  {transform:scale(1.07) translate3d(-1.2%,-.6%,0)}
+  45% {transform:scale(1.14) translate3d(1%,.4%,0)}
+  75% {transform:scale(1.10) translate3d(.8%,1.1%,0)}
+  100%{transform:scale(1.13) translate3d(-.8%,.9%,0)}
+}
+
+/* ---- 氛围特效层（云雾 / 天光 / 金尘） ---- */
+.login-fx{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+
+/* 顶部天光（明月）缓慢呼吸 */
+.fx-moon{
+  position:absolute;left:50%;top:-22%;width:100%;height:62%;
+  transform:translateX(-50%);
+  background:radial-gradient(closest-side,
+    rgba(252,242,212,.20) 0%,
+    rgba(250,236,196,.08) 42%,
+    rgba(250,236,196,0) 70%);
+  mix-blend-mode:screen;
+  animation:moonBreath 8s ease-in-out infinite;
+}
+@keyframes moonBreath{0%,100%{opacity:.55}50%{opacity:1}}
+
+/* 两层云雾，错速漂移 */
+.fx-mist{
+  position:absolute;width:150%;height:55%;left:-25%;
+  background:
+    radial-gradient(38% 60% at 22% 55%, rgba(244,240,228,.16) 0%, rgba(244,240,228,0) 70%),
+    radial-gradient(32% 52% at 58% 40%, rgba(238,234,222,.13) 0%, rgba(238,234,222,0) 72%),
+    radial-gradient(42% 64% at 85% 60%, rgba(244,240,228,.12) 0%, rgba(244,240,228,0) 70%);
+  filter:blur(10px);
+  will-change:transform,opacity;
+}
+.fx-mist-a{top:6%;animation:mistA 52s ease-in-out infinite alternate}
+.fx-mist-b{bottom:-6%;opacity:.75;animation:mistB 68s ease-in-out infinite alternate}
+@keyframes mistA{
+  0%  {transform:translate3d(-6%,0,0)}
+  50% {transform:translate3d(4%,-2%,0)}
+  100%{transform:translate3d(7%,1%,0)}
+}
+@keyframes mistB{
+  0%  {transform:translate3d(7%,0,0)}
+  50% {transform:translate3d(-5%,-3%,0)}
+  100%{transform:translate3d(-8%,1%,0)}
+}
+
+/* 金色微尘：JS 生成 i 粒子，自下而上缓缓漂浮 */
+.fx-dust{position:absolute;inset:0;overflow:hidden}
+.fx-dust i{
+  position:absolute;bottom:-4vh;border-radius:50%;
+  background:radial-gradient(circle, rgba(248,224,160,.95) 0%, rgba(240,206,130,.35) 45%, rgba(240,206,130,0) 72%);
+  box-shadow:0 0 6px rgba(244,214,150,.55);
+  opacity:0;
+  will-change:transform,opacity;
+  animation-name:dustUp;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+}
+@keyframes dustUp{
+  0%  {transform:translate3d(0,0,0) scale(.7);opacity:0}
+  10% {opacity:.85}
+  85% {opacity:.5}
+  100%{transform:translate3d(var(--dx,24px),-112vh,0) scale(1.1);opacity:0}
+}
+/* 登录卡屏：特效收敛，避免干扰阅读 */
+.login-overlay.is-login .fx-mist{opacity:.32}
+.login-overlay.is-login .fx-moon{opacity:.4}
+.login-overlay.is-login .fx-dust{opacity:.5}
+
+@media (prefers-reduced-motion: reduce){
+  .login-bg,.fx-moon,.fx-mist-a,.fx-mist-b,.fx-dust i{animation:none !important}
+  .fx-dust{display:none}
+}
 .login-veil{
   position:absolute;inset:0;z-index:1;pointer-events:none;
   transition:background .45s ease;

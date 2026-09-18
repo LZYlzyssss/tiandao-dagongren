@@ -154,6 +154,24 @@ function warmAll(){
   setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),3000);
 }
 
+/* ================= 封面氛围微尘 ================= */
+function spawnLoginDust(){
+  const box=$('loginDust');
+  if(!box) return;
+  const N=16;
+  for(let i=0;i<N;i++){
+    const p=document.createElement('i');
+    const sz=2+Math.random()*3.2;                 /* 2-5px */
+    const dur=14+Math.random()*18;                /* 14-32s 上浮一圈 */
+    const delay=-Math.random()*dur;               /* 错开初始相位，开局就满屏 */
+    const x=Math.random()*100;                    /* 横向位置 vw% */
+    const dx=(Math.random()*90-45).toFixed(0);    /* 上浮时左右漂移 px */
+    p.style.cssText=`left:${x.toFixed(2)}%;width:${sz.toFixed(1)}px;height:${sz.toFixed(1)}px;`+
+      `animation-duration:${dur.toFixed(1)}s;animation-delay:${delay.toFixed(1)}s;--dx:${dx}px`;
+    box.appendChild(p);
+  }
+}
+
 /* ================= 名号登录（本地点名册 · 两屏） ================= */
 const Login={
   $(){ return $('loginCard'); },
@@ -342,6 +360,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
   /* 名册加载 → 轻量启动门（只拉首批小图）→ 纯封面 → 点击进登录卡 */
   Game.loadRoster();
+  spawnLoginDust();
   BOOT.run();
   Login.show();
 
