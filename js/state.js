@@ -3,15 +3,103 @@
    v2 旧档保留不迁（用户已批准方案①），存档键互不覆盖。
    ============================================================ */
 const SAVE_KEY = 'tiandao_dagongren_v3';
+/* ---- 名号登录 · 多存档点（本地点名册，localStorage） ----
+   ROSTER_KEY：名册索引（轻量，用于登录页列表/查重）
+   每个角色一档：SLOT_PREFIX + slotId，内容仍是 v3 结构（多一个 pname 字段）
+   SAVE_KEY 仅用于把旧单档“起名认领”进名册，认领后删除 */
+const ROSTER_KEY  = 'tiandao_dagongren_v3__roster';
+const SLOT_PREFIX = 'tiandao_dagongren_v3__slot__';
 /* 首次获得整格的修为收益（v3 神格不再单列 cult 字段，按品质给） */
 const GH_CULT = { '凡':10, '灵':20, '宝':35, '仙':60 };
 
 const Game = {
   s: null,
+  slotId: null,
+  roster: [],
 
-  newGame(){
+  /* ================= 名号 / 名册 ================= */
+  loadRoster(){
+    try{ this.roster = JSON.parse(localStorage.getItem(ROSTER_KEY)||'[]') || []; }catch(e){ this.roster=[]; }
+    return this.roster;
+  },
+  saveRoster(){ try{ localStorage.setItem(ROSTER_KEY, JSON.stringify(this.roster)); }catch(e){} },
+  slotById(id){ return this.roster.find(r=>r.id===id); },
+  findName(name){ const n=(name||'').trim(); return this.roster.find(r=>r.name===n); },
+  /* 名号校验：1–8 位中英文数字，禁空白与特殊符号；返回 '' 合法，否则返回原因 */
+  validName(name){
+    name=(name||'').trim();
+    if(!name) return '请先写下名号';
+    if(name.length>8) return '名号至多 8 个字';
+    if(/[\s<>\\/"'`]/.test(name)) return '名号不可含空格或怪符号';
+    if(!/^[\u4e00-\u9fa5A-Za-z0-9·_]+$/.test(name)) return '名号只能用中文、英文或数字';
+    return '';
+  },
+  hasLegacy(){
+    try{ return !!localStorage.getItem(SAVE_KEY); }catch(e){ return false; }
+  },
+  /* 起名认领旧单档：把旧 v3 档迁入名册，成功返回 true */
+  claimLegacy(name){
+    name=(name||'').trim();
+    if(this.validName(name)||this.findName(name)) return false;
+    let s=null;
+    try{ s=JSON.parse(localStorage.getItem(SAVE_KEY)); }catch(e){ s=null; }
+    if(!s) return false;
+    this.s=s;
+    if(this.migrate()===false) return false;
+    this.s.pname=name;
+    this.slotId=this._newId();
+    this._writeSlot();
+    this.roster.push(this._metaFromSave(this.slotId,name));
+    this.saveRoster();
+    try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+    return true;
+  },
+  /* 新角色立契入册 */
+  createSlot(name){
+    name=(name||'').trim();
+    if(this.validName(name)||this.findName(name)) return false;
+    this.slotId=this._newId();
+    this.newGame(name);           /* newGame 内会 save 落槽 */
+    this.roster.push(this._metaFromSave(this.slotId,name));
+    this.saveRoster();
+    return true;
+  },
+  /* 登录已有名号 */
+  login(id){
+    const meta=this.slotById(id);
+    if(!meta) return false;
+    try{
+      const raw=localStorage.getItem(SLOT_PREFIX+id);
+      if(!raw) return false;
+      this.s=JSON.parse(raw);
+      this.migrate();
+      this.slotId=id;
+      return true;
+    }catch(e){ return false; }
+  },
+  /* 撕掉重玩：保留名号与槽位，进度清零 */
+  restartSlot(){
+    const meta=this.slotById(this.slotId);
+    if(!meta) return;
+    const name=meta.name;
+    this.newGame(name);
+  },
+  /* 返回名册（换个名号）前调用：清内存当前档 */
+  logout(){ this.s=null; this.slotId=null; },
+
+  _newId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); },
+  _writeSlot(){ try{ localStorage.setItem(SLOT_PREFIX+this.slotId, JSON.stringify(this.s)); }catch(e){} },
+  _metaFromSave(id,name){
+    const s=this.s;
+    return { id, name:name||s.pname||'无名',
+      rank:s.rank||0, month:s.month||1, day:s.day||1, money:s.money||0,
+      chapter:s.chapter||1, updatedAt:Date.now() };
+  },
+
+  newGame(pname){
     this.s = {
       ver:3,
+      pname:pname||'无名',
       rank:0, month:1, day:1,
       cult:0, money:120, renqing:2, merit:0,
       hp:100, strikes:0,
@@ -47,21 +135,24 @@ const Game = {
     this.save();
   },
 
-  save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(this.s)); }catch(e){} },
-  load(){
-    try{
-      const raw = localStorage.getItem(SAVE_KEY);
-      if(!raw) return false;
-      this.s = JSON.parse(raw);
-      this.migrate();
-      return true;
-    }catch(e){ return false; }
+  /* 存档：写当前登录角色的槽位，并同步名册摘要 */
+  save(){
+    if(!this.s) return;
+    if(!this.slotId){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(this.s)); }catch(e){} return; }
+    this._writeSlot();
+    const meta=this.slotById(this.slotId);
+    if(meta){
+      const fresh=this._metaFromSave(this.slotId, meta.name);
+      ['rank','month','day','money','chapter','updatedAt'].forEach(k=>meta[k]=fresh[k]);
+      this.saveRoster();
+    }
   },
   /** v3 小版本字段兜底（不接受 v2 及更早存档） */
   migrate(){
     const s=this.s;
     if(!s || s.ver!==3) return false;
     const def=(k,v)=>{ if(s[k]===undefined) s[k]=v; };
+    def('pname','无名');
     def('renqing', s.favor||0);
     def('erode',0); def('shards',{bing:0,fa:0,you:0,huo:0,sheng:0}); def('dshards',{});
     def('pills',{}); def('devour',{hp:0,atk:0,def:0,crit:0,lifesteal:0,zhanshen:false});
@@ -72,7 +163,15 @@ const Game = {
     (s.shelf||[]).forEach(o=>{ if(o.act===undefined) o.act=0; });
     return true;
   },
-  clear(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} },
+  /* 删除当前角色整档（连名册名号一起抹除）；“撕掉重玩”请用 restartSlot() */
+  clear(){
+    if(this.slotId){
+      try{ localStorage.removeItem(SLOT_PREFIX+this.slotId); }catch(e){}
+      this.roster=this.roster.filter(r=>r.id!==this.slotId);
+      this.saveRoster();
+    }
+    this.s=null; this.slotId=null;
+  },
 
   toast(t){ if(typeof UI!=='undefined' && UI.toast) UI.toast(t); },
 

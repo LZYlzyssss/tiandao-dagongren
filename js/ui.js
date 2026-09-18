@@ -128,6 +128,8 @@ const UI = {
     /* 顶栏玩家立绘随品阶换装（立绘共五档，高品复用 r4） */
     const sealImg=$('brandSealImg');
     if(sealImg) sealImg.src='img/p_r'+Math.min(s.rank||0,4)+'.jpg';
+    const bp=$('brandPname');
+    if(bp) bp.textContent=(s.pname?('典吏「'+s.pname+'」 · '):'')+rk.name;
     const target=monthTarget(s.month);
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
@@ -681,10 +683,15 @@ const UI = {
       <h2>身份卷宗</h2>
       <div class="me-seal"><img src="img/p_r${Math.min(s.rank||0,4)}.jpg" alt="你"></div>
       <div class="me-id">
+        <div class="me-pname">名号 · <b>${s.pname||'无名'}</b></div>
         <div class="me-rank">${rk.name}</div>
         <div class="sr-d">第 ${s.month} 月 ${s.day} 日 ｜ 修为 <b>${s.cult}</b> ｜ 香火钱 <b style="color:var(--gold)">${s.money} 文</b> ｜ 人情 <b>${s.renqing}</b></div>
       </div>`;
     idp.querySelector('.me-seal').onclick=()=>this.openPlayerPortrait();
+    const sw=h('button','btn btn-sell btn-logout','返回登录页 · 更换名号');
+    sw.style.clear='both'; sw.style.display='block'; sw.style.width='100%'; sw.style.marginTop='12px';
+    sw.onclick=()=>this.confirmLogout();
+    idp.appendChild(sw);
     c.appendChild(idp);
 
     /* 战力 */
@@ -1732,6 +1739,34 @@ const UI = {
   },
 
   /* 玩家自身立绘卷：点头像查看当前品阶立绘与身份，轻触合上 */
+  /* 返回登录页确认：先存档，不丢进度，再回名号封面 */
+  confirmLogout(){
+    const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
+    const ov=h('div','overlay');
+    const box=h('div','paper');
+    box.style.width='380px'; box.style.maxWidth='90vw'; box.style.textAlign='center';
+    box.innerHTML=`
+      <h3 style="margin-bottom:10px">暂退神衙？</h3>
+      <div style="font-size:14px;line-height:2;color:var(--ink)">
+        当前名号 <b style="color:var(--cinnabar-deep)">${Game.s.pname||'无名'}</b> 的进度会先落档，<br>
+        下次用同名号登录即可继续，不会丢失。
+      </div>`;
+    const row=h('div','login-actions'); row.style.marginTop='14px';
+    const r1=h('div','btn-row');
+    const ok=h('button','btn btn-primary','存好进度，回登录页');
+    const no=h('button','btn btn-ghost','再待会儿');
+    ok.onclick=()=>{
+      try{
+        if(Game.s.busy){ Game.s.busy=false; Shelf.refresh(); }
+        Game.save();
+      }catch(e){}
+      Game.logout(); location.reload();
+    };
+    no.onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); };
+    r1.appendChild(ok); r1.appendChild(no); row.appendChild(r1); box.appendChild(row);
+    ov.appendChild(box); ov.onclick=e=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    ml.appendChild(ov);
+  },
   openPlayerPortrait(){
     if(!Game||!Game.s) return;
     const s=Game.s, rk=RANKS[s.rank];
@@ -2028,7 +2063,7 @@ const UI = {
           <span style="color:var(--ink-faint)">—— 全剧终 ——</span>
         </div>`;
       const b=h('button','btn btn-primary btn-lg','重新投胎，再考一次');
-      b.onclick=()=>{ Game.clear(); Game.newGame(); ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); if(typeof Guide!=='undefined') Guide.begin(); };
+      b.onclick=()=>{ Game.restartSlot(); ml.innerHTML=''; UI.view='office'; UI.tab='desk'; UI.render(); warmAll(); if(typeof Guide!=='undefined') Guide.begin(); };
       box.appendChild(b); ov.appendChild(box); ml.appendChild(ov);
       return;
     }
@@ -2065,7 +2100,7 @@ const UI = {
             ${typeof ASSET!=='undefined'?ASSET.html(pKey,'fig-img',RANKS[Game.s.rank].name):''}
             <span class="fig-fallback">衙</span>
           </div>
-          <div class="fig-name">你 · ${RANKS[Game.s.rank].name}</div>
+          <div class="fig-name">${Game.s.pname?('「'+Game.s.pname+'」 · '):('你 · ')}${RANKS[Game.s.rank].name}</div>
           ${fbarHTML('p')}
           <div class="fstatus" id="pStatus"></div>
         </div>

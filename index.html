@@ -40,7 +40,7 @@
       <span class="brand-seal"><img id="brandSealImg" src="img/p_r0.jpg" alt="玩家立绘"></span>
       <div>
         <h1>天道打工人</h1>
-        <small>阴阳两界劳务契 · 无编制</small>
+        <small id="brandPname">阴阳两界劳务契 · 无编制</small>
       </div>
     </div>
     <div class="top-stats" id="topStats"></div>
@@ -80,18 +80,29 @@
   <!-- 轻提示 -->
   <div id="toastLayer"></div>
 
-  <!-- 开场 -->
-  <div id="intro" class="overlay">
-    <div class="paper intro-card">
-      <h1 class="title-brush">天道打工人</h1>
-      <p class="intro-sub">—— 一个外包阴神的升职(？)之路 ——</p>
-      <div class="intro-text">
-        <p>天庭机构臃肿，预算紧缩。正式神仙只管显灵，不管干活。</p>
-        <p>你在地府考公落榜，签了一份「阴阳两界劳务契」，被发配到两界交界处的破神衙，做了<b>无编制的九品阴神</b>。</p>
-        <p>斗战胜佛的私活、城隍爷的阴牒、阎魔王的强制派单……神仙们付不起工钱，只能切一块<b>神格</b>与你。</p>
-        <p>神格入体，或觉醒大神通，或道争相冲。三十日一考，KPI 不合格，便要贬作孤魂野鬼。</p>
+  <!-- 开场 · 名号登录（两屏：纯封面 → 点击 → 登录卡） -->
+  <div id="intro" class="overlay login-overlay is-cover">
+    <div class="login-bg"></div>
+    <div class="login-veil"></div>
+
+    <!-- 第一屏：纯封面 + 底部小字入口 -->
+    <div id="loginCover" class="login-cover">
+      <button class="cover-enter" id="coverEnter" type="button">
+        <span class="ce-line"></span>
+        <span class="ce-txt">轻 触 点 卯 · 登 录</span>
+        <span class="ce-line"></span>
+      </button>
+    </div>
+
+    <!-- 第二屏：名号登录卡 -->
+    <div class="login-wrap" id="loginWrap" hidden>
+      <button class="login-back" id="loginBack" type="button" aria-label="返回封面">‹</button>
+      <div class="login-head">
+        <div class="login-seal">天曹<br>候补</div>
+        <h1 class="title-brush login-title">天道打工人</h1>
+        <p class="login-sub">阴阳两界劳务契 · 无编制</p>
       </div>
-      <button class="btn btn-primary btn-lg" data-action="newGame">签字画押，入职神衙</button>
+      <div id="loginCard" class="login-card"></div>
     </div>
   </div>
 

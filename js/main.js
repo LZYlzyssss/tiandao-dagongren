@@ -154,6 +154,182 @@ function warmAll(){
   setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),3000);
 }
 
+/* ================= 名号登录（本地点名册 · 两屏） ================= */
+const Login={
+  $(){ return $('loginCard'); },
+  show(){
+    Game.loadRoster();
+    $('intro').classList.remove('hidden');
+    this.toCover();
+  },
+  /* 第一屏：纯封面 */
+  toCover(){
+    const intro=$('intro');
+    intro.classList.add('is-cover'); intro.classList.remove('is-login');
+    $('loginWrap').hidden=true;
+    $('loginCover').style.display='';
+  },
+  /* 第二屏：登录卡 */
+  toLogin(){
+    const intro=$('intro');
+    intro.classList.add('is-login'); intro.classList.remove('is-cover');
+    $('loginCover').style.display='none';
+    $('loginWrap').hidden=false;
+    this.renderHome();
+  },
+  _rankName(r){ return (typeof RANKS!=='undefined'&&RANKS[r])?RANKS[r].name:('九品'); },
+  renderHome(){
+    const card=this.$(); card.className='login-card'; card.innerHTML='';
+
+    /* 旧单档认领横幅 */
+    if(Game.hasLegacy()){
+      const lb=h('div','legacy-banner');
+      lb.innerHTML='<b>检出一份旧履历</b><br>检测到你此前的一份单档记录。在下方写下名号，点「认领旧档」即可把进度并入名册。';
+      card.appendChild(lb);
+    }
+
+    const field=h('div','login-field');
+    const inp=h('input','login-input');
+    inp.type='text'; inp.maxLength=8; inp.placeholder='写下你的名号（1–8 字）';
+    inp.setAttribute('aria-label','名号');
+    const go=h('button','btn btn-primary','点卯进入');
+    field.appendChild(inp); field.appendChild(go);
+    card.appendChild(field);
+
+    const hint=h('div','login-hint');
+    card.appendChild(hint);
+
+    const submit=()=>{
+      const name=inp.value;
+      const err=Game.validName(name);
+      if(err){ hint.textContent=err; inp.focus(); return; }
+      const meta=Game.findName(name);
+      if(meta) this.renderSlot(meta); else this.renderNew(name.trim());
+    };
+    go.onclick=submit;
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); });
+
+    /* 旧档认领按钮：读输入框名号 */
+    const lb=card.querySelector('.legacy-banner');
+    if(lb){
+      const cb=h('button','btn btn-indigo btn-sm','用这个名号认领旧档');
+      cb.onclick=()=>{
+        const name=inp.value;
+        if(Game.validName(name)){ hint.textContent=Game.validName(name); inp.focus(); return; }
+        if(Game.findName(name.trim())){ hint.textContent='此名号已在册，直接点「点卯进入」回去当差即可'; return; }
+        if(!Game.claimLegacy(name.trim())){ hint.textContent='旧履历已损坏，无法认领，可直接立契新档'; return; }
+        this._afterEnter('claim');
+      };
+      lb.appendChild(cb);
+    }
+
+    /* 在册名号：点一下直接填名并进入角色卡 */
+    if(Game.roster.length){
+      card.appendChild((()=>{
+        const t=h('div','roster-tip','— 在册名号 · 点选入衙 —');
+        const list=h('div','roster-list');
+        Game.roster
+          .slice().sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))
+          .forEach(m=>{
+            const chip=h('div','roster-chip');
+            const nm=h('span','',m.name); const rk=h('small','',this._rankName(m.rank));
+            chip.appendChild(nm); chip.appendChild(rk);
+            chip.onclick=()=>{ inp.value=m.name; hint.textContent=''; this.renderSlot(m); };
+            list.appendChild(chip);
+          });
+        const wrap=h('div'); wrap.appendChild(t); wrap.appendChild(list);
+        return wrap;
+      })());
+    }
+    setTimeout(()=>inp.focus(),50);
+  },
+  /* 名号不在册：只有新游戏 */
+  renderNew(name){
+    const card=this.$(); card.className='login-card';
+    card.innerHTML=`
+      <div class="slot-card">
+        <div class="slot-name">${name}</div>
+        <div class="slot-new-tip">
+          两界花名册上查无此人。<br>
+          立契入册，便做那<b>无编制的九品阴神</b>，从此三十日一考，自求多福。
+        </div>
+        <div class="login-actions">
+          <button class="btn btn-primary btn-lg" id="lnNew">立契入册 · 新游戏</button>
+        </div>
+        <button class="slot-back" id="lnBack">‹ 返回，重写名号</button>
+      </div>`;
+    card.querySelector('#lnNew').onclick=()=>{
+      if(!Game.createSlot(name)){ this.renderHome(); return; }
+      this._afterEnter('new');
+    };
+    card.querySelector('#lnBack').onclick=()=>this.renderHome();
+  },
+  /* 名号在册：回去当差 / 撕掉重玩（二次确认） */
+  renderSlot(meta){
+    const card=this.$(); card.className='login-card';
+    card.innerHTML=`
+      <div class="slot-card">
+        <div class="slot-name">${meta.name}</div>
+        <div class="slot-meta">
+          <span>现任 <b>${this._rankName(meta.rank)}</b></span>
+          <span>第 <b>${meta.chapter||1}</b> 章</span>
+          <span>第 <b>${meta.month}</b> 月 <b>${meta.day}</b> 日</span>
+          <span>香火钱 <b>${meta.money}</b> 文</span>
+        </div>
+        <div class="login-actions">
+          <button class="btn btn-primary btn-lg" id="lnGo">回去当差</button>
+          <button class="btn btn-ghost" id="lnReset">撕掉劳务契，重玩此号</button>
+        </div>
+        <button class="slot-back" id="lnBack">‹ 返回名册</button>
+      </div>`;
+    card.querySelector('#lnGo').onclick=()=>{
+      if(!Game.login(meta.id)){ alert('此份档案读取失败，可能已被清除'); this.renderHome(); return; }
+      this._afterEnter('continue');
+    };
+    /* 撕掉重玩：两步确认，4 秒内不点第二下自动还原 */
+    const resetBtn=card.querySelector('#lnReset');
+    let arm=false, armTimer=null;
+    resetBtn.onclick=()=>{
+      if(!arm){
+        arm=true;
+        resetBtn.textContent='再点一次确认：本号进度全部清零';
+        resetBtn.classList.add('btn-danger'); resetBtn.classList.remove('btn-ghost');
+        armTimer=setTimeout(()=>{
+          arm=false;
+          resetBtn.textContent='撕掉劳务契，重玩此号';
+          resetBtn.classList.remove('btn-danger'); resetBtn.classList.add('btn-ghost');
+        },4000);
+        return;
+      }
+      clearTimeout(armTimer);
+      if(!Game.login(meta.id)){ alert('此份档案读取失败，可能已被清除'); this.renderHome(); return; }
+      Game.restartSlot();
+      this._afterEnter('restart');
+    };
+    card.querySelector('#lnBack').onclick=()=>this.renderHome();
+  },
+  /* 登录/新建/重开/认领 统一进门：先过点卯门，再开衙 */
+  _afterEnter(mode){
+    Stats.recalc();
+    /* 异常退出时若在执行单中，安全复位（当天工单重刷） */
+    if(Game.s && Game.s.busy){ Game.s.busy=false; Shelf.refresh(); Game.save(); }
+    const keys=(mode==='continue'||mode==='claim')
+      ? BOOT.requiredKeys()
+      : BOOT.smallKeys(0).concat(BOOT.shelfKeys());
+    const tip=(mode==='continue'||mode==='claim')?'调取你的案卷…':'点卯到任，先领文书…';
+    gate(keys,tip).then(()=>{
+      $('intro').classList.add('hidden');
+      UI.view='office'; UI.tab='desk'; UI.render(); warmAll();
+      if(mode==='continue'||mode==='claim'){
+        if(typeof Guide!=='undefined') Guide.autoStart();
+      }else{
+        UI.toast(mode==='restart'?'旧契已撕，从头再来':'画押已成，从此你就是天庭的人了（外包）');
+        if(typeof Guide!=='undefined') Guide.begin();
+      }
+    });
+  },
+};
+
 window.addEventListener('DOMContentLoaded', ()=>{
 
   /* ---- Service Worker：图片持久缓存，二次访问本地秒开 ---- */
@@ -164,71 +340,14 @@ window.addEventListener('DOMContentLoaded', ()=>{
   /* 顶栏头像：点开玩家自身立绘卷 */
   document.querySelector('.brand-seal').addEventListener('click', ()=>UI.openPlayerPortrait());
 
-  /* 开场 / 续玩 */
-  const hasSave = Game.load();
-  if(hasSave){
-    Stats.recalc();
-    UI.view = Game.s.busy ? 'office' : 'office';
-    /* 异常退出时若在执行单中，安全复位（当天工单重刷） */
-    if(Game.s.busy){
-      Game.s.busy=false;
-      Shelf.refresh();
-      Game.save();
-    }
-    /* 启动加载屏：预载当天工单与首屏一切，真实到齐才放行 */
-    BOOT.run();
-    /* 已有存档：直接进衙，开场页轻量放行 */
-    const intro=$('intro');
-    intro.innerHTML=`<div class="paper intro-card">
-      <h1 class="title-brush" style="font-size:40px">天道打工人</h1>
-      <p class="intro-sub">神衙的灯笼还亮着，就等你回来</p>
-      <div style="margin-top:8px;line-height:2.1;font-size:15px">
-        现任：<b>${RANKS[Game.s.rank].name}</b> ｜ 第 ${Game.s.month} 月 ${Game.s.day} 日 ｜ 香火钱 ${Game.s.money} 文
-      </div>
-    </div>`;
-    intro.querySelector('.paper').appendChild((()=>{
-      const cont=h('button','btn btn-primary btn-lg','回神衙当值');
-      cont.onclick=()=>{
-        gate(BOOT.shelfKeys(),'调取在架工单…').then(()=>{
-          intro.classList.add('hidden'); UI.render(); warmAll();
-          if(typeof Guide!=='undefined') Guide.autoStart();
-        });
-      };
-      return cont;
-    })());
-    intro.querySelector('.paper').appendChild((()=>{
-      const nw=h('button','btn btn-ghost btn-lg','撕碎劳务契重开');
-      nw.style.marginLeft='12px';
-      nw.onclick=()=>{
-        Game.clear(); Game.newGame();
-        gate(BOOT.smallKeys(0).concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
-          intro.innerHTML='';
-          intro.classList.add('hidden'); UI.view='office'; UI.tab='desk'; UI.render(); warmAll();
-          if(typeof Guide!=='undefined') Guide.begin();
-        });
-      };
-      return nw;
-    })());
-  }else{
-    /* 新访客：必修集少，快速放行到契约页 */
-    BOOT.run();
-  }
+  /* 名册加载 → 轻量启动门（只拉首批小图）→ 纯封面 → 点击进登录卡 */
+  Game.loadRoster();
+  BOOT.run();
+  Login.show();
 
-  /* 入职 */
-  document.addEventListener('click', e=>{
-    const act=e.target.getAttribute && e.target.getAttribute('data-action');
-    if(act==='newGame'){
-      Game.newGame();
-      gate(BOOT.smallKeys(0).concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
-        $('intro').classList.add('hidden');
-        UI.view='office';
-        UI.render();
-        warmAll();
-        UI.toast('画押已成，从此你就是天庭的人了（外包）');
-        if(typeof Guide!=='undefined') Guide.begin();
-      });
-    }
-  });
+  $('coverEnter').addEventListener('click', e=>{ e.stopPropagation(); Login.toLogin(); });
+  $('loginCover').addEventListener('click', ()=>Login.toLogin());
+  $('loginBack').addEventListener('click', ()=>Login.toCover());
 
   /* 防止意外关页丢档：所有关键动作内已即时存档 */
 });

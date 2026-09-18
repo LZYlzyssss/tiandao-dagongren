@@ -169,6 +169,8 @@ body::before{
 }
 .me-seal img{width:100%;height:100%;display:block;object-fit:cover;object-position:center top}
 .me-rank{font-family:var(--font-brush);font-size:27px;letter-spacing:4px;color:var(--cinnabar-deep);margin:2px 0 7px}
+.me-pname{font-size:14px;letter-spacing:1px;color:var(--ink-faint);margin-bottom:2px}
+.me-pname b{color:var(--ink);font-size:16px;letter-spacing:2px}
 .me-id .sr-d{line-height:1.8}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
 .stat-cell{
@@ -2249,6 +2251,155 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   opacity:0;transform:translateY(12px);
 }
 .rp-on.s5 .rp-gifts i{opacity:1;transform:none;transition:all .45s ease}
+
+/* ================= 名号登录页（两屏：纯封面 → 登录卡） ================= */
+.login-overlay{
+  background:none;backdrop-filter:none;
+  z-index:2400;overflow:hidden;
+}
+.login-bg{
+  position:absolute;inset:0;z-index:0;
+  background:#1a1510 url('img/cover.png') center/cover no-repeat;
+  animation:loginBgIn 1.2s ease-out both;
+}
+@keyframes loginBgIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+.login-veil{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  transition:background .45s ease;
+}
+/* 封面屏：只压一条底边，最大程度露图 */
+.login-overlay.is-cover .login-veil{
+  background:linear-gradient(180deg, rgba(14,10,6,0) 55%, rgba(14,10,6,.45) 82%, rgba(14,10,6,.78) 100%);
+}
+/* 登录卡屏：四周压暗，保证卡片可读 */
+.login-overlay.is-login .login-veil{
+  background:
+    radial-gradient(120% 90% at 50% 18%, rgba(20,15,9,.25) 0%, rgba(20,15,9,.66) 68%, rgba(14,10,6,.92) 100%),
+    linear-gradient(180deg, rgba(14,10,6,.6) 0%, rgba(14,10,6,.3) 38%, rgba(14,10,6,.85) 100%);
+}
+
+/* ---- 第一屏：纯封面 + 底部小字 ---- */
+.login-cover{
+  position:absolute;inset:0;z-index:2;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:max(46px,env(safe-area-inset-bottom,34px));
+  cursor:pointer;
+}
+.cover-enter{
+  display:flex;align-items:center;gap:16px;
+  background:none;border:none;cursor:pointer;
+  padding:12px 18px;
+  color:rgba(244,232,204,.92);
+  text-shadow:0 2px 10px rgba(0,0,0,.9);
+  animation:cePulse 2.6s ease-in-out infinite;
+}
+.cover-enter .ce-txt{
+  font-family:var(--font-brush);font-size:clamp(17px,4.6vw,23px);letter-spacing:5px;text-indent:5px;
+  white-space:nowrap;
+}
+.cover-enter .ce-line{
+  width:clamp(34px,10vw,72px);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(240,214,160,.85));
+}
+.cover-enter .ce-line:last-child{
+  background:linear-gradient(90deg,rgba(240,214,160,.85),transparent);
+}
+@keyframes cePulse{0%,100%{opacity:.72}50%{opacity:1}}
+
+/* ---- 两屏切换 ---- */
+.login-overlay.is-cover .login-wrap{display:none}
+.login-overlay.is-login .login-cover{display:none}
+.login-wrap[hidden]{display:none !important}
+
+/* ---- 第二屏：登录卡 ---- */
+.login-wrap{
+  position:relative;z-index:2;width:440px;max-width:92vw;
+  display:flex;flex-direction:column;align-items:center;gap:18px;
+  max-height:94vh;overflow-y:auto;padding:10px 0;
+  animation:panelIn .4s ease-out both;
+}
+.login-back{
+  position:absolute;top:-4px;left:-6px;z-index:3;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(240,226,196,.45);
+  background:rgba(20,15,9,.45);color:#f0e2c4;
+  font-size:26px;line-height:1;cursor:pointer;
+  display:grid;place-items:center;
+  transition:all .15s;
+}
+.login-back:hover{background:rgba(150,60,40,.75);border-color:rgba(240,214,160,.8)}
+.login-head{text-align:center;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.login-seal{
+  width:64px;height:64px;margin:0 auto 10px;border-radius:10px;
+  display:grid;place-items:center;line-height:1.15;
+  font-family:var(--font-brush);font-size:24px;color:#f6e7c8;letter-spacing:2px;
+  background:linear-gradient(160deg,#b34434,#8e2f22);
+  border:2px solid rgba(240,205,150,.55);
+  box-shadow:0 6px 22px rgba(0,0,0,.5), inset 0 0 14px rgba(255,220,160,.25);
+}
+.login-title{font-size:clamp(38px,9vw,52px);letter-spacing:10px;text-indent:10px;color:#f4e6c8;margin:0}
+.login-sub{color:rgba(240,226,196,.82);letter-spacing:4px;font-size:14px;margin:6px 0 0}
+.login-card{
+  width:100%;background:linear-gradient(180deg,rgba(251,245,230,.97),rgba(240,229,205,.97));
+  border:1px solid rgba(60,45,28,.35);border-radius:12px;
+  padding:20px 22px;box-shadow:0 14px 44px rgba(0,0,0,.55);
+  animation:panelIn .45s ease-out both;
+}
+.login-field{display:flex;gap:8px;margin-top:4px}
+.login-input{
+  flex:1;min-width:0;padding:11px 14px;font-size:17px;letter-spacing:2px;
+  border:1.5px solid var(--ink-soft);border-radius:8px;
+  background:rgba(255,252,244,.9);color:var(--ink);
+  font-family:var(--font-body);
+}
+.login-input:focus{outline:none;border-color:var(--cinnabar);box-shadow:0 0 0 3px rgba(192,60,46,.15)}
+.login-hint{min-height:20px;font-size:13px;color:var(--cinnabar-deep);margin-top:8px;letter-spacing:1px}
+.login-actions{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.login-actions .btn{width:100%;margin-top:0}
+.login-actions .btn-row{display:flex;gap:10px}
+.login-actions .btn-row .btn{flex:1}
+.btn-danger{background:#8a2b1e;border-color:#6e2117;color:#fbe9d4}
+.btn-danger:hover{background:#732217}
+/* 名册 */
+.roster-tip{font-size:13px;color:var(--ink-faint);margin:14px 0 6px;letter-spacing:2px;text-align:center}
+.roster-list{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:132px;overflow-y:auto}
+.roster-chip{
+  border:1px solid var(--ink-soft);border-radius:999px;
+  padding:6px 14px;font-size:14px;letter-spacing:1px;cursor:pointer;
+  background:rgba(255,252,244,.85);color:var(--ink);
+  transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.roster-chip:hover{border-color:var(--cinnabar);color:var(--cinnabar-deep);transform:translateY(-1px)}
+.roster-chip small{color:var(--ink-faint);font-size:11px}
+/* 查到名号后的角色卡 */
+.slot-card{animation:panelIn .3s ease-out both}
+.slot-card .slot-name{
+  font-family:var(--font-brush);font-size:30px;letter-spacing:3px;text-align:center;
+  color:var(--ink);margin:2px 0 10px;
+}
+.slot-meta{
+  display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;
+  font-size:14px;color:var(--ink);margin-bottom:6px;
+}
+.slot-meta b{color:var(--cinnabar-deep)}
+.slot-new-tip{line-height:1.9;font-size:14px;color:var(--ink);text-align:center;margin:6px 0 12px}
+.slot-back{
+  display:block;margin:12px auto 0;border:none;background:none;
+  color:var(--ink-faint);font-size:13px;cursor:pointer;letter-spacing:1px;
+}
+.slot-back:hover{color:var(--cinnabar-deep)}
+/* 旧档认领横幅 */
+.legacy-banner{
+  margin-bottom:12px;padding:10px 12px;border-radius:8px;
+  border:1px dashed rgba(150,110,40,.7);background:rgba(232,210,150,.35);
+  font-size:13px;line-height:1.8;color:#5c4316;
+}
+.legacy-banner b{color:#7a5410}
+.legacy-banner .btn{margin-top:8px;width:100%}
+@media (max-width:480px){
+  .login-title{letter-spacing:6px;text-indent:6px}
+  .login-card{padding:16px}
+}
 .rp-on.s5 .rp-gifts i:nth-child(1){transition-delay:1s}
 .rp-on.s5 .rp-gifts i:nth-child(2){transition-delay:1.12s}
 .rp-on.s5 .rp-gifts i:nth-child(3){transition-delay:1.24s}
