@@ -798,6 +798,8 @@ const UI = {
       /* 图鉴墙全是神立绘大图：先过点卯门，墙开即满画，不看空框 */
       const met=Object.keys(GODS).filter(g=>{ const r=Game.s.godsRel[g]; return r&&r.met; });
       const keys=met.map(g=>(typeof GOD_ART!=='undefined'&&GOD_ART.includes(g))?'g_'+g:ASSET.avatarFile(g));
+      /* 点开即 demand 全墙立绘（独立池+重试），点卯门最多 6 秒；墙开后没到的继续补、滚到即拉 */
+      try{ ASSET.demand(keys); }catch(e){}
       gate(keys,'恭请仙僚卷宗…').then(()=>this.openGodCodex());
     };
     Object.entries(GODS).forEach(([g,gd])=>{
@@ -832,6 +834,9 @@ const UI = {
     keys.push((typeof GOD_ART!=='undefined'&&GOD_ART.includes(m.god))?'g_'+m.god:ASSET.avatarFile(m.god));
     (m.acts||[]).forEach(a=>{ if(a.enemy && ASSET.list['e_'+a.enemy]) keys.push('e_'+a.enemy); });
     this._missionLock=true;
+    /* 立刻把全套卷宗交给视口 demand（30s 超时+退避重试）：点卯门最多 6 秒就放行，
+       玩家看下凡过场/故事/神登场卷期间，场景与立绘自动补齐淡入，不再被大图卡住 */
+    try{ ASSET.demand(keys); }catch(e){}
     /* gate 已保证只 resolve 不 reject；再兜一层：任何意外都解锁并回滚，绝不死在工单架 */
     gate(keys,'架起遁光，下凡途中…').then(()=>{
       try{

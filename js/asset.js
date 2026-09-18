@@ -117,12 +117,16 @@ const ASSET = {
   _demandStart(){
     if(this._demandRunning) return;
     this._demandRunning=true;
+    const self=this;
     const CONC=4; let active=0, idx=0;
     const pump=()=>{
-      while(active<CONC && idx<this._demandQ.length){
-        const k=this._demandQ[idx++]; active++;
-        this._demandOne(k).catch(()=>{}).finally(()=>{ active--; pump(); });
+      while(active<CONC && idx<self._demandQ.length){
+        const k=self._demandQ[idx++]; active++;
+        self._demandOne(k).catch(()=>{}).finally(()=>{ active--; pump(); });
       }
+      /* 队列彻底排空（无在途、无剩余）才复位闸门，给后续 demand 重新开泵；
+         否则闸门永远为 true，晚到的可见图会搁浅在队列里无人处理 */
+      if(active===0 && idx>=self._demandQ.length) self._demandRunning=false;
     };
     pump();
   },

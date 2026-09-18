@@ -39,17 +39,19 @@ function gate(keys, label){
       }}).then(r=>res(r)).catch(()=>res({fail:1}));
     }catch(e){ res({fail:1}); }
   });
-  /* 网络失败重拉两轮；20 秒保险（断网时每轮快速失败，不会死等）
+  /* 只做"短暂点卯"：到齐即走，最多等 6 秒。所有目标界面都有骨架→真图原地淡入，
+     未到的图由调用方 ASSET.demand 在玩家看过场/读故事期间自动补齐——
+     弱网下绝不再为大图硬等 20 秒（接案下凡卡死的根因）。
      铁律：无论成功、失败还是超时，此 Promise 只 resolve 不 reject ——
      点卯门是增强体验，永远不能成为「卡在原页面」的理由 */
   const job=(async()=>{
     let r=await run(), guard=0;
-    while(r.fail && guard<2 && !cancelled){ setTip('网络波动，重拉卷宗…'); r=await run(); guard++; }
+    while(r.fail && guard<1 && !cancelled){ setTip('网络波动，重拉卷宗…'); r=await run(); guard++; }
     await new Promise(r=>setTimeout(r,260));                    /* 给淡入留半拍 */
   })();
   return Promise.race([
     job,
-    new Promise(res=>setTimeout(()=>{ cancelled=true; res(); },20000)),
+    new Promise(res=>setTimeout(()=>{ cancelled=true; res(); },6000)),
   ]).catch(()=>{}).finally(()=>{ try{ el.classList.add('hidden'); }catch(e){} });
 }
 
