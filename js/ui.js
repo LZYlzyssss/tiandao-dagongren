@@ -788,7 +788,12 @@ const UI = {
         <button class="btn btn-primary btn-sm" id="btnGodCodex">📖 神仙图鉴</button>
       </div>
       <div class="section-tip">交情至「相熟」，战斗关键时刻可呼叫其援助。送礼偏好：挚爱 +18 / 喜欢 +8 / 无感 +4 / 忌讳 +1，每日一礼。</div>`;
-    rp.querySelector('#btnGodCodex').onclick=()=>this.openGodCodex();
+    rp.querySelector('#btnGodCodex').onclick=()=>{
+      /* 图鉴墙全是神立绘大图：先过点卯门，墙开即满画，不看空框 */
+      const met=Object.keys(GODS).filter(g=>{ const r=Game.s.godsRel[g]; return r&&r.met; });
+      const keys=met.map(g=>(typeof GOD_ART!=='undefined'&&GOD_ART.includes(g))?'g_'+g:ASSET.avatarFile(g));
+      gate(keys,'恭请仙僚卷宗…').then(()=>this.openGodCodex());
+    };
     Object.entries(GODS).forEach(([g,gd])=>{
       const rel=s.godsRel[g], met=rel&&rel.met;
       /* 只渲染已结识的；未解锁/未结识的完全隐藏 */
@@ -811,6 +816,18 @@ const UI = {
 
   /* ================= 下凡事件链 ================= */
   startMission(idx){
+    /* 先点卯：过场场景图、委托神立绘、本单交手敌人全部到齐再下凡，不看空卷 */
+    const o=Game.s.shelf[idx];
+    if(!o) return;
+    const m=MISSIONS.find(x=>x.id===o.mid);
+    if(!m) return;
+    const keys=[];
+    keys.push(ASSET.list['task_'+m.id]?'task_'+m.id:ASSET.sceneKey(m.chapter||Game.s.chapter||1));
+    keys.push((typeof GOD_ART!=='undefined'&&GOD_ART.includes(m.god))?'g_'+m.god:ASSET.avatarFile(m.god));
+    (m.acts||[]).forEach(a=>{ if(a.enemy && ASSET.list['e_'+a.enemy]) keys.push('e_'+a.enemy); });
+    gate(keys,'架起遁光，下凡途中…').then(()=>this._startMissionRun(idx));
+  },
+  _startMissionRun(idx){
     const o=Game.s.shelf[idx];
     this.rt={ order:o, mid:o.mid, node:0, ctx:{atkBuff:0,shield:0,enemyAtk:0,enemyVuln:false}, result:null };
     Game.s.busy=true;

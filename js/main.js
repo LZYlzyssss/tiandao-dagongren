@@ -1,10 +1,11 @@
 /* ================= 天道打工人 · 启动（BOOT 预载门） =================
-   1) 启动加载屏：引擎/字体 + 进门必修图集全部就绪才放行（硬超时兜底）
-   2) 点入职/续玩：小遮罩等当天工单图就绪再渲染，绝不“进去了图还没到”
-   3) 进门后：剩余全部素材后台空闲预热（ASSET.warm），真实请求自动让路
-   4) Service Worker 持久缓存图片，二次访问本地秒开 */
+   1) 启动加载屏：引擎/字体 + 进门必修图集【真正下载完成】才放行；
+      404 缺图计入完成（水墨兜底是正确终态），网络失败自动重拉，绝不假装 100%
+   2) 点入职/续玩/下凡/翻图鉴：小遮罩等对应卷宗到齐再展开
+   3) 进门后：剩余素材后台单线程预热，真实请求让路 12 秒
+   4) Service Worker 持久缓存 + 在途请求去重，二次访问本地秒开 */
 
-/* 轮询等待某条件成立（带超时，超时也算放行） */
+/* 轮询等待某条件成立（带超时） */
 function waitUntil(pred, ms, step){
   return new Promise(res=>{
     const t0=Date.now();
@@ -17,14 +18,26 @@ function waitUntil(pred, ms, step){
 }
 const withTimeout=(p,ms)=>Promise.race([p,new Promise(res=>setTimeout(()=>res(false),ms))]);
 
-/* ================= 小型“点卯”遮罩：切场景前等图 ================= */
+/* 去重保序 */
+function uniq(a){ return (a||[]).filter((v,i)=>v&&a.indexOf(v)===i); }
+
+/* ================= 小型“点卯”遮罩：切场景前等图（真实进度，不假装） ================= */
 function gate(keys, label){
-  if(!keys||!keys.length) return Promise.resolve();
-  const el=$('bootGate'); $('bgTip').textContent=label||'研墨铺纸…';
+  keys=uniq(keys);
+  if(!keys.length) return Promise.resolve();
+  const el=$('bootGate'), tip=$('bgTip');
+  tip.textContent=label||'研墨铺纸…';
   el.classList.remove('hidden');
-  const job=ASSET.preload(keys,{conc:6});
-  return Promise.race([job,new Promise(res=>setTimeout(res,8000))])
-    .then(()=>new Promise(r=>setTimeout(r,260)))           /* 给淡入留半拍 */
+  const run=()=>ASSET.preload(keys,{conc:8,onprogress:(d,t,st)=>{
+    tip.textContent=(label||'研墨铺纸…')+'（'+d+'/'+t+(st.fail?'，重拉 '+st.fail:'')+'）';
+  }});
+  /* 网络失败重拉两轮；30 秒保险（断网时每轮快速失败，不会死等） */
+  const job=(async()=>{
+    let r=await run(), guard=0;
+    while(r.fail && guard<2){ tip.textContent='网络波动，重拉卷宗…'; r=await run(); guard++; }
+    await new Promise(r=>setTimeout(r,260));                    /* 给淡入留半拍 */
+  })();
+  return Promise.race([job,new Promise(res=>setTimeout(res,30000))])
     .finally(()=>el.classList.add('hidden'));
 }
 
@@ -37,7 +50,7 @@ const BOOT={
     [0.70,'孟婆汤在煮，场景图在宣纸上晾…'],
     [0.90,'南天门的光缆年久失修，再稍候片刻…'],
   ],
-  /* 当天在架工单涉及的图：专属场景 + 神仙立绘 */
+  /* 当天在架工单涉及的图：专属场景（卡片背景）+ 委托神立绘（卡片印信位） */
   shelfKeys(){
     const ks=[];
     (Game.s.shelf||[]).forEach(o=>{
@@ -48,67 +61,84 @@ const BOOT={
     });
     return ks;
   },
-  /* 进门第一眼会看到的一切 */
-  requiredKeys(){
-    const s=Game.s;
-    const ch=Math.min(5,Math.max(1,s.chapter||1));
-    const rk=Math.min(4,Math.min(8,s.rank||0));
+  /* 切到任何页签都立刻可见的小图全家桶（约 20MB）：顶栏/营造/商铺/神格/底图/品阶立绘 */
+  smallKeys(rk){
     return [
       'p_r'+rk,
       'ui_main','ui_desk','ui_yamen','ui_hero',
-      'bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch,
       'stat_rank','stat_calendar','stat_cult','stat_money','stat_favor',
       'stat_erode','stat_merit','stat_hp','stat_mp',
-    ].concat(this.shelfKeys());
+      'fac_shrine','fac_desk','fac_incense','fac_banner',
+      'sol_xiaojiang','sol_duwei',
+    ].concat(Object.keys(ASSET.list).filter(k=>/^(it_|gh_)/.test(k)));
+  },
+  /* 进门第一眼会看到的一切：小图桶 + 在架工单大图 */
+  requiredKeys(){
+    const s=Game.s;
+    const rk=Math.min(4,Math.min(8,s.rank||0));
+    return this.smallKeys(rk).concat(this.shelfKeys());
   },
   run(){
     const bar=$('blBar'), pct=$('blPct'), tip=$('blTip'), loader=$('bootLoader');
     const hasSave=!!Game.s;
     const keys=hasSave?this.requiredKeys():['p_r0','ui_main','ui_hero'];
-    let finished=false;
+    let finished=false, skip=false;
     const finish=()=>{
       if(finished) return; finished=true;
       bar.style.width='100%'; pct.textContent='100%';
       tip.textContent='朱砂已干，请进——';
       setTimeout(()=>{ loader.classList.add('done'); setTimeout(()=>loader.remove(),600); },350);
     };
-    /* 图集进度（占大头） */
-    const imgJob=ASSET.preload(keys,{conc:6,onprogress:(d,t)=>{
+    /* 网络实在太差时的人道出口：60 秒后可主动进门，未到卷宗后台继续拉 */
+    const skipBtn=document.createElement('button');
+    skipBtn.className='btn btn-ghost btn-sm';
+    skipBtn.textContent='网络太慢，先进衙（图片随后就到）';
+    skipBtn.style.cssText='margin-top:14px;opacity:0;transition:opacity .4s;pointer-events:none';
+    skipBtn.onclick=()=>{ skip=true; };
+    loader.appendChild(skipBtn);
+    const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },60000);
+
+    const onprog=(d,t,st)=>{
       const p=t?d/t:1;
       bar.style.width=(p*100).toFixed(0)+'%';
       pct.textContent=Math.round(p*100)+'%';
-      const line=this.TIPS.find(x=>p<x[0]+0.001)?null:this.TIPS.filter(x=>p>=x[0]).pop();
-      if(line) tip.textContent=line[1];
-    }});
-    /* 引擎/字体并行，不相互拖后腿，各自超时放行 */
-    const engine=waitUntil(()=>window.PIXI,5000);
+      const line=this.TIPS.filter(x=>p>=x[0]).pop();
+      if(line && !st.fail) tip.textContent=line[1];
+      if(st.fail) tip.textContent='南天门驿道拥堵，正在重拉掉队的卷宗…';
+    };
+    const run=()=>ASSET.preload(keys,{conc:8,onprogress:onprog});
+    /* 引擎/字体并行，各自超时放行，不拖图的后腿 */
+    const engine=waitUntil(()=>window.PIXI,8000);
     const fonts=(document.fonts&&document.fonts.ready)?withTimeout(document.fonts.ready,3000):Promise.resolve();
-    /* 全齐放行；网络极差时 25 秒硬保底，未完成的转后台继续 */
-    Promise.race([Promise.all([imgJob,engine,fonts]),new Promise(res=>setTimeout(res,25000))])
-      .then(finish);
+    /* 图集必须真实到齐；网络失败整轮重拉（已到/已缺项秒回，只补掉队的） */
+    (async()=>{
+      let r=await run(), guard=0;
+      while(r.fail && !skip && guard<4){ r=await run(); guard++; }
+      await Promise.all([engine,fonts]);
+      clearTimeout(skipTimer);
+      finish();
+    })();
   },
 };
 
-/* ================= 进门后：全量素材后台预热（静默，让路） ================= */
+/* ================= 进门后：全量素材后台预热（静默、单线程、让路） ================= */
 function warmAll(){
   if(typeof ASSET==='undefined') return;
   const s=Game.s;
   const ch=Math.min(5,Math.max(1,s.chapter||1));
-  const rk='p_r'+Math.min(4,Math.min(8,s.rank||0));
-  /* P0：衙门设施/阴兵 + 五系神格底图/技能（战斗在即） */
-  const p0=['fac_shrine','fac_desk','fac_incense','fac_banner','sol_xiaojiang','sol_duwei']
-    .concat(Object.keys(ASSET.list).filter(k=>/^(sk_|gh_)/.test(k)));
-  /* P1：已结识神立绘+头像、本章战场/过场 */
-  const unlocked=Object.keys(GODS).filter(g=>Game.isGodUnlocked(g));
-  const p1=unlocked.filter(g=>ASSET.list['g_'+g]).map(g=>'g_'+g)
-    .concat(['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch,rk]);
-  const av=unlocked.map(g=>ASSET.avatarFile(g));
-  /* P2：敌人立绘 */
-  const p2=Object.keys(ASSET.list).filter(k=>/^e_/.test(k));
-  /* 先排普通队列，再把 P0 提到队首：保证最先下的是马上要用的 */
-  ASSET.warm(p1); ASSET.warm(av); ASSET.warm(p2);
-  ASSET.warm(p0,true);
-  /* 其余一切（物品图标/未解锁神/其余章节场景工单），稍后补排，去重自动跳过 */
+  /* 第一梯队（队首）：已结识神立绘（大图最慢，图鉴/人脉随时会看）、在架单敌人、本章战场过场 */
+  const met=Object.keys(GODS).filter(g=>Game.isGodUnlocked(g));
+  const gKeys=met.filter(g=>ASSET.list['g_'+g]).map(g=>'g_'+g);
+  const avKeys=met.filter(g=>typeof GOD_ART!=='undefined' && !GOD_ART.includes(g)).map(g=>ASSET.avatarFile(g));
+  const eKeys=[];
+  (s.shelf||[]).forEach(o=>{
+    const m=MISSIONS.find(x=>x.id===o.mid);
+    (m&&m.acts||[]).forEach(a=>{ if(a.enemy) eKeys.push('e_'+a.enemy); });
+  });
+  ASSET.warm(uniq(gKeys.concat(eKeys).concat(['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch])),true);
+  /* 第二梯队：技能（战斗）、无真绘神的头像 */
+  ASSET.warm(Object.keys(ASSET.list).filter(k=>/^sk_/.test(k)).concat(avKeys));
+  /* 其余一切（全部敌人、未解锁神、他章场景工单），去重自动跳过已完成项 */
   setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),3000);
 }
 
@@ -133,7 +163,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       Shelf.refresh();
       Game.save();
     }
-    /* 启动加载屏：预载当天工单与首屏一切，齐了才放行 */
+    /* 启动加载屏：预载当天工单与首屏一切，真实到齐才放行 */
     BOOT.run();
     /* 已有存档：直接进衙，开场页轻量放行 */
     const intro=$('intro');
@@ -159,7 +189,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       nw.style.marginLeft='12px';
       nw.onclick=()=>{
         Game.clear(); Game.newGame();
-        gate(['ui_main','ui_desk'].concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
+        gate(BOOT.smallKeys(0).concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
           intro.innerHTML='';
           intro.classList.add('hidden'); UI.view='office'; UI.tab='desk'; UI.render(); warmAll();
           if(typeof Guide!=='undefined') Guide.begin();
@@ -177,7 +207,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
     const act=e.target.getAttribute && e.target.getAttribute('data-action');
     if(act==='newGame'){
       Game.newGame();
-      gate(['ui_main','ui_desk','ui_hero'].concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
+      gate(BOOT.smallKeys(0).concat(BOOT.shelfKeys()),'点卯到任，先领文书…').then(()=>{
         $('intro').classList.add('hidden');
         UI.view='office';
         UI.render();

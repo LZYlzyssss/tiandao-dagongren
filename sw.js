@@ -5,8 +5,9 @@
    - Pixi/Google 字体 CDN：可缓存即缓存（opaque 跨域响应也落盘）
    - 页面(HTML)：网络优先，断网回退本地壳
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
+   - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
    发版改下方 VERSION 即自动清旧桶 */
-const VERSION='xw-v1';
+const VERSION='xw-v2';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
   './','./index.html','./style.css',
@@ -34,24 +35,36 @@ self.addEventListener('activate', e=>{
 
 const cacheable=res=>!!res && (res.ok || res.type==='opaque');
 
-/* 图片/固定版本 CDN：缓存优先 */
+/* 在途请求表：页面预载与 <img> 挂载常同时索要同一张大图，
+   必须共用同一条网络响应，否则弱网下每张图被重复下载、带宽对半砍 */
+const inflight=new Map();
+function sharedFetch(req){
+  const key=req.url;
+  if(inflight.has(key)) return inflight.get(key);
+  const p=fetch(req).then(res=>{
+    if(cacheable(res)){
+      const copy=res.clone();
+      caches.open(RT).then(c=>c.put(req,copy)).catch(()=>{});  /* 配额满/写失败不影响看图 */
+    }
+    return res;
+  }).finally(()=>{ inflight.delete(key); });
+  inflight.set(key,p);
+  return p;
+}
+
+/* 图片/固定版本 CDN：缓存优先，未命中走在途去重的网络 */
 async function cacheFirst(req){
   const cache=await caches.open(RT);
   const hit=await cache.match(req);
   if(hit) return hit;
-  const res=await fetch(req);
-  if(cacheable(res)) cache.put(req,res.clone());
-  return res;
+  return sharedFetch(req);
 }
 
 /* 代码/样式：先给旧档秒开，后台静默更新 */
 async function staleWhileRevalidate(req){
   const cache=await caches.open(RT);
   const hit=await cache.match(req);
-  const net=fetch(req).then(res=>{
-    if(cacheable(res)) cache.put(req,res.clone());
-    return res;
-  }).catch(()=>null);
+  const net=sharedFetch(req).catch(()=>null);
   return hit || (await net) || new Response('',{status:504});
 }
 
@@ -60,7 +73,10 @@ async function networkFirst(req){
   const cache=await caches.open(RT);
   try{
     const res=await fetch(req);
-    if(cacheable(res)) cache.put(req,res.clone());
+    if(cacheable(res)){
+      const copy=res.clone();
+      caches.open(RT).then(c=>c.put(req,copy)).catch(()=>{});
+    }
     return res;
   }catch(_){
     const hit=await cache.match(req) || await cache.match('./');

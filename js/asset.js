@@ -24,27 +24,54 @@ const ASSET = {
   file(key){ key=this.ALIAS[key]||key; return 'img/'+key+'.jpg'; },
   avatarFile(gid){ return 'img/av_'+gid+'.jpg'; },
 
-  /* ---- 本地图探测（Promise + 缓存） ---- */
+  /* ---- 本地图探测（Promise + 缓存） ----
+     三种结论：true=有本地图(已下载) / false=坐实缺失(404，永久水墨兜底) / undefined=本次网络失败(不坐实，下次还能再试) */
+  _probe:{}, _probeQueue:[], _probeInflight:{}, _missing:{},
+
+  /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量） */
+  async _loadOnce(url){
+    const ok=await new Promise(res=>{
+      const im=new Image();
+      im.onload =()=>res(true);
+      im.onerror=()=>res(false);
+      im.src=url;
+    });
+    if(ok) return 'ok';
+    try{
+      const hr=await fetch(url,{method:'HEAD',cache:'no-store'});
+      if(hr.status===404) return 'missing';
+    }catch(e){ /* 断网时 HEAD 也失败 → 视为网络抖动 */ }
+    return 'fail';
+  },
+
   hasLocal(key){
     const f=this.file(key);
-    if(this._probe[f]!==undefined) return Promise.resolve(this._probe[f]);
-    if(this._probe[f]===null) return new Promise(res=>this._probeQueue.push(()=>res(this._probe[f])));
-    this._probe[f]=null;
-    return new Promise(res=>{
-      const im=new Image();
-      im.onload =()=>{ this._probe[f]=true;  this._flush(f); res(true);  };
-      im.onerror=()=>{ this._probe[f]=false; this._flush(f); res(false); };
-      im.src=f;
-    });
+    if(this._probe[f]===true) return Promise.resolve(true);
+    if(this._probe[f]===false || this._missing[f]) return Promise.resolve(false);
+    if(this._probeInflight[f]) return this._probeInflight[f];
+    const p=(async()=>{
+      /* 网络失败自动补一次；仍失败则本次回退 SVG，但不坐实，后续 preload/warm 还能再拉 */
+      let st=await this._loadOnce(f);
+      if(st==='fail') st=await this._loadOnce(f);
+      if(st==='ok'){
+        this._probe[f]=true;
+      }else if(st==='missing'){
+        this._probe[f]=false; this._missing[f]=1;
+      }
+      this._probeInflight[f]=null;
+      this._flush(f);
+      return this._probe[f]===true;
+    })();
+    this._probeInflight[f]=p;
+    return p;
   },
-  _probe:{}, _probeQueue:[],
   _flush(f){ this._probeQueue.splice(0).forEach(fn=>fn()); },
 
   /* ---- 最终 src：本地真图优先 → 程序化水墨 SVG 兜底（图床接口已需认证，不再直连） ---- */
   async src(key){
     if(!this.list[key]) return '';
-    /* 真实业务请求优先：后台预热主动让路 4 秒，避免占满同域连接 */
-    this._warmPauseUntil=Date.now()+4000;
+    /* 真实业务请求优先：后台预热主动让路 12 秒，避免占满同域连接 */
+    this._warmPauseUntil=Date.now()+12000;
     if(await this.hasLocal(key)) return this.file(key);
     const svg=this.svg(key);
     return svg ? 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg) : '';
@@ -58,39 +85,49 @@ const ASSET = {
      ================================================================== */
   preload(keys, opt){
     opt=opt||{};
-    const conc=opt.conc||6;
+    const conc=opt.conc||8;
     const list=(keys||[]).filter((v,i,a)=>v&&a.indexOf(v)===i);
-    let done=0, fail=0;
-    const tick=()=>{ if(opt.onprogress) opt.onprogress(done+fail, list.length, {done,fail}); };
+    let done=0, fail=0, missing=0;
+    const tick=()=>{ if(opt.onprogress) opt.onprogress(done+missing, list.length, {done,fail,missing}); };
     const q=list.slice();
     function worker(){
       const key=q.shift();
       if(key===undefined) return Promise.resolve();
-      return ASSET._preloadOne(key).then(()=>{ done++; ASSET._warmDone[key]=1; tick(); return worker(); })
-                                   .catch(()=>{ fail++; tick(); return worker(); });
+      return ASSET._preloadOne(key).then(st=>{
+        if(st==='fail'){ fail++; /* 不标记 warmDone，留给后续重试与预热 */ }
+        else{ if(st==='missing') missing++; else done++; ASSET._warmDone[key]=1; }
+        tick();
+        return worker();
+      });
     }
     tick();
     return Promise.all(Array.from({length:Math.min(conc,q.length)},worker))
-      .then(()=>({done,fail,total:list.length}));
+      .then(()=>({done,fail,missing,total:list.length}));
   },
-  async _preloadOne(key){
+  /* 单键预载，返回 'ok' | 'missing'(永久缺图) | 'fail'(网络失败，已重试2次) */
+  async _preloadOne(key, tries){
+    tries=tries||0;
     let url;
     if(this.list[key]){
-      /* 直连探测链、坐实 _probe，但不走 src() 的“业务让路”暂停（预热自身不能被自己暂停） */
-      if(await this.hasLocal(key)) url=this.file(key);
-      else{ const svg=this.svg(key); url=svg?'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg):''; }
+      /* list 内：探测链本身就是下载（经 SW 在途去重+落盘）；成功/缺图都有确定终态 */
+      if(await this.hasLocal(key)) return 'ok';
+      return this._missing[this.file(key)] ? 'missing' : 'fail';
     }
-    else if(/^(img\/|https?:\/\/|data:)/.test(key)) url=key;
+    if(typeof key==='string' && key.startsWith('data:')) return 'ok';
+    if(/^(img\/|https?:\/\/)/.test(key||'')) url=key;
     else url=this.file(key);
-    if(!url||url.startsWith('data:')) return;            /* SVG/空项视为就绪，不计失败 */
-    await new Promise(res=>{
-      const im=new Image();
-      im.onload=()=>res(); im.onerror=()=>res();         /* 缺失不阻塞流程，结论已坐实 */
-      im.src=url;
-    });
+    const st=await this._loadOnce(url);
+    if(st==='ok') return 'ok';
+    if(st==='missing'){ this._missing[url]=1; return 'missing'; }
+    /* 网络抖动：退避后重试，最多 2 次 */
+    if(tries<2){
+      await new Promise(r=>setTimeout(r,600*(tries+1)));
+      return this._preloadOne(key,tries+1);
+    }
+    return 'fail';
   },
 
-  /* ---- 后台预热队列 ---- */
+  /* ---- 后台预热队列：单并发，绝与玩家抢图；真实请求后让路 12 秒 ---- */
   _warmQ:[], _warmDone:{}, _warmBusy:0, _warmStarted:false, _warmPauseUntil:0,
   warm(keys, front){
     if(!keys) return;
@@ -105,17 +142,17 @@ const ASSET = {
     this._warmStarted=true;
     const idle=cb=>{ (window.requestIdleCallback||setTimeout)(cb,{timeout:2000}); };
     const loop=()=>idle(()=>{
-      if(Date.now()<this._warmPauseUntil || this._warmBusy>=2){ setTimeout(loop,400); return; }
+      if(Date.now()<this._warmPauseUntil || this._warmBusy>=1){ setTimeout(loop,800); return; }
       const k=this._warmQ.shift();
       if(k===undefined){ setTimeout(loop,1500); return; }
       this._warmBusy++;
       this._preloadOne(k)
-        .then(()=>{ this._warmDone[k]=1; })
+        .then(st=>{ if(st!=='fail') this._warmDone[k]=1; else this._warmQ.push(k); /* 网络失败重新排队 */ })
         .catch(()=>{})
-        .then(()=>{ this._warmBusy--; loop(); });
+        .then(()=>{ this._warmBusy--; setTimeout(loop,500); });
       loop();
     });
-    setTimeout(loop, 6000);                               /* 进门 6 秒、首屏稳定后再悄悄开始 */
+    setTimeout(loop, 8000);                               /* 进门 8 秒、首屏稳定后再悄悄开始 */
   },
 
   /* ---- <img> 标签：html() 出骨架，scan() 挂载回退链 ---- */
