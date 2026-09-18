@@ -43,9 +43,79 @@ const ASSET = {
   /* ---- 最终 src：本地真图优先 → 程序化水墨 SVG 兜底（图床接口已需认证，不再直连） ---- */
   async src(key){
     if(!this.list[key]) return '';
+    /* 真实业务请求优先：后台预热主动让路 4 秒，避免占满同域连接 */
+    this._warmPauseUntil=Date.now()+4000;
     if(await this.hasLocal(key)) return this.file(key);
     const svg=this.svg(key);
     return svg ? 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg) : '';
+  },
+
+  /* ==================================================================
+     预加载体系
+     - preload(keys)：进门必修，并发拉取 + 坐实本地探测（有/无都缓存结论）
+     - warm(keys)   ：进门后空闲预热，低并发、真实请求让路、同 URL 去重
+     所有下载都经过浏览器缓存（并被 Service Worker 持久化），消费方零等待
+     ================================================================== */
+  preload(keys, opt){
+    opt=opt||{};
+    const conc=opt.conc||6;
+    const list=(keys||[]).filter((v,i,a)=>v&&a.indexOf(v)===i);
+    let done=0, fail=0;
+    const tick=()=>{ if(opt.onprogress) opt.onprogress(done+fail, list.length, {done,fail}); };
+    const q=list.slice();
+    function worker(){
+      const key=q.shift();
+      if(key===undefined) return Promise.resolve();
+      return ASSET._preloadOne(key).then(()=>{ done++; ASSET._warmDone[key]=1; tick(); return worker(); })
+                                   .catch(()=>{ fail++; tick(); return worker(); });
+    }
+    tick();
+    return Promise.all(Array.from({length:Math.min(conc,q.length)},worker))
+      .then(()=>({done,fail,total:list.length}));
+  },
+  async _preloadOne(key){
+    let url;
+    if(this.list[key]){
+      /* 直连探测链、坐实 _probe，但不走 src() 的“业务让路”暂停（预热自身不能被自己暂停） */
+      if(await this.hasLocal(key)) url=this.file(key);
+      else{ const svg=this.svg(key); url=svg?'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg):''; }
+    }
+    else if(/^(img\/|https?:\/\/|data:)/.test(key)) url=key;
+    else url=this.file(key);
+    if(!url||url.startsWith('data:')) return;            /* SVG/空项视为就绪，不计失败 */
+    await new Promise(res=>{
+      const im=new Image();
+      im.onload=()=>res(); im.onerror=()=>res();         /* 缺失不阻塞流程，结论已坐实 */
+      im.src=url;
+    });
+  },
+
+  /* ---- 后台预热队列 ---- */
+  _warmQ:[], _warmDone:{}, _warmBusy:0, _warmStarted:false, _warmPauseUntil:0,
+  warm(keys, front){
+    if(!keys) return;
+    (Array.isArray(keys)?keys:[keys]).forEach(k=>{
+      if(!k||this._warmDone[k]||this._warmQ.includes(k)) return;
+      if(front) this._warmQ.unshift(k); else this._warmQ.push(k);
+    });
+    this._warmStart();
+  },
+  _warmStart(){
+    if(this._warmStarted) return;
+    this._warmStarted=true;
+    const idle=cb=>{ (window.requestIdleCallback||setTimeout)(cb,{timeout:2000}); };
+    const loop=()=>idle(()=>{
+      if(Date.now()<this._warmPauseUntil || this._warmBusy>=2){ setTimeout(loop,400); return; }
+      const k=this._warmQ.shift();
+      if(k===undefined){ setTimeout(loop,1500); return; }
+      this._warmBusy++;
+      this._preloadOne(k)
+        .then(()=>{ this._warmDone[k]=1; })
+        .catch(()=>{})
+        .then(()=>{ this._warmBusy--; loop(); });
+      loop();
+    });
+    setTimeout(loop, 6000);                               /* 进门 6 秒、首屏稳定后再悄悄开始 */
   },
 
   /* ---- <img> 标签：html() 出骨架，scan() 挂载回退链 ---- */

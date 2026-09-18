@@ -6,10 +6,26 @@
 <title>天道打工人</title>
 <link rel="icon" type="image/jpeg" href="img/p_r0.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<!-- 书法字体非阻塞：不挡首屏，未到用楷体兜底 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap"></noscript>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<!-- ================= 启动加载屏：必修资源齐了才放行 ================= -->
+<div id="bootLoader">
+  <div class="bl-ink"></div>
+  <div class="bl-seal">天曹<br>候补</div>
+  <h1 class="bl-title">天 道 打 工 人</h1>
+  <div class="bl-sub">阴阳两界劳务契 · 无编制</div>
+  <div class="bl-bar"><i id="blBar"></i></div>
+  <div class="bl-meta"><span id="blTip">判官笔已蘸墨，正在勾销两界往来文书…</span><b id="blPct">0%</b></div>
+</div>
+<!-- 进门后切换场景的小型点卯遮罩（JS 动态填充） -->
+<div id="bootGate" class="hidden"><div class="bg-card"><div class="bg-seal">点卯</div><div id="bgTip">研墨铺纸…</div></div></div>
+
 <!-- 画质渲染分层：氛围底图 → 情景图 → Pixi 墨雾 → 浮墨/雾气兜底 -->
 <div id="ambientBg"></div>
 <div id="sceneBg"></div>
@@ -81,17 +97,17 @@
 
 </div>
 
-<!-- PixiJS 渲染引擎：加载失败时 fx.js 自动降级为 CSS 粒子 -->
-<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
-<script src="js/data.js"></script>
-<script src="js/lore.js"></script>
-<script src="js/asset.js"></script>
-<script src="js/fx.js"></script>
-<script src="js/state.js"></script>
-<script src="js/battle.js"></script>
-<script src="js/minigames.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/guide.js"></script>
-<script src="js/main.js"></script>
+<!-- PixiJS 渲染引擎：defer 不挡解析；加载失败时 fx.js 自动降级为 CSS 粒子 -->
+<script defer src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.js"></script>
+<script defer src="js/data.js"></script>
+<script defer src="js/lore.js"></script>
+<script defer src="js/asset.js"></script>
+<script defer src="js/fx.js"></script>
+<script defer src="js/state.js"></script>
+<script defer src="js/battle.js"></script>
+<script defer src="js/minigames.js"></script>
+<script defer src="js/ui.js"></script>
+<script defer src="js/guide.js"></script>
+<script defer src="js/main.js"></script>
 </body>
 </html>

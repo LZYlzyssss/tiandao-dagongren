@@ -2298,3 +2298,62 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   .rp-gifts i{padding:5px 10px}
   .rp-go{font-size:14px;letter-spacing:6px}
 }
+
+/* ================= 启动加载屏（进门前必修资源） ================= */
+#bootLoader{
+  position:fixed; inset:0; z-index:99999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px;
+  background:radial-gradient(130% 100% at 50% 28%, #211c15 0%, #12100c 62%, #0a0907 100%);
+  transition:opacity .55s ease; overflow:hidden;
+}
+#bootLoader.done{opacity:0;pointer-events:none}
+/* 背景淡墨游丝 */
+.bl-ink{position:absolute;inset:-20%;pointer-events:none;opacity:.5;
+  background:
+   radial-gradient(420px 260px at 18% 30%, rgba(184,146,74,.10), transparent 70%),
+   radial-gradient(520px 320px at 84% 68%, rgba(90,107,128,.10), transparent 70%),
+   radial-gradient(300px 200px at 60% 18%, rgba(168,70,47,.07), transparent 70%);
+  animation:blDrift 14s ease-in-out infinite alternate;}
+@keyframes blDrift{from{transform:translate3d(-1.5%,-1%,0) scale(1.02)}to{transform:translate3d(1.5%,1.2%,0) scale(1.06)}}
+.bl-seal{
+  width:84px;height:84px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:'Ma Shan Zheng','Kaiti SC','STKaiti','KaiTi',serif;
+  font-size:25px;line-height:1.25;color:#f3e9d2;letter-spacing:3px;
+  background:linear-gradient(150deg,#b04632,#8c2f22);
+  box-shadow:0 0 0 3px rgba(243,233,210,.16) inset,0 10px 34px rgba(0,0,0,.55),0 0 46px rgba(176,70,50,.35);
+  transform:rotate(-4deg);animation:blSeal 3.2s ease-in-out infinite;
+}
+@keyframes blSeal{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-2deg) translateY(-5px)}}
+.bl-title{
+  margin:4px 0 0;font-size:46px;letter-spacing:14px;text-indent:14px;
+  font-family:'Ma Shan Zheng','Kaiti SC','STKaiti','KaiTi',serif;
+  color:#e9dcb8;text-shadow:0 2px 0 #000,0 0 30px rgba(184,146,74,.35);
+}
+.bl-sub{font-size:13px;letter-spacing:6px;text-indent:6px;color:#9a8b68;margin-bottom:12px}
+.bl-bar{
+  width:min(420px,72vw);height:7px;border-radius:99px;overflow:hidden;
+  background:rgba(243,233,210,.10);box-shadow:0 0 0 1px rgba(243,233,210,.08) inset;
+}
+.bl-bar i{display:block;height:100%;width:0%;border-radius:99px;
+  background:linear-gradient(90deg,#8c2f22,#c9a25b 70%,#f0d89a);
+  box-shadow:0 0 14px rgba(201,162,91,.65);transition:width .35s ease;}
+.bl-meta{width:min(420px,72vw);display:flex;justify-content:space-between;gap:14px;align-items:center;
+  font-size:12.5px;color:#a99a75;letter-spacing:1px}
+.bl-meta b{color:#d9c48a;font-size:14px;font-variant-numeric:tabular-nums}
+/* 点卯小遮罩（进门后切场景） */
+#bootGate{position:fixed;inset:0;z-index:99998;display:flex;align-items:center;justify-content:center;
+  background:rgba(10,9,7,.58);backdrop-filter:blur(2px);transition:opacity .3s ease}
+#bootGate.hidden{display:none}
+.bg-card{display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px 42px;border-radius:14px;
+  background:linear-gradient(160deg,rgba(38,32,24,.96),rgba(20,17,12,.96));
+  box-shadow:0 18px 60px rgba(0,0,0,.6),0 0 0 1px rgba(201,162,91,.22) inset}
+.bg-seal{width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-family:'Ma Shan Zheng','Kaiti SC','KaiTi',serif;font-size:20px;color:#f3e9d2;letter-spacing:2px;
+  background:linear-gradient(150deg,#b04632,#8c2f22);
+  animation:blSeal 1.4s ease-in-out infinite}
+#bgTip{color:#cdbd93;font-size:13.5px;letter-spacing:3px;text-indent:3px}
+@media (max-width:600px){
+  .bl-title{font-size:34px;letter-spacing:9px;text-indent:9px}
+  .bl-seal{width:70px;height:70px;font-size:21px}
+}

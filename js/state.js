@@ -624,5 +624,9 @@ const Shelf = {
       }
     }
     s.shelf=kept;
+    /* 新在架工单的场景图提前入预热队首，玩家翻开案牍时已在缓存 */
+    if(typeof ASSET!=='undefined'){
+      ASSET.warm(kept.map(o=>'task_'+o.mid).filter(k=>ASSET.list[k]), true);
+    }
   },
 };
