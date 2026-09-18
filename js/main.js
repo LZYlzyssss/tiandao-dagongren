@@ -73,7 +73,9 @@ const BOOT={
     });
     return ks;
   },
-  /* 切到任何页签都立刻可见的小图全家桶（约 20MB）：顶栏/营造/商铺/神格/底图/品阶立绘 */
+  /* 进门硬门骨架（约 4-5MB）：玩家立绘 + 四栏底图 + 数值/营造/阴兵小图。
+     保证进门瞬间界面完整、不空白；其余所有图（含工单大图/神格道具图标）
+     一律进门后分级后台拉，靠"骨架→真图原地替换"渐进出现 */
   smallKeys(rk){
     return [
       'p_r'+rk,
@@ -82,18 +84,18 @@ const BOOT={
       'stat_erode','stat_merit','stat_hp','stat_mp',
       'fac_shrine','fac_desk','fac_incense','fac_banner',
       'sol_xiaojiang','sol_duwei',
-    ].concat(Object.keys(ASSET.list).filter(k=>/^(it_|gh_)/.test(k)));
+    ];
   },
-  /* 进门第一眼会看到的一切：小图桶 + 在架工单大图 */
+  /* 硬门只保骨架；在架工单大图不再挡门 */
   requiredKeys(){
     const s=Game.s;
     const rk=Math.min(4,Math.min(8,s.rank||0));
-    return this.smallKeys(rk).concat(this.shelfKeys());
+    return this.smallKeys(rk);
   },
   run(){
     const bar=$('blBar'), pct=$('blPct'), tip=$('blTip'), loader=$('bootLoader');
     const hasSave=!!Game.s;
-    const keys=hasSave?this.requiredKeys():['p_r0','ui_main','ui_hero'];
+    const keys=hasSave?this.requiredKeys():this.smallKeys(0);
     let finished=false, skip=false;
     const finish=()=>{
       if(finished) return; finished=true;
@@ -108,7 +110,8 @@ const BOOT={
     skipBtn.style.cssText='margin-top:14px;opacity:0;transition:opacity .4s;pointer-events:none';
     skipBtn.onclick=()=>{ skip=true; };
     loader.appendChild(skipBtn);
-    const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },60000);
+    /* 硬门只剩约 5MB 骨架，12 秒还没拉完说明网络极差：先进衙，图后台补 */
+    const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },12000);
 
     const onprog=(d,t,st)=>{
       const p=t?d/t:1;
@@ -133,25 +136,64 @@ const BOOT={
   },
 };
 
-/* ================= 进门后：全量素材后台预热（静默、单线程、让路） ================= */
+/* ================= 进门后：素材分级后台预热 =================
+   P0  进门即刻，高优并发：在架工单大图 + 在架神头像（案牍页第一眼）
+   P1  1.2s：本章升官单（章末晋升任务全套）+ 本章战场过场 + 在架敌人
+   P2  2.5s：道具/神格小图标（切商铺/修行时即有真图）
+   P3  低优先级 warm 队列：已结识神真绘、技能、本章其余工单、全量补齐
+   所有图未到时界面先出水墨骨架，真图一到原地替换淡入，不空白、不挡玩 */
+function missionEnemyKeys(m){
+  const ks=[];
+  (m&&m.acts||[]).forEach(a=>{ if(a.enemy) ks.push('e_'+a.enemy); });
+  return ks;
+}
+/* 小头像：无真绘（不在 GOD_ART）的神才需要拉 av_，直接文件路径 */
+function avatarPath(g){
+  return (typeof GOD_ART!=='undefined' && GOD_ART.includes(g))?null:ASSET.avatarFile(g);
+}
 function warmAll(){
   if(typeof ASSET==='undefined') return;
   const s=Game.s;
   const ch=Math.min(5,Math.max(1,s.chapter||1));
-  /* 第一梯队（队首）：已结识神立绘（大图最慢，图鉴/人脉随时会看）、在架单敌人、本章战场过场 */
+
+  /* ---- P0：在架工单卡 + 在架神（真绘大图 + 小头像） ---- */
+  const shelfMissions=(s.shelf||[]).map(o=>MISSIONS.find(x=>x.id===o.mid)).filter(Boolean);
+  const p0=BOOT.shelfKeys();
+  shelfMissions.forEach(m=>{ const av=m.god&&avatarPath(m.god); if(av) p0.push(av); });
+  ASSET.priority(uniq(p0),4);
+
+  /* ---- P1：升官单（本章章末晋升）+ 本章战场/过场 + 在架敌人 ---- */
+  setTimeout(()=>{
+    const p1=['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch];
+    shelfMissions.forEach(m=>missionEnemyKeys(m).forEach(k=>p1.push(k)));
+    /* 升官：本章 chapterEnd 任务的工单图/敌人/委托神全套优先 */
+    MISSIONS.forEach(m=>{
+      if(m.chapterEnd && (m.chapter||1)===ch){
+        if(ASSET.list['task_'+m.id]) p1.push('task_'+m.id);
+        if(m.god){
+          if(ASSET.list['g_'+m.god]) p1.push('g_'+m.god);
+          const av=avatarPath(m.god); if(av) p1.push(av);
+        }
+        missionEnemyKeys(m).forEach(k=>p1.push(k));
+      }
+    });
+    ASSET.priority(uniq(p1),3);
+  },1200);
+
+  /* ---- P2：道具 + 五系神格小图标（单张小，约 11MB） ---- */
+  setTimeout(()=>{
+    ASSET.priority(Object.keys(ASSET.list).filter(k=>/^(it_|gh_)/.test(k)),3);
+  },2500);
+
+  /* ---- P3：低优 warm 队列（单线程让路） ---- */
   const met=Object.keys(GODS).filter(g=>Game.isGodUnlocked(g));
   const gKeys=met.filter(g=>ASSET.list['g_'+g]).map(g=>'g_'+g);
-  const avKeys=met.filter(g=>typeof GOD_ART!=='undefined' && !GOD_ART.includes(g)).map(g=>ASSET.avatarFile(g));
-  const eKeys=[];
-  (s.shelf||[]).forEach(o=>{
-    const m=MISSIONS.find(x=>x.id===o.mid);
-    (m&&m.acts||[]).forEach(a=>{ if(a.enemy) eKeys.push('e_'+a.enemy); });
-  });
-  ASSET.warm(uniq(gKeys.concat(eKeys).concat(['bf_c'+ch,'bf_c'+ch+'n','scene_c'+ch])),true);
-  /* 第二梯队：技能（战斗）、无真绘神的头像 */
+  const avKeys=met.map(avatarPath).filter(Boolean);
+  /* 本章其余工单（含支线）真绘，边玩边到 */
+  const chTasks=MISSIONS.filter(m=>(m.chapter||1)===ch).map(m=>'task_'+m.id).filter(k=>ASSET.list[k]);
+  ASSET.warm(uniq(gKeys.concat(chTasks)),true);
   ASSET.warm(Object.keys(ASSET.list).filter(k=>/^sk_/.test(k)).concat(avKeys));
-  /* 其余一切（全部敌人、未解锁神、他章场景工单），去重自动跳过已完成项 */
-  setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),3000);
+  setTimeout(()=>ASSET.warm(Object.keys(ASSET.list)),5000);
 }
 
 /* ================= 封面氛围微尘 ================= */
@@ -171,6 +213,70 @@ function spawnLoginDust(){
     box.appendChild(p);
   }
 }
+
+/* ================= PWA 安装引导 ================= */
+const PWA={
+  deferred:null,
+  isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone===true;
+  },
+  isIOS(){
+    return /iphone|ipad|ipod/i.test(navigator.userAgent)
+      || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  },
+  dismissedRecently(){
+    const t=+localStorage.getItem('pwa_bar_closed_at')||0;
+    return Date.now()-t < 7*24*3600*1000;   /* 关过则 7 天不再提 */
+  },
+  /* 安卓/桌面 Chrome：捕获浏览器的安装邀请 */
+  init(){
+    if(this.isStandalone()) return;
+    window.addEventListener('beforeinstallprompt', e=>{
+      e.preventDefault();
+      this.deferred=e;
+      this.maybeShow();
+    });
+    window.addEventListener('appinstalled', ()=>{
+      this.deferred=null;
+      this.hide();
+      UI.toast('已装入桌面，从此全屏点卯');
+    });
+  },
+  /* 进门后由 Login 调用：已具备安装条件时显示引导 */
+  maybeShow(){
+    if(this.isStandalone() || this.dismissedRecently()) return;
+    const bar=$('pwaBar');
+    if(!bar || !bar.hidden) return;
+    const ios=this.isIOS();
+    /* iOS 只有"没有原生安装事件"，始终给手动指引；其余平台等 beforeinstallprompt */
+    if(!ios && !this.deferred) return;
+    if(ios){
+      $('pwaHow').textContent='Safari 底部分享 → 添加到主屏幕';
+      $('pwaInstall').textContent='查看步骤';
+    }
+    bar.hidden=false;
+    requestAnimationFrame(()=>bar.classList.add('show'));
+  },
+  async install(){
+    if(this.isIOS()){
+      UI.toast('点底部分享图标 ⬆️ ，再选「添加到主屏幕」即可');
+      return;
+    }
+    if(!this.deferred){ UI.toast('浏览器菜单里也能找到「安装应用」'); return; }
+    this.deferred.prompt();
+    const {outcome}=await this.deferred.userChoice.catch(()=>({outcome:'unknown'}));
+    if(outcome==='accepted'){ this.deferred=null; this.hide(); }
+  },
+  hide(){
+    const bar=$('pwaBar');
+    if(bar){ bar.classList.remove('show'); setTimeout(()=>{bar.hidden=true;},300); }
+  },
+  close(){
+    localStorage.setItem('pwa_bar_closed_at',String(Date.now()));
+    this.hide();
+  }
+};
 
 /* ================= 名号登录（本地点名册 · 两屏） ================= */
 const Login={
@@ -331,13 +437,12 @@ const Login={
     Stats.recalc();
     /* 异常退出时若在执行单中，安全复位（当天工单重刷） */
     if(Game.s && Game.s.busy){ Game.s.busy=false; Shelf.refresh(); Game.save(); }
-    const keys=(mode==='continue'||mode==='claim')
-      ? BOOT.requiredKeys()
-      : BOOT.smallKeys(0).concat(BOOT.shelfKeys());
+    const keys=BOOT.requiredKeys();
     const tip=(mode==='continue'||mode==='claim')?'调取你的案卷…':'点卯到任，先领文书…';
     gate(keys,tip).then(()=>{
       $('intro').classList.add('hidden');
       UI.view='office'; UI.tab='desk'; UI.render(); warmAll();
+      setTimeout(()=>PWA.maybeShow(),2500);   /* 进门后再轻声提一句安装 */
       if(mode==='continue'||mode==='claim'){
         if(typeof Guide!=='undefined') Guide.autoStart();
       }else{
@@ -367,6 +472,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
   $('coverEnter').addEventListener('click', e=>{ e.stopPropagation(); Login.toLogin(); });
   $('loginCover').addEventListener('click', ()=>Login.toLogin());
   $('loginBack').addEventListener('click', ()=>Login.toCover());
+
+  /* PWA 安装引导 */
+  PWA.init();
+  $('pwaInstall').addEventListener('click', ()=>PWA.install());
+  $('pwaClose').addEventListener('click', ()=>PWA.close());
 
   /* 防止意外关页丢档：所有关键动作内已即时存档 */
 });

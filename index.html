@@ -2,9 +2,17 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>天道打工人</title>
 <link rel="icon" type="image/jpeg" href="img/p_r0.jpg">
+<!-- PWA：可安装到桌面、全屏、离线 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#12100c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="天道打工人">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -79,6 +87,17 @@
   <div id="guideLayer" class="hidden"></div>
   <!-- 轻提示 -->
   <div id="toastLayer"></div>
+
+  <!-- PWA 安装引导（JS 判断是否显示） -->
+  <div id="pwaBar" class="pwa-bar" hidden>
+    <span class="pwa-ico">天</span>
+    <div class="pwa-txt">
+      <b>装到桌面</b>
+      <span id="pwaHow">全屏游玩 · 断网也能玩</span>
+    </div>
+    <button class="btn btn-primary btn-sm" id="pwaInstall" type="button">安装</button>
+    <button class="pwa-x" id="pwaClose" type="button" aria-label="以后再说">×</button>
+  </div>
 
   <!-- 开场 · 名号登录（两屏：纯封面 → 点击 → 登录卡） -->
   <div id="intro" class="overlay login-overlay is-cover">

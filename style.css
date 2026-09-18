@@ -2588,3 +2588,137 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   .bl-title{font-size:34px;letter-spacing:9px;text-indent:9px}
   .bl-seal{width:70px;height:70px;font-size:21px}
 }
+
+/* ================= PWA 安装引导条 ================= */
+.pwa-bar{
+  position:fixed;left:10px;right:10px;
+  bottom:calc(64px + env(safe-area-inset-bottom,0px));
+  z-index:2300;
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px 9px 12px;
+  border-radius:12px;
+  background:linear-gradient(160deg,rgba(38,32,24,.97),rgba(20,17,12,.97));
+  box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 0 1px rgba(201,162,91,.3) inset;
+  transform:translateY(16px);opacity:0;
+  transition:transform .35s cubic-bezier(.34,1.4,.64,1),opacity .3s;
+}
+.pwa-bar.show{transform:translateY(0);opacity:1}
+.pwa-ico{
+  flex:none;width:36px;height:36px;border-radius:8px;
+  display:grid;place-items:center;
+  font-family:var(--font-brush);font-size:20px;color:#f3e9d2;
+  background:linear-gradient(150deg,#b04632,#8c2f22);
+  box-shadow:0 0 0 1px rgba(243,233,210,.2) inset;
+}
+.pwa-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.pwa-txt b{color:#f0e2c4;font-size:14.5px;letter-spacing:1px}
+.pwa-txt span{color:#b9a880;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pwa-bar .btn{flex:none;min-height:36px;padding:0 18px}
+.pwa-x{
+  flex:none;width:30px;height:30px;border:none;background:none;
+  color:#9a8b68;font-size:22px;line-height:1;cursor:pointer;border-radius:50%;
+}
+.pwa-x:active{background:rgba(255,255,255,.08)}
+
+/* ================================================================
+   手机触控优化 · 安全区 · 最小触控尺寸
+   ================================================================ */
+@media (max-width:768px){
+  /* 顶栏避让刘海/状态栏 */
+  #topbar{padding-top:calc(6px + env(safe-area-inset-top,0px))}
+  /* 舞台上下安全区 */
+  .stage{
+    padding-top:10px;
+    padding-left:max(10px,env(safe-area-inset-left,0px));
+    padding-right:max(10px,env(safe-area-inset-right,0px));
+    padding-bottom:max(16px,env(safe-area-inset-bottom,0px));
+  }
+  /* 底部导航：标准触控高度 + 横条安全区 */
+  #tabbar{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tab{min-height:54px;padding:7px 2px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tab-ico{font-size:22px}
+  .tab-txt{font-size:11px}
+  .tab-dot{top:8px}
+
+  /* 按钮：保证不小于 40px 触控高度 */
+  .btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+  .btn-sm{min-height:36px;padding:0 14px}
+  .o-actions .btn{min-height:42px}
+  .choice-btn{min-height:48px;padding:12px 14px}
+  .skill-pick{min-height:44px}
+  .m-actions .btn{min-height:46px}
+
+  /* 弹窗：超高可滚，不被安全区挡住 */
+  #modalLayer .overlay{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(10px,env(safe-area-inset-top,0px)) 10px}
+  #modalLayer .paper,#modalLayer .m-box{max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:auto}
+
+  /* KPI 数字略放大 */
+  .kpi-row b{font-size:17px}
+
+  /* 工单卡：标题与正文阅读尺寸 */
+  .order{padding:11px 12px}
+  .o-title{font-size:16px}
+  .o-scroll{font-size:13.5px;line-height:1.7;-webkit-line-clamp:5}
+
+  /* 神格盘槽位保持手指可点 */
+  .slot{width:52px;height:52px;font-size:22px}
+
+  /* 战斗操作区按钮 */
+  .moment .m-actions .btn{font-size:14px}
+}
+
+/* ================================================================
+   手机横屏（高度吃紧）：压顶栏/导航/过场，内容优先
+   覆盖主流横屏宽 568-960、高 ≤520 的机型
+   ================================================================ */
+@media (max-width:960px) and (max-height:520px) and (orientation:landscape){
+  #topbar{padding:3px max(10px,env(safe-area-inset-left,0px));gap:4px}
+  .brand-seal{width:28px;height:28px}
+  .brand h1{font-size:16px;letter-spacing:1px}
+  .brand small{display:none}
+  .top-stats{gap:3px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .top-stats::-webkit-scrollbar{display:none}
+  .stat-chip{padding:1px 7px 1px 4px}
+  .stat-chip .sc-ico{width:18px;height:18px}
+  .stat-chip .k{font-size:9px}
+  .stat-chip .v{font-size:12px}
+  .bar-chip{min-width:110px}
+
+  .stage{padding:6px 12px 10px;max-width:760px}
+
+  /* 导航收窄为单行小条 */
+  #tabbar{padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tab{min-height:0;padding:4px 2px calc(3px + env(safe-area-inset-bottom,0px));flex-direction:row;gap:5px}
+  .tab-ico{font-size:16px}
+  .tab-txt{font-size:11px}
+  .tab-dot{top:3px;left:calc(50% + 14px)}
+  .tab.active .tab-ico{transform:none}
+
+  /* 战斗场景压缩 */
+  .battle-field{min-height:120px;padding:8px 10px}
+  .fig-body{width:60px;height:78px}
+  .fig-body .fig-fallback{font-size:26px}
+  .vs{font-size:20px}
+  .battle-log{min-height:52px;padding:5px 10px;font-size:12px;line-height:1.55}
+  .btn{min-height:36px}
+  .btn-sm{min-height:32px}
+  .choice-btn{min-height:40px;padding:8px 12px}
+
+  /* 故事过场：横屏下文字区限高 */
+  .m-intro-cap{max-height:94vh}
+  .mi-name{font-size:clamp(26px,5vh,40px);margin:2px 0 6px}
+  .mi-story{margin-top:10px;max-width:720px}
+  .mi-story p{font-size:clamp(14px,2.1vh,17px);line-height:1.7;margin-bottom:8px}
+  .mi-go{bottom:2.5%}
+
+  /* 弹窗横屏贴顶滚动 */
+  #modalLayer .overlay{padding:6px 10px}
+  #modalLayer .paper,#modalLayer .m-box{max-height:96vh}
+
+  /* 封面横屏：文字入口下移收窄 */
+  .login-cover{padding-bottom:max(14px,env(safe-area-inset-bottom,0px))}
+  .cover-enter .ce-txt{font-size:16px;letter-spacing:3px}
+
+  /* 安装条避让矮导航 */
+  .pwa-bar{bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+}

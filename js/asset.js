@@ -70,16 +70,22 @@ const ASSET = {
     this._pullInflight[file]=p;
     return p;
   },
-  /* 批量高优先级：小并发池主动拉取一组 key（用于进门后在架工单图等） */
+  /* 批量高优先级：小并发池主动拉取一组 key（用于进门后在架工单图等）
+     兼容两种入参：list 内的 key（'g_xxx'）或直接文件路径（'img/av_xxx.jpg'） */
   priority(keys,conc){
-    const q=(keys||[]).filter((v,i,a)=>v&&a.indexOf(v)===i && this.list[v]
-      && this._probe[this.file(v)]===undefined && !this._missing[this.file(v)]);
+    const fileOf=v=>this.list[v]?this.file(v):(/^img\//.test(v)?v:null);
+    const q=(keys||[]).filter((v,i,a)=>{
+      if(!v||a.indexOf(v)!==i) return false;
+      const f=fileOf(v);
+      if(!f) return false;
+      return this._probe[f]===undefined && !this._missing[f];
+    });
     if(!q.length) return;
     let i=0;
     const worker=()=>{
       const k=q[i++];
       if(k===undefined) return Promise.resolve();
-      return this._pull(this.file(k)).then(()=>{ this._warmDone[k]=1; return worker(); });
+      return this._pull(fileOf(k)).then(()=>{ this._warmDone[k]=1; return worker(); });
     };
     for(let w=0;w<Math.min(conc||3,q.length);w++) worker();
   },
