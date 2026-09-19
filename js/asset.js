@@ -64,13 +64,21 @@ const ASSET = {
     return hit;
   },
 
-  file(key){ key=this.ALIAS[key]||key; return this.base()+'img/'+key+'.'+(this._webp?'webp':'jpg'); },
+  /* key 可带 '#sprite' 后缀：战斗专用抠底立牌，取独立库 img/bsprite/<key>.png；
+     不带后缀的原图（登场/过场/图鉴）路径完全不变 */
+  file(key){
+    const sp=typeof key==='string'&&key.endsWith('#sprite');
+    if(sp) key=key.slice(0,-7);
+    key=this.ALIAS[key]||key;
+    return this.base()+'img/'+(sp?'bsprite/':'')+key+'.'+(sp?'png':(this._webp?'webp':'jpg'));
+  },
   avatarFile(gid){ return this.base()+'img/av_'+gid+'.jpg'; },
 
   /* 任意入参 → 可直接请求的文件 URL：list key 走 file()；绝对 URL 原样；'img/' 相对路径补 base */
   _toFile(v){
     if(!v) return null;
-    if(this.list[v]) return this.file(v);
+    const b=typeof v==='string'?v.replace(/#sprite$/,''):v;   /* 变体按其原图 key 验籍 */
+    if(this.list[v]||this.list[b]) return this.file(v);
     if(/^(https?:|file:|blob:|data:)/i.test(v)) return v;
     if(v.slice(0,4)==='img/') return this.base()+v;
     return null;
@@ -125,9 +133,10 @@ const ASSET = {
     (this._waiters[file]=this._waiters[file]||[]).push(cb);
     this._pull(file);
   },
-  /* 按资产 key 订阅 */
+  /* 按资产 key 订阅（'#sprite' 变体按原图 key 验籍，文件走 bsprite png） */
   onKeyReady(key,cb){
-    if(!key||!this.list[key]){ cb(null); return; }
+    const b=typeof key==='string'?key.replace(/#sprite$/,''):key;
+    if(!key||!this.list[b]){ cb(null); return; }
     this.onFile(this.file(key),cb);
   },
   /* 高优先级直拉（页面正在看的图）：自带在途去重，不走 warm 的单线程/让路节流；
@@ -492,14 +501,23 @@ const ASSET = {
   },
 
   mount(img, key){
-    if(!key || !this.list[key]){ img.style.display='none'; return; }
+    const sp=typeof key==='string'&&key.endsWith('#sprite');
+    const base=sp?key.slice(0,-7):key;
+    if(!key || !this.list[base]){ img.style.display='none'; return; }
     img.decoding='async';
     img.classList.add('asset-fade');
-    /* 总保险：任何真图 URL 赋给节点后再失败（blob 失效/磁盘缓存损坏），换占位图而非裂图 */
+    /* 总保险：任何真图 URL 赋给节点后再失败（blob 失效/磁盘缓存损坏）——
+       #sprite 战斗立牌缺失时回退挂载原 jpg（仅一次），其余换统一占位图，绝不留裂图 */
     img.addEventListener('error',()=>{
       if(img.dataset.phSet) return;
       const s=img.getAttribute('src')||'';
-      if(s && s.slice(0,5)!=='data:'){ img.dataset.phSet='1'; img.src=this.PLACEHOLDER; }
+      if(s && s.slice(0,5)!=='data:'){
+        if(sp){
+          img.dataset.phSet='1'; img.dataset.asset=base;
+          this.mount(img,base); return;
+        }
+        img.dataset.phSet='1'; img.src=this.PLACEHOLDER;
+      }
     },true);
     this.watchVis(img,[key]);          /* 进入视口即高优直拉并失败重试 */
     const f=this.file(key);
@@ -515,7 +533,11 @@ const ASSET = {
       img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
     }
     this.onKeyReady(key,url=>{
-      if(!url){ if(!img.getAttribute('src')) img.src=this.PLACEHOLDER;  /* 坐实 404：墨字骨架即占位，无骨架时用通用占位 */ return; }
+      if(!url){
+        if(sp){ img.dataset.asset=base; this.mount(img,base); return; }  /* 立牌坐实 404：回退原图 */
+        if(!img.getAttribute('src')) img.src=this.PLACEHOLDER;  /* 坐实 404：墨字骨架即占位，无骨架时用通用占位 */
+        return;
+      }
       this._assignReal(img,url);
     });
   },
@@ -627,7 +649,7 @@ const ASSET = {
   sceneKey(ch){ return 'scene_c'+Math.min(5,Math.max(1,ch||1)); },
 
   /* ---- 程序化水墨 SVG 兜底（由文件末尾 INKSVG 提供） ---- */
-  svg(key){ return INKSVG ? INKSVG.make(key) : ''; },
+  svg(key){ return INKSVG ? INKSVG.make(String(key).replace(/#sprite$/,'')) : ''; },
 };
 
 /* ================================================================

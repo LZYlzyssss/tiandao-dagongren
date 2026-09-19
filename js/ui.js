@@ -2108,9 +2108,9 @@ const UI = {
   renderBattle(B){
     const c=$('pageStage'); c.innerHTML='';
     const wrap=h('div','battle-wrap');
-    /* 立绘 key：玩家 p_r{rank}，敌人 e_{id} */
-    const pKey='p_r'+(Game.s.rank||0);
-    const eKey='e_'+(B.e.id||'');
+    /* 立绘 key：玩家 p_r{rank}，敌人 e_{id}；战斗专用 #sprite 抠底立牌库（登场/过场/图鉴仍用原图） */
+    const pKey='p_r'+(Game.s.rank||0)+'#sprite';
+    const eKey='e_'+(B.e.id||'')+'#sprite';
     wrap.innerHTML=`<div class="battle-field" id="battleField">
         <div class="battle-bg" id="battleBg"></div><div class="battle-veil"></div>
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
@@ -2197,7 +2197,8 @@ const UI = {
     box.innerHTML=`<span class="aid-label">${gd.name}</span>`;
     const img=h('img','aid-img');
     img.alt=gd.name;
-    img.dataset.gava=gkey;
+    /* 神明上阵：用战斗专用 #sprite 抠底立牌（图鉴/下凡/神格仍挂原 g_ 大图）；缺牌时 ASSET 自动回退原图 */
+    img.dataset.asset='g_'+gkey+'#sprite';
     box.insertBefore(img, box.firstChild);
     field.appendChild(box);
     setTimeout(()=>box.remove(), 3000);
