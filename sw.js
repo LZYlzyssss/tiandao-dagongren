@@ -7,7 +7,7 @@
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
    - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
    发版改下方 VERSION 即自动清旧桶 */
-const VERSION='xw-v25';
+const VERSION='xw-v26';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
   './','./index.html','./style.css','./manifest.json',
@@ -37,11 +37,13 @@ self.addEventListener('activate', e=>{
 const cacheable=res=>!!res && (res.ok || res.type==='opaque');
 
 /* 在途请求表：页面预载与 <img> 挂载常同时索要同一张大图，
-   必须共用同一条网络响应，否则弱网下每张图被重复下载、带宽对半砍 */
+   必须共用同一条网络响应，否则弱网下每张图被重复下载、带宽对半砍。
+   注意 Response.body 是单消费者流：后来的复用者必须各拿 clone()，
+   否则两个 <img>/fetch 抢同一 body，后者 net::ERR_FAILED 卡在骨架 */
 const inflight=new Map();
 function sharedFetch(req){
   const key=req.url;
-  if(inflight.has(key)) return inflight.get(key);
+  if(inflight.has(key)) return inflight.get(key).then(res=>res.clone());
   const p=fetch(req).then(res=>{
     if(cacheable(res)){
       const copy=res.clone();
