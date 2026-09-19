@@ -118,6 +118,7 @@ const Battle = {
 
     /* ---------- 玩家普攻 ---------- */
     const playerStrike = async (mult=1, path, opts={})=>{
+      if(typeof SFX!=='undefined') SFX.play('swing');
       if(e.stun>0){ /* 敌人震骇不影响玩家 */ }
       const isCrit = Math.random() < p.crit;
       const vulnMul = (e.vulnTurns>0 || e.vulnFixed>1) ? 1.5 : 1;
@@ -130,6 +131,7 @@ const Battle = {
       let h = 0;
       if(life>0){ h=Math.round(dmg*life); p.hp=clamp(p.hp+h,0,p.maxHp); }
       if(!opts.silent) addLog(`你出手，${isCrit?'<b>暴击！</b>':''}造成 <b>${dmg}</b> 点伤害${h?`，汲取 ${h} 点生机`:''}`, 'lg-good');
+      if(typeof SFX!=='undefined') SFX.play(isCrit?'crit':'hit');
       UI.flash('foe','hit'); UI.floatFoe(`-${dmg}`, isCrit?'#c03c2e':'#5c5347');
       if(typeof FX!=='undefined') FX.comboHit();
       if(isCrit) await sleep(120);
@@ -155,6 +157,7 @@ const Battle = {
       if(e.intent==='xu'){
         /* 蓄力：本回合不攻击，下回合加倍 */
         e.charging = true;
+        if(typeof SFX!=='undefined') SFX.play('charge');
         addLog(`「${e.name}」正在【蓄力】，气息暴涨——下回合必有重击！`,'lg-bad');
         e.intentNext = 'qiang';   // 蓄力后必强攻
         return;
@@ -162,6 +165,7 @@ const Battle = {
       if(e.intent==='shou'){
         e.shielding = true;
         e.hp = clamp(e.hp + Math.round(e.maxHp*0.05), 0, e.maxHp);
+        if(typeof SFX!=='undefined') SFX.play('shield');
         addLog(`「${e.name}」摆出【守势】，周身浮起护体之气，还回了点神元。`,'lg-bad');
         tag='（守势）';
       }
@@ -185,6 +189,7 @@ const Battle = {
       if(p.shield>0){ const ab = Math.min(p.shield,dmg); p.shield-=ab; dmg-=ab; }
       p.hp = Math.max(0,p.hp-dmg);
       addLog(`「${e.name}」${tag}反击，造成 <b>${dmg}</b> 点伤害`, 'lg-bad');
+      if(typeof SFX!=='undefined') SFX.play('hurt');
       UI.flash('player','hit'); UI.floatPlayer(`-${dmg}`,'#c03c2e');
       if(typeof FX!=='undefined'){ FX.comboReset(); FX.bloodScreen(); }
       /* 敌方特性 */
@@ -208,6 +213,7 @@ const Battle = {
       if((p.cooldowns[id]||0)>0){ UI.toast(`「${g.name}」冷却中（${p.cooldowns[id]}回合）`); return false; }
       p.mp -= a.cost;
       p.cooldowns[id] = a.cd||0;
+      if(typeof SFX!=='undefined') SFX.play('cast');
       UI.flash('player','cast');
       addLog(`你催动神格「${g.name}」——<b>${a.name}</b>！`,'lg-sys');
       await sleep(250);
@@ -308,6 +314,12 @@ const Battle = {
         default:
           addLog(`「${g.name}」的神通暂未显化。`,'lg-sys');
       }
+      /* 疗伤/护盾类神通给专属尾音 */
+      if(typeof SFX!=='undefined'){
+        if(/heal|cleanse/.test(a.type)) SFX.play('heal');
+        else if(a.type==='shield') SFX.play('shield');
+        else SFX.play('hit');
+      }
       await sleep(300);
       return true;
     };
@@ -315,9 +327,11 @@ const Battle = {
     /* ---------- 拼命 ---------- */
     const burnGodhood = async (id)=>{
       const g = GODHOODS[id];
+      if(typeof SFX!=='undefined') SFX.play('burn');
       UI.flash('player','cast');
       const dmg=Math.max(1,Math.round(p.atk*3.2*rnd(1.0,1.15)*shellMul(false)));
       e.hp=Math.max(0,e.hp-dmg);
+      if(typeof SFX!=='undefined') SFX.play('crit');
       UI.floatFoe(`-${dmg}`,'#c03c2e');
       addLog(`你强行透支「${g.name}」，倾尽全力一击——<b>${dmg}</b> 点伤害！神格随即黯淡。`,'lg-bad');
       s.gh[id].sleep = 3;
@@ -335,6 +349,7 @@ const Battle = {
       if(lv<=0 || factor<=0){ UI.toast('交情尚浅，无法呼神'); return; }
       B.aidUsed=true; B.aidGod=gkey;
       if(UI.showAidGod) UI.showAidGod(gkey);   /* 画质批2：支援神立绘降临 */
+      if(typeof SFX!=='undefined') SFX.play('aid');
       UI.flash('player','cast');
       const lvName=FAVOR_LEVELS[lv].name;
       addLog(`危难之际，你遥唤「${gd.name}」——${lvName}降临，<b>${a.name}</b>！`,'lg-sys');
@@ -506,12 +521,14 @@ const Battle = {
     /* ============ 结算 ============ */
     B.finished = true;
     if(B.fled){
+      if(typeof SFX!=='undefined') SFX.play('flee');
       addLog('你祭出遁光，抽身而退。工单……只能听天由命了。','lg-bad');
       UI.updateBattle(B); await sleep(400);
       s.hp = p.hp; Game.save();
       return 'flee';
     }
     if(e.hp<=0){
+      if(typeof SFX!=='undefined') SFX.play('win');
       addLog(`「${e.name}」溃散成一地${e.deathFx}。`,'lg-good');
       UI.killFoe();
       UI.updateBattle(B); await sleep(500);
@@ -521,6 +538,7 @@ const Battle = {
     /* 玩家倒下 */
     B.playerDown = true;
     p.hp = 0;
+    if(typeof SFX!=='undefined') SFX.play('dead');
     addLog('你的神躯重重坠地，眼前一黑……','lg-bad');
     UI.updateBattle(B); await sleep(600);
     s.hp = 0; Game.save();

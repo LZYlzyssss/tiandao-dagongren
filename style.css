@@ -327,6 +327,17 @@ body::before{
   box-shadow:0 1px 4px rgba(46,111,142,.16),inset 0 1px 0 rgba(255,255,255,.30);
   transform:translateY(1px) scale(.985);
 }
+/* 音效开关：淡石青软键 */
+.btn-sfx{
+  color:#2e6f8e;font-size:13px;letter-spacing:2px;
+  background:linear-gradient(180deg,rgba(126,170,191,.18) 0%,rgba(126,170,191,.09) 100%);
+  border-color:rgba(46,111,142,.35);
+  box-shadow:0 2px 7px rgba(46,111,142,.10),inset 0 1px 0 rgba(255,255,255,.35);
+}
+.btn-sfx:hover{
+  color:#26607c;border-color:rgba(46,111,142,.55);
+  background:linear-gradient(180deg,rgba(126,170,191,.30) 0%,rgba(126,170,191,.16) 100%);
+}
 .btn-sell{background:transparent;color:var(--cinnabar);border-color:var(--cinnabar);
   box-shadow:0 2px 0 rgba(150,48,31,.12),inset 0 1px 0 rgba(255,255,255,.4);}
 .btn-sell:hover{background:rgba(192,60,46,.10);box-shadow:0 3px 0 rgba(150,48,31,.12),0 6px 12px rgba(150,48,31,.12);}

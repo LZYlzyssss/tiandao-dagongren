@@ -7,12 +7,12 @@
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
    - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
    发版改下方 VERSION 即自动清旧桶 */
-const VERSION='xw-v26';
+const VERSION='xw-v27';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
   './','./index.html','./style.css','./manifest.json',
   './js/data.js','./js/lore.js','./js/asset.js','./js/fx.js','./js/state.js',
-  './js/battle.js','./js/minigames.js','./js/ui.js','./js/guide.js','./js/main.js',
+  './js/sfx.js','./js/battle.js','./js/minigames.js','./js/ui.js','./js/guide.js','./js/main.js',
   './img/p_r0.jpg','./img/cover.png',
   './img/icon-192.png','./img/icon-512.png','./img/icon-maskable-512.png','./img/apple-touch-icon.png',
 ];

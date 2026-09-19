@@ -692,6 +692,13 @@ const UI = {
     sw.style.clear='both'; sw.style.display='block'; sw.style.width='100%'; sw.style.marginTop='12px';
     sw.onclick=()=>this.confirmLogout();
     idp.appendChild(sw);
+    /* 音效开关（全局，不随存档） */
+    const sbtn=h('button','btn btn-sfx');
+    const paintSfx=()=>{ sbtn.textContent=(typeof SFX!=='undefined'&&SFX.on?'🔊 音效 · 开':'🔇 音效 · 关'); };
+    paintSfx();
+    sbtn.style.display='block'; sbtn.style.width='100%'; sbtn.style.marginTop='8px';
+    sbtn.onclick=()=>{ SFX.toggle(); paintSfx(); };
+    idp.appendChild(sbtn);
     c.appendChild(idp);
 
     /* 战力 */
@@ -1003,7 +1010,8 @@ const UI = {
       const kd=KIND[e.kind]||['祟','邪祟'];
       const stars='✦'.repeat(e.tier)+'✧'.repeat(Math.max(0,5-e.tier));
       const dread=(typeof ENEMY_DREAD!=='undefined'&&ENEMY_DREAD[e.id])||'';
-      /* 登场瞬间震屏一次 */
+      /* 登场瞬间震屏一次，鸣锣/阴风按品级分音 */
+      if(typeof SFX!=='undefined') SFX.play(e.tier>=3?'debutBoss':'debutMin');
       document.body.classList.add('em-shake');
       setTimeout(()=>document.body.classList.remove('em-shake'),380);
 
@@ -1182,6 +1190,7 @@ const UI = {
       const clearTimers=()=>{ timers.forEach(clearTimeout); timers.length=0; };
       /* 落印震屏 */
       const slam=()=>{
+        if(typeof SFX!=='undefined') SFX.play('stamp');
         document.body.classList.add('rp-shake');
         later(()=>document.body.classList.remove('rp-shake'),460);
       };
@@ -1655,6 +1664,7 @@ const UI = {
       <div style="width:80px;height:80px;margin:6px auto 4px">${godAvatar(m.god,80)}</div>
       <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name} 一揖到地</div>
       <div class="reward-line">${rwdHtml}</div>${mainMsg}`;
+    if(typeof SFX!=='undefined') SFX.play('reward');
     if(gh.awakened){
       const pop=h('div','wake-pop',
         `<h4>神格觉醒！</h4><div>「${gh.name}」在你神躯中轰然亮起——<br>
@@ -1691,6 +1701,7 @@ const UI = {
   },
 
   openNotice(title,html,onClose){
+    if(typeof SFX!=='undefined') SFX.play('pop');
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay'), box=h('div','paper m-box');
     box.innerHTML=`<h3>${title}</h3><div style="font-size:15px;line-height:2">${html}</div>`;
