@@ -1757,8 +1757,6 @@ body::before{
 .codex-ico{flex:0 0 52px;width:52px;height:52px;border-radius:9px;overflow:hidden;
   display:grid;place-items:center;background:#2b2620;box-shadow:inset 0 0 0 1px rgba(201,150,47,.4)}
 .codex-ico img{width:100%;height:100%;object-fit:cover;display:block}
-.codex-ico-god{background:radial-gradient(circle at 35% 30%,#4a3f2a,#241d12)}
-.codex-emoji{font-size:28px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
 .codex-label{display:flex;flex-direction:column;gap:2px;
   font-family:var(--font-brush);font-size:19px;letter-spacing:2px;color:var(--ink);text-indent:2px}
 .codex-label small{font-family:var(--font-body);font-size:11px;letter-spacing:1px;color:var(--ink-soft);font-weight:normal}

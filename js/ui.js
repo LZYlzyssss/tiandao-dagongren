@@ -798,7 +798,7 @@ const UI = {
           <span class="codex-label">妖鬼收集录<small>已录 ${Game.enemyCount()} 妖</small></span>
         </button>
         <button class="codex-entry" id="btnGodCodex" type="button">
-          <span class="codex-ico codex-ico-god"><span class="codex-emoji">📖</span></span>
+          <span class="codex-ico"><img src="img/icon_gods.jpg" alt="神明宗卷"></span>
           <span class="codex-label">神明宗卷<small>已识 ${metN} 位仙僚</small></span>
         </button>
       </div>
