@@ -451,38 +451,69 @@ body::before{
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
 @keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes cast{0%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}50%{filter:drop-shadow(0 0 26px rgba(192,60,46,.85))}100%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}}
-/* 信息卡：名牌/血条/状态统一承托，任意战场背景上都清晰 */
+/* 信息卡：半透宣纸签——纸色淡承、墨线双勾，融进水墨战场而非白块覆盖
+   调浓淡只改 --fp（纸底色）与 --fl（墨线色）两处 */
 .finfo{
+  --fp:rgba(242,233,212,.58);          /* 纸底：想更淡降到 .48 / 更清晰升到 .68 */
+  --fl:rgba(43,38,32,.30);             /* 墨线浓度 */
+  /* 远山两层（近浓远淡）内联 SVG，零请求 */
+  --wash:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 112'%3E%3Cg fill='%232b2620'%3E%3Cpath d='M0 112V80q14-10 30-2 18 9 34 0 20-20 42-4 16 12 32 2 18-12 38-2 22 11 44 0v38z' opacity='.075'/%3E%3Cpath d='M0 112V96q26-12 52-3 26 9 52-2 24-9 48 1 26 10 50-1 10-4 18-9v30z' opacity='.05'/%3E%3C/g%3E%3C/svg%3E");
+  /* 纸绢颗粒 */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
   width:218px;max-width:100%;
-  background:linear-gradient(180deg,rgba(251,245,231,.96) 0%,rgba(244,233,210,.94) 100%);
-  border:1px solid rgba(60,50,35,.22);border-radius:10px;
-  padding:7px 12px 8px;
-  box-shadow:0 3px 10px rgba(35,27,16,.22),inset 0 1px 0 rgba(255,255,255,.55);
+  position:relative;overflow:hidden;
+  background-color:var(--fp);
+  background-image:
+    var(--grain),
+    var(--wash),
+    radial-gradient(150% 95% at 0% 100%,rgba(43,38,32,.12),transparent 62%),
+    radial-gradient(130% 90% at 100% 0%,rgba(120,92,52,.10),transparent 58%),
+    linear-gradient(180deg,rgba(247,240,224,.52),rgba(232,219,192,.45));
+  background-repeat:repeat,no-repeat,no-repeat,no-repeat,no-repeat;
+  background-size:130px 130px,100% 100%,100% 100%,100% 100%,100% 100%;
+  -webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);
+  border:1px solid var(--fl);border-radius:4px;
+  outline:1px solid rgba(43,38,32,.13);outline-offset:2px;
+  padding:8px 13px 9px;
+  /* 上下两端压一道渐隐墨，仿卷轴天杆地轴 */
+  box-shadow:0 2px 9px rgba(30,23,13,.12),
+    inset 0 3px 5px -3px rgba(43,38,32,.30),
+    inset 0 -4px 6px -4px rgba(43,38,32,.26);
   display:flex;flex-direction:column;gap:4px;
 }
-.finfo-top{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
-.fig-name{font-size:15px;font-weight:bold;letter-spacing:2px;color:#2b2620;line-height:1.25}
+.finfo-top{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:nowrap;
+  padding-bottom:5px;margin-bottom:1px}
+/* 名牌下一道渐隐墨分水线 */
+.finfo-top::after{content:"";position:absolute;left:20%;right:20%;bottom:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(43,38,32,.38),transparent)}
+/* 名号：赭墨题签色，加粗毛笔体，单行不折，过长以墨点省略 */
+.fig-name{font-family:var(--font-brush);font-size:18px;font-weight:700;letter-spacing:2px;
+  color:#7d3526;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto;text-align:center;
+  -webkit-text-stroke:.3px currentColor;
+  text-shadow:0 1px 2px rgba(242,233,212,.85)}
+.intent-bubble{flex:0 0 auto}
+/* 玩家名号带品阶较长，字号收两档保证单行完整 */
+.fighter:not(.foe) .fig-name{font-size:12px;letter-spacing:0}
 .fbar{width:100%}
 .fbar .fl{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:2px}
-.fbar .fl-k{color:#5c5347;font-weight:bold;letter-spacing:2px}
-.fbar .fl-v{color:#2b2620;font-weight:bold;font-variant-numeric:tabular-nums}
-.fbar .fl-v .fl-sub{color:#2e6f8e;font-weight:bold;margin-left:6px;font-size:11px}
-.fbar .bar{height:11px;background:rgba(52,44,30,.24);border-radius:6px;overflow:hidden;
-  box-shadow:inset 0 1px 2px rgba(30,22,12,.30),0 1px 0 rgba(255,255,255,.4)}
-.fbar .bar i{display:block;height:100%;border-radius:6px;transition:width .35s;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
-/* 状态徽标行：彩色 chip，替代原淡紫浮字 */
-.fstatus{min-height:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.fbar .fl-k{color:var(--ink-soft);font-weight:bold;letter-spacing:2px;text-shadow:0 1px 2px rgba(242,233,212,.7)}
+.fbar .fl-v{color:var(--ink);font-weight:bold;font-variant-numeric:tabular-nums;text-shadow:0 1px 2px rgba(242,233,212,.7)}
+.fbar .fl-v .fl-sub{color:var(--indigo);font-weight:bold;margin-left:6px;font-size:11px}
+.fbar .bar{height:10px;background:rgba(43,38,32,.14);border:1px solid rgba(43,38,32,.18);border-radius:2px;overflow:hidden}
+.fbar .bar i{display:block;height:100%;border-radius:1px;transition:width .35s}
+/* 状态徽标行：淡彩墨签——同色浅底、墨线勾边、深字，替代饱和彩胶囊 */
+.fstatus{min-height:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
 .fst{
   font-size:11px;line-height:1;font-weight:bold;letter-spacing:1px;
-  padding:3px 8px;border-radius:9px;color:#fbf3e2;
-  box-shadow:0 1px 3px rgba(30,22,12,.28),inset 0 1px 0 rgba(255,255,255,.22);
+  padding:3px 8px;border-radius:3px;border:1px solid;
+  background:transparent;
 }
-.fst-shield{background:linear-gradient(180deg,#3f85a6,#2c6686)}
-.fst-mp{background:linear-gradient(180deg,#46608f,#32486e)}
-.fst-burn{background:linear-gradient(180deg,#d9702f,#b5491d)}
-.fst-stun{background:linear-gradient(180deg,#8a5aae,#6b3d8c)}
-.fst-vuln{background:linear-gradient(180deg,#c9962f,#a87416)}
+.fst-shield{color:#2c5d76;border-color:rgba(46,111,142,.55);background:rgba(46,111,142,.14)}
+.fst-mp{color:#33466a;border-color:rgba(70,96,143,.55);background:rgba(70,96,143,.14)}
+.fst-burn{color:var(--cinnabar-deep);border-color:rgba(192,60,46,.55);background:rgba(192,60,46,.13)}
+.fst-stun{color:#5f4470;border-color:rgba(122,90,140,.55);background:rgba(122,90,140,.14)}
+.fst-vuln{color:#7a5612;border-color:rgba(150,108,20,.6);background:rgba(201,150,47,.17)}
 .vs{font-family:var(--font-brush);font-size:40px;color:var(--cinnabar);text-align:center;z-index:1;
   text-shadow:0 2px 6px rgba(251,245,231,.8),0 0 2px rgba(251,245,231,1)}
 .battle-log{
@@ -494,10 +525,14 @@ body::before{
 .battle-log .lg-sys{color:#9fc6dc}
 .round-tag{
   position:absolute;top:10px;left:14px;z-index:4;
-  font-size:12px;font-weight:bold;color:#4a4236;letter-spacing:2px;
-  background:rgba(251,245,231,.88);border:1px solid rgba(60,50,35,.2);
-  border-radius:10px;padding:3px 11px;
-  box-shadow:0 2px 6px rgba(35,27,16,.18);
+  font-family:var(--font-brush);font-size:14px;color:var(--ink);letter-spacing:2px;
+  background:rgba(242,233,212,.66);
+  -webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);
+  border:1px solid rgba(43,38,32,.28);border-radius:3px;
+  outline:1px solid rgba(43,38,32,.12);outline-offset:1px;
+  padding:2px 10px;
+  box-shadow:0 1px 5px rgba(30,23,13,.10);
+  text-shadow:0 1px 2px rgba(242,233,212,.8);
 }
 
 /* 关键时刻 */
@@ -834,6 +869,7 @@ body::before{
   .fig-body .fig-img{height:116%}
   .fig-body .fig-fallback{font-size:36px}
   .fig-name{font-size:12.5px;letter-spacing:1px}
+  .fighter:not(.foe) .fig-name{font-size:11.5px;letter-spacing:0}
   .finfo{width:158px;padding:6px 9px 7px;gap:3px}
   .fbar .fl{font-size:10.5px}
   .fbar .fl-v .fl-sub{display:block;margin-left:0;font-size:10px}
@@ -882,6 +918,8 @@ body::before{
   .fig-body .fig-img{height:112%}
   .fig-body .fig-fallback{font-size:28px}
   .finfo{width:140px;padding:5px 8px 6px}
+  .fighter:not(.foe) .fig-name{font-size:10.5px}
+  .fig-name{font-size:11.5px}
   .vs{font-size:22px}
   .stat-chip{padding:2px 6px;gap:4px}
   .stat-chip .sc-ico{width:18px;height:18px}
@@ -1265,16 +1303,19 @@ body::before{
 /* ---- 14. v3 战斗意图徽标（名牌行内，不再压立绘头部） ---- */
 .intent-bubble{
   display:none;
-  font-size:11px;line-height:1.2;font-weight:bold;padding:3px 9px;border-radius:9px;
-  white-space:nowrap;letter-spacing:1px;color:#fbf3e2;
-  box-shadow:0 1px 3px rgba(30,22,12,.30),inset 0 1px 0 rgba(255,255,255,.22);
+  font-family:var(--font-body);
+  font-size:12px;line-height:1.2;font-weight:bold;padding:3px 8px;border-radius:3px;
+  white-space:nowrap;letter-spacing:2px;color:#f6ecd6;
+  border:1px solid rgba(255,242,220,.38);
+  box-shadow:0 1px 3px rgba(30,22,12,.30),inset 0 0 0 1px rgba(0,0,0,.12);
   pointer-events:none;
 }
 .intent-bubble:not(:empty){display:inline-block}
-.intent-qiang{background:linear-gradient(180deg,#d4503f,#a83224)}
-.intent-xu{background:linear-gradient(180deg,#8a5aae,#6b3d8c)}
-.intent-shou{background:linear-gradient(180deg,#3f7ea6,#2c5d80)}
-.intent-mixed{background:linear-gradient(180deg,#6f675b,#524a40)}
+/* 四意图＝四方钤印：强攻朱砂 / 虚实紫 / 守势石青 / 混合墨 */
+.intent-qiang{background:#b03a2a}
+.intent-xu{background:#6f4b88}
+.intent-shou{background:#356a86}
+.intent-mixed{background:#58504a}
 .fighter.foe{position:relative}
 
 /* ---- 15. v3 侵蚀条 / 顶栏侵蚀 ---- */
