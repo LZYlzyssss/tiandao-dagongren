@@ -410,22 +410,16 @@ const ASSET = {
     if(!g){ img.remove(); return; }
     const hasArt=(typeof GOD_ART!=='undefined')&&GOD_ART.includes(gid);
     const av=this.avatarFile(gid);
-    /* 视口内：av 小头像立拉，有真绘的神同时排队 g_ 大立绘 */
-    this.watchVis(img, hasArt?[av,'g_'+gid]:[av]);
-    const swap=(url,tag)=>{
-      const im=new Image();
-      im.onload=()=>{
-        /* g 大图优先级最高，已显示后不被 av 小图覆盖 */
-        if(tag==='av' && img.dataset.art==='g') return;
-        if(tag==='g') img.dataset.art='g';
-        img.src=url; img.classList.add('loaded');
-      };
-      im.src=url;
-    };
-    /* 先上 av 小图（均 200KB 级，很快）；坐实没有 av 就移除 img 露底层墨字 */
-    this.onFile(av,url=>{ if(url) swap(url,'av'); else if(!hasArt) img.remove(); });
-    /* 有真立绘的神：大图到达后压过小图；大图坐实缺失且小图也没成，则露墨字 */
-    if(hasArt) this.onKeyReady('g_'+gid,url=>{ if(url) swap(url,'g'); else if(!img.getAttribute('src')) img.remove(); });
+    /* 有真绘神：demand 只拉 g_ 大图（本地无 av_ 小图文件，跳过 av 省 demand 槽） */
+    if(hasArt){
+      this.watchVis(img,['g_'+gid]);
+      this.onKeyReady('g_'+gid,url=>{ if(!url){ img.remove(); return; }
+        const im=new Image(); im.onload=()=>{ img.src=url; img.classList.add('loaded'); }; im.src=url; });
+      return;
+    }
+    /* 无真绘神：不 demand av（本地无 av_ 文件），仅挂订阅（若后续有 av 自动挂载；404 坐实则露字骨架） */
+    this.onFile(av,url=>{ if(!url){ img.remove(); return; }
+      const im=new Image(); im.onload=()=>{ img.src=url; img.classList.add('loaded'); }; im.src=url; });
   },
 
   /* ---- 便捷取 key ---- */
@@ -1073,6 +1067,87 @@ const INKSVG=(()=>{
     return s+tailSvg(200,200);
   }
 
+  /* ---------- 礼物（7）+ 装备（10） 方形水墨骨架（真图弱网未到即见） ---------- */
+  /* key 后缀 → 分类色 + 字形 + 装饰简图（墨笔写意，统一 200×200） */
+  const ITEM={
+    /* 礼物：木土色底，古字 */
+    it_taomu:{c:'#6f4a2c',w:'桃',kind:'peach'},
+    it_wugu:{c:'#7a5a30',w:'谷',kind:'sack'},
+    it_xiangzhu:{c:'#5a3a20',w:'香',kind:'candle'},
+    it_mozhen:{c:'#3a2c22',w:'墨',kind:'ink'},
+    it_panta:{c:'#a0522d',w:'桃',kind:'peachBig'},
+    it_hulu:{c:'#4a5f32',w:'葫',kind:'gourd'},
+    it_puti:{c:'#2f4a3a',w:'菩',kind:'leaf'},
+    /* 丹药（走 pill 已有；列在这里保证 make 也能兜住） */
+    it_danmo:{c:INK3,w:'尘'},it_dan:{c:GRN,w:'丹'},it_wang:{c:GOLD,w:'王'},
+    it_xiong:{c:CIN,w:'凶'},it_bingzhu:{c:IDG,w:'兵'},it_gui:{c:PUR,w:'鬼'},
+    /* 装备：钢蓝/赭底，兵器古字 */
+    it_pan:{c:'#334a5f',w:'笔',kind:'brush'},
+    it_zhan:{c:'#4a3528',w:'剑',kind:'sword'},
+    it_chui:{c:'#3a3a3a',w:'锤',kind:'hammer'},
+    it_jia:{c:'#5a4022',w:'甲',kind:'armor'},
+    it_pei:{c:'#2f4f6f',w:'佩',kind:'turtle'},
+    it_yi:{c:'#4a3a60',w:'衣',kind:'robe'},
+    it_chen:{c:'#3f3f45',w:'尘',kind:'whisk'},
+    it_suo:{c:'#4a2f2f',w:'链',kind:'chain'},
+    it_hu:{c:'#4a3a20',w:'葫',kind:'flameGourd'},
+    it_yin:{c:'#6f2c22',w:'印',kind:'seal'},
+  };
+  function itemArt(k){
+    const d=ITEM[k]||{c:INK,w:''};
+    let s=head(200,200,PAPER);
+    s+=`<rect x="14" y="14" width="172" height="172" rx="14" fill="none" stroke="${d.c}" stroke-width="3" opacity="0.5"/>`;
+    s+=`<circle cx="100" cy="100" r="74" fill="${d.c}" opacity="0.12"/>`;
+    switch(d.kind){
+      case 'brush': s+=`<line x1="130" y1="44" x2="82" y2="152" stroke="${INK}" stroke-width="9" stroke-linecap="round"/>`+
+                      `<path d="M82 152 L72 170 L94 170 Z" fill="${d.c}"/>`; break;
+      case 'sword': s+=`<path d="M100 32 L108 170 L92 170 Z" fill="${d.c}"/>`+
+                      `<rect x="60" y="162" width="80" height="10" rx="3" fill="${INK2}"/>`; break;
+      case 'hammer': s+=`<rect x="70" y="60" width="60" height="34" rx="6" fill="${d.c}"/>`+
+                       `<rect x="95" y="92" width="10" height="84" rx="3" fill="${INK2}"/>`; break;
+      case 'armor': s+=`<path d="M60 50 L140 50 L150 170 L130 180 L100 172 L70 180 L50 170 Z" fill="${d.c}" opacity="0.8"/>`+
+                       `<path d="M100 50 L100 172" stroke="${PAPER}" stroke-width="3"/>`; break;
+      case 'turtle': s+=`<ellipse cx="100" cy="116" rx="52" ry="38" fill="${d.c}"/>`+
+                       `<circle cx="100" cy="78" r="16" fill="${d.c}"/>`; break;
+      case 'robe': s+=`<path d="M72 42 L128 42 L146 180 L54 180 Z" fill="${d.c}" opacity="0.8"/>`+
+                      `<path d="M100 42 L100 180" stroke="${INK2}" stroke-width="2" opacity="0.5"/>`; break;
+      case 'whisk': for(let i=0;i<9;i++) s+=`<line x1="${100+i*4-16}" y1="60" x2="${100+i*4-24}" y2="170" stroke="${INK}" stroke-width="3" stroke-linecap="round" opacity="0.65"/>`;
+                     s+=`<ellipse cx="100" cy="56" rx="20" ry="10" fill="${d.c}"/>`; break;
+      case 'chain': s+=`<circle cx="60" cy="60" r="12" fill="none" stroke="${INK}" stroke-width="6"/>`+
+                       `<circle cx="140" cy="60" r="12" fill="none" stroke="${INK}" stroke-width="6"/>`+
+                       `<circle cx="100" cy="100" r="12" fill="none" stroke="${INK}" stroke-width="6"/>`+
+                       `<circle cx="60" cy="140" r="12" fill="none" stroke="${INK}" stroke-width="6"/>`+
+                       `<circle cx="140" cy="140" r="12" fill="none" stroke="${INK}" stroke-width="6"/>`; break;
+      case 'gourd': s+=`<ellipse cx="100" cy="72" rx="28" ry="32" fill="${d.c}"/>`+
+                      `<ellipse cx="100" cy="132" rx="42" ry="36" fill="${d.c}"/>`+
+                      `<rect x="96" y="28" width="8" height="12" rx="2" fill="${INK}"/>`; break;
+      case 'flameGourd': s+=`<ellipse cx="100" cy="72" rx="28" ry="32" fill="${d.c}"/>`+
+                           `<ellipse cx="100" cy="132" rx="42" ry="36" fill="${d.c}"/>`+
+                           `<path d="M100 84 Q108 110 100 132 Q92 110 100 84" fill="${CIN}" opacity="0.7"/>`; break;
+      case 'seal': s+=`<rect x="60" y="60" width="80" height="80" rx="6" fill="${d.c}"/>`+
+                     `<rect x="74" y="74" width="52" height="52" rx="2" fill="none" stroke="${PAPER}" stroke-width="3" opacity="0.7"/>`; break;
+      case 'peach': s+=`<circle cx="100" cy="110" r="52" fill="${d.c}"/>`+
+                       `<path d="M100 58 Q84 32 68 40" stroke="${INK}" stroke-width="6" fill="none" stroke-linecap="round"/>`+
+                       `<ellipse cx="100" cy="110" rx="12" ry="8" fill="${PAPER}" opacity="0.3"/>`; break;
+      case 'peachBig': s+=`<circle cx="100" cy="110" r="56" fill="${d.c}"/>`+
+                          `<path d="M100 54 Q76 22 60 32" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/>`+
+                          `<ellipse cx="100" cy="110" rx="14" ry="9" fill="${PAPER}" opacity="0.3"/>`; break;
+      case 'sack': s+=`<path d="M46 74 L154 74 L140 170 L60 170 Z" fill="${d.c}"/>`+
+                      `<path d="M46 74 L100 56 L154 74" stroke="${INK}" stroke-width="4" fill="none"/>`; break;
+      case 'candle': s+=`<rect x="88" y="70" width="24" height="96" rx="3" fill="${d.c}"/>`+
+                        `<path d="M100 40 Q112 60 100 74 Q88 60 100 40" fill="${CIN}" opacity="0.9"/>`; break;
+      case 'ink': s+=`<rect x="56" y="78" width="88" height="60" rx="6" fill="${d.c}"/>`+
+                     `<rect x="68" y="90" width="64" height="10" rx="2" fill="${INK2}" opacity="0.5"/>`; break;
+      case 'gourd': s+=`<ellipse cx="100" cy="72" rx="28" ry="32" fill="${d.c}"/>`+
+                       `<ellipse cx="100" cy="132" rx="42" ry="36" fill="${d.c}"/>`+
+                       `<rect x="96" y="28" width="8" height="12" rx="2" fill="${INK}"/>`; break;
+      case 'leaf': s+=`<path d="M100 34 Q150 70 132 160 Q100 180 68 160 Q50 70 100 34 Z" fill="${d.c}"/>`+
+                       `<path d="M100 34 L100 170" stroke="${PAPER}" stroke-width="3" opacity="0.7"/>`; break;
+    }
+    s+=txt(100,d.kind==='brush'?144:d.kind==='seal'?116:116,d.w,PAPER,d.kind==='seal'?26:32,'normal');
+    return s+tailSvg(200,200);
+  }
+
   /* ---------- 总入口 ---------- */
   function make(key){
     try{
@@ -1083,7 +1158,8 @@ const INKSVG=(()=>{
       if(key.startsWith('task_')) return task(key);
       if(key.startsWith('sk_')) return skill(key);
       if(key.startsWith('gh_')) return grid(key);
-      if(PILL[key]) return pill(key);
+      if(PILL[key]) return pill(key);           /* 丹药专用（保留旧渲染） */
+      if(ITEM[key]) return itemArt(key);         /* 礼物 + 装备 + 丹药兜底 */
       if(key==='stat_mp') return head(200,200,PAPER)+`<circle cx="100" cy="100" r="70" fill="${IDG}"/>`+txt(100,104,'力',PAPER,52)+tailSvg(200,200);
       return '';
     }catch(e){ return ''; }
