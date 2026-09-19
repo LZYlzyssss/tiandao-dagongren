@@ -998,6 +998,57 @@ const ENEMIES = {
   }
 };
 
+/* ---- 借名小怪独立化：任务树 43 个具名怪（属性克隆自通用 id，立绘各自独立） ----
+   [新id, 源id, 显示名]；战斗数值沿用源模板，icon 指向自有立绘 key */
+const ENEMY_CLONES = [
+  ['wuyeyehun','youhun','无业野魂'],
+  ['tiangengzhinianhun','youhun','田埂执念魂'],
+  ['maopaijiachai','youhun','冒牌假差'],
+  ['guanzhongnihun','youhun','管中溺魂'],
+  ['chidietaohun','youhun','持牒逃魂'],
+  ['taoyiheichai','zhisha','逃役黑差'],
+  ['huolingtongzi','zhisha','火灵童子'],
+  ['moguigui','zhisha','墨柜鬼'],
+  ['keshenkuilei','kongqipanguan','壳神傀儡'],
+  ['guanshen','kongqipanguan','冠神'],
+  ['huanzhongzhuyi','kongqipanguan','幻中朱衣'],
+  ['tiancaitiefang','kongqipanguan','天曹贴房'],
+  ['bixingqiaoshou','kongqipanguan','赑屃形壳兽'],
+  ['fengtiaohegui','kongqipanguan','封条化形·合规'],
+  ['kongmaogongcao','kongqipanguan','空卯功曹'],
+  ['daibanpuzhanggui','kongqipanguan','点卯代办铺掌柜'],
+  ['bianzhishou','kongqipanguan','编制兽'],
+  ['juanxiansheng','kongqipanguan','卷先生'],
+  ['huishoushi','kongqipanguan','天曹回收使'],
+  ['zhouxuntiying','kongqipanguan','昼巡替影'],
+  ['renzhengkeli','kongqipanguan','认证壳吏'],
+  ['heguimoshou','kongqipanguan','合规模兽'],
+  ['fanshiyinchai','changgui','反噬阴差'],
+  ['yigui','changgui','疫鬼'],
+  ['jianhanhanqiu','changgui','减函悍囚'],
+  ['shengyouxiaocheli','xishenxiaoli','省油小车吏'],
+  ['tiankukugui','xishenxiaoli','天库库鬼'],
+  ['gongdaotianchai','xishenxiaoli','贡道天差'],
+  ['zhaoansuiyuan','xishenxiaoli','招安随员'],
+  ['gongyunxingli','xishenxiaoli','公允星吏'],
+  ['qiwei','xishenxiaoli','契卫'],
+  ['huishouxiaoli','xishenxiaoli','回收小吏'],
+  ['xunyeqiwei','xishenxiaoli','巡夜契卫'],
+  ['chizhengxuhao','xishenxiaoli','持证虚耗'],
+  ['lipeiqichai','xishenxiaoli','理赔契差'],
+  ['zhengshuichaiding','xishenxiaoli','征水差丁'],
+  ['kuzhankuzu','xishenxiaoli','库栈库卒'],
+  ['yujingshao','dafeng','鱼精哨'],
+  ['xunfengguai','dafeng','巽风怪'],
+  ['bailangjiaojiang','bashe','白浪蛟将'],
+  ['jiaowang','jiuying','蛟王'],
+  ['guishexuanjiajiang','hundun','龟蛇玄甲将'],
+  ['wangsiguiwang','guiwang','枉死鬼王']
+];
+ENEMY_CLONES.forEach(([id,base,name])=>{
+  ENEMIES[id]=Object.assign({},ENEMIES[base],{name,icon:id});
+});
+
 /* 敌人登场判语：id -> 一句杀机黑话（登场卷专用，贴合空心化志怪与黑色幽默） */
 const ENEMY_DREAD = {
   youhun:        '死了没人祭，连自己怎么死的都忘了——可它还记得，活人是热的。',
@@ -1026,6 +1077,52 @@ const ENEMY_DREAD = {
   wenyoujie:     '驳回、记过、发还原籍。笑脸底下那张脸，神衙的老差都不敢认。',
   xiangye:       '满朝朱紫，半出其门。他不亲自动手——一纸文书，够人死三回。',
 };
+/* 43 个独立化具名怪的登场判语 */
+Object.assign(ENEMY_DREAD,{
+  wuyeyehun:       '死了还在找活儿干。它拦你不为索命，只想问问——阴间还招不招临时工。',
+  tiangengzhinianhun:'脚陷进田埂几十年，拔不出来的不是脚，是那口没咽的气。',
+  maopaijiachai:   '一身借来的差服，锁链是真的，腰牌是假的——它自己都快信了。',
+  guanzhongnihun:  '从井管里往上看，天就铜钱那么大。它想把你也拖进来，一起看那么大的天。',
+  chidietaohun:    '牒文攥得稀烂也不肯撒手。跑了半辈子，没跑出那道朱批。',
+  taoyiheichai:    '黑衣皂帽，专逃苦役。它拿链子锁人，是怕有人逃得比它还远。',
+  huolingtongzi:   '纸扎的童子沾了香火，活了。它一笑，脚下莲火就窜起三尺高。',
+  moguigui:        '长年泡在公文案牍的墨里，脸黑得只剩两只眼，开口一股陈墨味。',
+  keshenkuilei:    '提线早断了，它还在磕头。壳里没人，是规矩替它动着。',
+  guanshen:        '金冠悬空，下头无人。冠一旦戴上，就再也摘不下来。',
+  huanzhongzhuyi:  '一袭朱衣在雾里自行走动，穿它的人，三百年前就化了灰。',
+  tiancaitiefang:  '满墙卷宗贴成了窝。它不咬人，只把你的名字也往上贴。',
+  bixingqiaoshou:  '驮碑驮成了碑的模样，壳上刻的，全是别人的功过。',
+  fengtiaohegui:   '封条层层裹出的人形，张口闭口"合规"，动一下先盖三个章。',
+  kongmaogongcao:  '卯时点了个空名，功曹就此空着。它最恨把名字填得满满当当的人。',
+  daibanpuzhanggui:'代点卯、代画押、代受过——代价是，连你这个人也一并代办了。',
+  bianzhishou:     '为一个编制长出了獠牙。谁动它的名额，它咬谁。',
+  juanxiansheng:   '一卷会走路的文牍，自称先生。讲规矩能讲三天，讲到你断气。',
+  huishoushi:      '手持天曹回收令，连人带魂带旧账，一并打包收回。',
+  zhouxuntiying:   '白天巡街的是它，影子替它巡。你看见它时，影已到了你身后。',
+  renzhengkeli:    '浑身挂满认证牌，少一个章，它就不认你是个人。',
+  heguimoshou:     '规矩养大的兽，每道坎都卡得方方正正，连吃人都要先走完流程。',
+  fanshiyinchai:   '被上头反咬过的差役，如今专咬差役，锁链上还挂着半块腰牌。',
+  yigui:           '一身时疫黑气，走到哪儿瘟到哪儿，自己却瘦得像把枯柴。',
+  jianhanhanqiu:   '卷宗被减掉三页，它就越三回狱。悍不畏死，只求一个全尸的说法。',
+  shengyouxiaocheli:'推着省油小车，账算到一滴灯油。它收的不是油，是你的命数。',
+  tiankukugui:     '守着天库的穷鬼，库里金山银海，它连根灯草都摸不着。',
+  gongdaotianchai: '押贡上天的差官，脸比贡箱还沉，过手的东西都要刮下三层。',
+  zhaoansuiyuan:   '受了招安的妖来当随员，妖气未散，官威倒先学了个十成。',
+  gongyunxingli:   '自称公允的星边小吏，秤是歪的、星是斜的，偏还一脸正经。',
+  qiwei:           '契文化成的卫卒，刀就是那支笔，劈下来先叫你画个押。',
+  huishouxiaoli:   '专管回收旧物旧魂。在它眼里，你也不过是一件到了期的东西。',
+  xunyeqiwei:      '夜里巡更的契卫，梆子一响，魂得自己排好队等它点。',
+  chizhengxuhao:   '虚耗成精偏考了个证，偷你东西前先亮证，好叫你心服口服。',
+  lipeiqichai:     '管理赔的差，单子填得越快你赔得越多，末了反倒欠它一笔。',
+  zhengshuichaiding:'连孟婆的汤都要征个水钱。它一到，井里的水都自认倒霉。',
+  kuzhankuzu:      '库栈搬货的老卒，背压弯了还在搬——搬的全是别人的寿数。',
+  yujingshao:      '鱼精里的探哨，鳃上挂着风干的盐，换气比报信还快。',
+  xunfengguai:     '巽位生的风怪，来无影去无踪，卷走东西时还留个旋儿笑你。',
+  bailangjiaojiang:'白浪里杀出的蛟将，鳞甲未全、杀心已盛，一浪掀翻半条船。',
+  jiaowang:        '九头之尊，蛟里称王。它不吐水火时，一江的水都是倒着流的。',
+  guishexuanjiajiang:'龟蛇相缠化成的玄甲将军，刀砍一道白印，水淹不进它的甲缝。',
+  wangsiguiwang:   '枉死城王座上的那位，一城的枉死都堵在它胸口，只等一个公道。'
+});
 
 
 /* ================= 法宝与礼物 =================
@@ -1222,7 +1319,7 @@ const MISSIONS = [
      why:'冥司公文取水飞辰砂，性合幽冥；生鸡血至阳，印气浮泛，案牍老手一嗅一照便破。'}
    ],
    pass:{enemyVuln:true,merit:4,log:'两处破绽当堂点破，黑差脸上的凶横先虚了一半——他的刀，也慢了半拍。'}},
-  {type:'battle',enemy:'zhisha',name:'逃役黑差',scale:1.05},
+  {type:'battle',enemy:'taoyiheichai',name:'逃役黑差',scale:1.05},
   {type:'event',text:'黑差被你人赃并获，怀里还揣着半包供香与一张天庭回执。',
    choices:[
     {t:'连人带假文书押往阎罗殿',r:{money:60,merit:8,log:'正道流程。阎罗王朱批两个字：「尚可」。'}},
@@ -1287,7 +1384,7 @@ const MISSIONS = [
      why:'灶君东厨司命，腊月廿四上天言好事，岁首回銮降福——所以他的奏报匣万万熄不得。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:4,log:'两位门神听得连连点头，困意散了大半，把守门的煞气借了你三分。'}},
-  {type:'battle',enemy:'youhun',name:'无业野魂',scale:1.1},
+  {type:'battle',enemy:'wuyeyehun',name:'无业野魂',scale:1.1},
   {type:'event',text:'天将明，你顺着昨夜动静盘问三神。',
    choices:[
     {t:'以火德帮灶君修奏报匣',requires:{path:'huo'},r:{favor:{zao_jun:10},merit:10,flags:{flag_know_truth:1},log:'「不是火没了，是准你生火的那道许可薄了。」'}},
@@ -1407,7 +1504,7 @@ const MISSIONS = [
     {t:'吞随身丹药，调息片刻',r:{heal:35,log:'你就着毒雾咽下丹药，神躯稍复。'}},
     {t:'带伤猛进，抢一个先手',r:{hp:-10,atkBuff:0.15,log:'你把痛楚压进下一击。'}}
    ]},
-  {type:'battle',enemy:'guiwang',name:'枉死鬼王',scale:0.85},
+  {type:'battle',enemy:'wangsiguiwang',name:'枉死鬼王',scale:0.85},
   {type:'event',text:'鬼王伏诛，沼心账台上那本总账还滴着水。',
    choices:[
     {t:'原账交给崔珏',r:{favor:{cui_jue:8},flags:{flag_cui_trust:15,flag_know_truth:2},log:'入册员外神里有三位，正是近年「失德被削」、不肯纳供奉的旧神。'}},
@@ -1439,7 +1536,7 @@ const MISSIONS = [
    pass:{shield:0.3,merit:6,log:'温有节笑意不变，眼底却冷了一分：「有意思。」满室柏木香里，你周身先凝起一层防备他的气场。'}},
   {type:'event',text:'你不肯领协办穷奇案的人情。温有节便「请」你试试新收的护印傀儡——一尊穿旧神袍、动作整齐划一的无脸神。面具里一缕残识轻声：「我……签过字的……」',
    choices:[{t:'拔刀',r:{log:'傀儡提印，踏前一步。'}}]},
-  {type:'battle',enemy:'kongqipanguan',name:'壳神傀儡',scale:0.8}
+  {type:'battle',enemy:'keshenkuilei',name:'壳神傀儡',scale:0.8}
  ]},
 
 {id:'c3m4',name:'放兽与收兽·穷奇',god:'yan_luo',chapter:3,forced:true,main:'c3m4',reqMain:'c3m3',danger:5,money:120,merit:25,
@@ -1528,7 +1625,7 @@ const MISSIONS = [
   {type:'game',game:'lights',difficulty:2,
    text:'田埂尽头一片漆黑，引魂灯九盏明灭不定。踏亮一盏，相邻四盏明暗齐翻——这是引魂灯的老阵式。令九灯尽数通明，给老农的执念照出一条能走的路，他才肯跟你走；灯阵不开，拘票递到眼前也是白搭。',
    pass:{enemyVuln:true,merit:4,log:'九灯齐明，田埂尽头浮起一条淡金色的轮回路。老农的执念松了，黑气却还剩最后一口，不肯散。'}},
-  {type:'battle',enemy:'youhun',name:'田埂执念魂',scale:1.05},
+  {type:'battle',enemy:'tiangengzhinianhun',name:'田埂执念魂',scale:1.05},
   {type:'event',text:'事了，老农走前往你兜里塞了把没烧完的稻谷——暖得像刚从阳间田里摘下来。',
    choices:[{t:'收好稻谷，继续办差',r:{log:'横死魂多是苦人，你记下了。'}}]}
  ]},
@@ -1546,7 +1643,7 @@ const MISSIONS = [
   {type:'game',game:'pairs',difficulty:1,
    text:'长明灯被调走后，窑神庙三十六盏灯位乱了套。灯神牌背置案上，同灯位者成对：每翻两牌，同位则配住留案、异位则覆回。全案配齐，灯位才依序重燃，哭得发昏的火灵童子方肯听你说话——配不齐，窑火便一直这么窜着。',
    pass:{enemyVuln:true,merit:4,log:'灯牌两两归位，窑火随之矮成温和的橘黄。火灵童子抽噎着抬起头，看你的眼神少了三分戒备。'}},
-  {type:'battle',enemy:'zhisha',name:'火灵童子',scale:0.95},
+  {type:'battle',enemy:'huolingtongzi',name:'火灵童子',scale:0.95},
   {type:'event',text:'火灵认你做了临时灯主，缩在你掌心像一簇暖融融的小火苗。',
    choices:[{t:'把它安顿回长明灯',r:{log:'灯火重新亮起，恰好够照亮一户夜归的人。'}}]}
  ]},
@@ -1571,7 +1668,7 @@ const MISSIONS = [
      why:'冥簿勾人以名籍为凭，一字之差，三魂错位、投录皆错——抄簿人的笔，与判官的朱笔一样重。'}
    ],
    pass:{enemyVuln:true,merit:5,favor:{cui_jue:3},log:'崔珏松开按簿的手：「下笔吧，手要稳。」你腕底不乱，连墨柜鬼扑出时都比平日快了半招。'}},
-  {type:'battle',enemy:'zhisha',name:'墨柜鬼',scale:1},
+  {type:'battle',enemy:'moguigui',name:'墨柜鬼',scale:1},
   {type:'event',text:'崔珏袖手看完你收拾墨柜鬼，破天荒地给你斟了半盏冷茶。',
    choices:[{t:'谢过府君',r:{favor:{cui_jue:2},log:'他点了点头，没说话。'}}]}
  ]},
@@ -1591,7 +1688,7 @@ const MISSIONS = [
     {t:'点破「筒被整组调换」，锁定外包老差役',r:{flags:{flag_know_truth:1},skip:1,log:'能进出值房、整组调筒的，只有当值外包老差役——他在偷卖「好胎」名额。暗记当堂比对，他抵赖不得，俯首认罪，不必动刑。'}},
     {t:'不听分辩，直接定罪马面',r:{flags:{flag_ruthless:1},log:'马面又惊又怒，被逼得反噬出手！'}}
    ]},
-  {type:'battle',enemy:'changgui',name:'反噬阴差',scale:1.1},
+  {type:'battle',enemy:'fanshiyinchai',name:'反噬阴差',scale:1.1},
   {type:'event',text:'拿获老差役，搜出一小袋「调换回执费」。钱上的制式印，赫然是天曹库记。',
    choices:[{t:'把钱袋封作证物',r:{log:'一桩普通舞弊案，轻轻挂上了天曹的边。'}}]}
  ]},
@@ -1618,7 +1715,7 @@ const MISSIONS = [
   {type:'game',game:'spot',difficulty:2,
    text:'当堂对质，三份《腊月奏报》摆作一排——真本出自灶君灶膛神火，假本出自天曹模板，肉眼几不可辨。按制房旧例三轮辨认：辨印角朱缺、辨墨色深浅、辨边框单线双线。三轮皆指认真本，灶君的冤才洗得脱；认错一轮，便是当堂翻案失败，重来。',
    pass:{enemyVuln:true,merit:6,favor:{zao_jun:5},log:'三处暗记连中，假奏报被当堂挑出。灶君一拍灶台，小车吏脸色煞白，见事败便放壳行凶——早被你看破了路数。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'省油小车吏',scale:1.1}
+  {type:'battle',enemy:'shengyouxiaocheli',name:'省油小车吏',scale:1.1}
  ]},
 
 {id:'s07',name:'冒牌阴神案',god:'cheng_huang',chapter:2,side:'s07',danger:3,money:90,merit:20,
@@ -1637,14 +1734,14 @@ const MISSIONS = [
      why:'不在祀典而私自立祠受祭者为「淫祠」，正神不享其祭，索祭的多半是邪祟或冒牌阴神。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:6,log:'两道黑影逃窜的方位、暗哨的空隙，都在你心里——你先一步封住了他们的去路。'}},
-  {type:'battle',enemy:'youhun',name:'冒牌假差',scale:1.15},
+  {type:'battle',enemy:'maopaijiachai',name:'冒牌假差',scale:1.15},
   {type:'event',text:'三证并勘：假阴神知道巡路时辰、签文格式，唯独背不出城隍亲定的暗口令——内鬼就在城隍案下。',
    choices:[
     {t:'当堂指认书吏',r:{flags:{flag_know_truth:1},log:'书吏被天曹许了「转正神格」，被逼入绝路，放出一具试用壳神！'}},
     {t:'打草惊蛇，先拿外围',r:{flags:{flag_ruthless:1},log:'书吏携册逃入枉死城，你没能拦住。'}},
     {t:'收下书吏的买路钱',r:{money:150,erode:5,flags:{flag_ruthless:1},log:'真神蒙冤，城隍辖区又丢了六个魂。'}}
    ]},
-  {type:'battle',enemy:'kongqipanguan',name:'冠神',scale:0.7},
+  {type:'battle',enemy:'guanshen',name:'冠神',scale:0.7},
   {type:'event',text:'案破，城隍屏退左右，取出半张私藏旧回执——和你章一那张一模一样。「十年了，第一道印是假的，第二道回执，从来都是真的。」',
    choices:[{t:'收好这半张回执',r:{favor:{cheng_huang:5},flags:{flag_cui_trust:5,flag_know_truth:1},log:'城隍拍了拍你的肩，没再多说。'}}]}
  ]},
@@ -1668,7 +1765,7 @@ const MISSIONS = [
     {t:'只帮孟婆洗锅换净水',r:{favor:{meng_po:15},flags:{flag_mercy_cut:1},log:'「孩子，有些锅盖着，才能继续给人一条干净路。」'}},
     {t:'把灰证卖给天曹库吏换钱',r:{money:130,erode:6,flags:{flag_ruthless:1},favor:{meng_po:-15},log:'孟婆从此不再给你照影汤。'}}
    ]},
-  {type:'battle',enemy:'xishenxiaoli',name:'天库库鬼',scale:1.1},
+  {type:'battle',enemy:'tiankukugui',name:'天库库鬼',scale:1.1},
   {type:'event',text:'库鬼身后散出一页《磨灰回掺定额》：故意让神格灰微量回掺孟婆汤，是为了让亡魂忘不干净、还认得旧神牌位——好收割来世香火，输送给「重封」的新神。',
    choices:[{t:'灰是废料、是库存，还是香火的原料',r:{log:'你只觉得后颈一阵发凉。'}}]}
  ]},
@@ -1689,7 +1786,7 @@ const MISSIONS = [
      why:'疫气流行，药若成了天价「天曹药引」，纵有千金方也救不得满城人——义诊与告示，才是破疫的引子。'}
    ],
    pass:{enemyVuln:true,merit:6,favor:{sun_simiao:5},log:'药王含笑点头，往你掌心塞了一包「辟瘟散」：「带着。」疫鬼扑来，你鼻端先有一缕清神药香。'}},
-  {type:'battle',enemy:'changgui',name:'疫鬼',scale:1.05},
+  {type:'battle',enemy:'yigui',name:'疫鬼',scale:1.05},
   {type:'event',text:'药煎好了，药王问你该怎么开价。',
    choices:[
     {t:'按天曹「药引价」卖，所得捐回药馆',r:{money:80,log:'你入账不菲又尽数捐回，民心却只是一般。'}},
@@ -1714,7 +1811,7 @@ const MISSIONS = [
      why:'背剑邋遢、黄粱点梦者，正是八仙之一、全真道尊为祖师的吕洞宾，道号纯阳子。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:6,favor:{lv_dongbin:5},log:'「算你还有些道缘。」道人指尖一缕纯阳剑气弹在你眉心——再入梦境时，镜中朱衣的动作在你眼里慢了三分。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'幻中朱衣',scale:0.7},
+  {type:'battle',enemy:'huanzhongzhuyi',name:'幻中朱衣',scale:0.7},
   {type:'event',text:'黄粱饭香扑鼻，你猛地睁眼。邋遢道人正往你碗里夹菜。',
    choices:[
     {t:'拜谢求剑',r:{favor:{lv_dongbin:12},log:'吕祖大笑，授你两道纯阳剑意，又塞一张旧货半价回收券。'}},
@@ -1739,7 +1836,7 @@ const MISSIONS = [
   {type:'game',game:'pairs',difficulty:3,
    text:'贴房动手前，一把卷宗被风扬满殿：十七处涂改，散作三十四片墨痕——每处涂改的「原墨」与「天曹柏香墨」各成一片，须凭墨色、笔锋、洇痕两两配回同一处，才凑得齐钉死贴房的完整证物。每翻两片：同处则配住，异处覆回。三十四片不齐，贴房抵死不认。',
    pass:{shield:0.25,enemyVuln:true,merit:8,favor:{qin_guang:5},log:'十七对墨痕在殿上列成一排，柏香墨的气味连成一线——涂改者的来路，再无可抵赖。贴房化壳的瞬间，破绽已被你钉死。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'天曹贴房',scale:0.85},
+  {type:'battle',enemy:'tiancaitiefang',name:'天曹贴房',scale:0.85},
   {type:'event',text:'贴房就擒，结案的尺度在你一念之间。',
    choices:[
     {t:'文吏与线人一并正法',r:{merit:15,flags:{flag_ruthless:1},log:'线人临死撕毁文吏妻儿的轮回票——你无法两全。'}},
@@ -1770,8 +1867,8 @@ const MISSIONS = [
      why:'六次年检，真珠早被壳珠掉包——珠光依旧照得宝库透亮，却再镇不住海潮，账面上还次次「验讫归还」。'}
    ],
    pass:{shield:0.3,enemyVuln:true,merit:8,favor:{ao_guang:5},log:'水屏里龙颜稍霁，一道避水龙气裹上你周身：浪头压来时，你脚下竟稳如实地。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'贡道天差',scale:1.2},
-  {type:'battle',enemy:'kongqipanguan',name:'赑屃形壳兽',scale:0.8},
+  {type:'battle',enemy:'gongdaotianchai',name:'贡道天差',scale:1.2},
+  {type:'battle',enemy:'bixingqiaoshou',name:'赑屃形壳兽',scale:0.8},
   {type:'event',text:'真相是「年检掉包」，老龙王又怒又怕，怕的是得罪天庭。',
    choices:[
     {t:'帮他写「自查失珠、自行补铸」的含糊奏章',r:{favor:{ao_guang:20},flags:{flag_neutral_pact:1},log:'你保全了老龙王的面子，他欠你一份情。'}},
@@ -1802,7 +1899,7 @@ const MISSIONS = [
      why:'内贼不是人，是「统一熔铸」新规下的云纹火漆——封条合规、流程合规，抽成便也合规，这才叫「合规」壳神。'}
    ],
    pass:{shield:0.3,enemyVuln:true,merit:8,favor:{zhao_gongming:5},log:'「伢子懂行！」赵公明铁鞭一抖，借给你三分玄坛煞气——「合规」那层层厚盾，在你眼里先薄了一层。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'封条化形·合规',scale:0.85},
+  {type:'battle',enemy:'fengtiaohegui',name:'封条化形·合规',scale:0.85},
   {type:'event',text:'不是人偷，是封印本身在抽成，而四库神都在自己没细看的《统一熔铸同意书》上签了押。',
    choices:[
     {t:'强行揭封，证据在手',r:{merit:20,flags:{flag_refuse_count:1},log:'赵公明却被天曹反告「损毁御封」。'}},
@@ -1827,7 +1924,7 @@ const MISSIONS = [
      why:'天雷簿讲究旨、痕、押三者对勘：无旨之雷，纵是劈恶，也得在簿上单独说清来龙去脉，否则便是私雷。'}
    ],
    pass:{enemyVuln:true,merit:6,favor:{dian_mu:5},log:'电母将一面小镜塞入你袖中：「雷痕不会说假话。」库卒扑来时，镜光先晃花了它的眼。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'库栈库卒',scale:1},
+  {type:'battle',enemy:'kuzhankuzu',name:'库栈库卒',scale:1},
   {type:'event',text:'核对雷痕：十六道是雷公部旧人「忍不住」劈的坏人，一道劈库栈的被改记成「天火走水」。该怎么记？',
    choices:[
     {t:'如实补录，连「天火走水」一起翻',r:{favor:{dian_mu:15},flags:{flag_refuse_count:1,flag_leizu_trust:5},log:'电母解气又忧心，雷祖线提前记下了你。'}},
@@ -1846,19 +1943,19 @@ const MISSIONS = [
    {type:'game',game:'memory',difficulty:3,
     text:'雷部点卯，以符为凭：功曹各持一道雷符，应卯时须照卯册上的符序，在法坛上连环复按。真功曹符序烂熟于心，混进来的空卯只学了个响，序列一长便接不上。法坛三转、符序渐长——你替王灵官当堂复序，三道空卯自然藏不住。记错一环，本轮重转。',
     pass:{shield:0.3,enemyVuln:true,merit:8,log:'三转法坛符序不差，六道雷符的余光里，三道「功曹」的面具同时裂开——壳下空空如也。它们退无可退，扑上法坛！'}},
-   {type:'battle',enemy:'kongqipanguan',name:'空卯功曹',scale:0.75},
+   {type:'battle',enemy:'kongmaogongcao',name:'空卯功曹',scale:0.75},
    {type:'event',text:'三名空卯功曹被你一一戳破，王灵官的雷符在工单架上烧出两个字：深查。',
     choices:[{t:'明日再查考功法名册',r:{log:'这一夜你先歇下。'}}]}
   ]},
   {title:'深查·考功法名册',nodes:[
    {type:'event',text:'按《考功法》反查：被「异地提拔」的功曹共二十七名，替换路径都通向同一家「点卯代办铺」。',
     choices:[{t:'按图索骥，再点一名',r:{log:'又一道空卯在你面前炸成纸灰。'}}]},
-   {type:'battle',enemy:'kongqipanguan',name:'空卯功曹',scale:0.85},
+   {type:'battle',enemy:'kongmaogongcao',name:'空卯功曹',scale:0.85},
    {type:'event',text:'代办铺的幌子在雷云下晃着，掌柜的戴着半张功曹面具。',
     choices:[{t:'直闯代办铺',r:{log:'明日便是收网之时。'}}]}
   ]},
   {title:'代办铺·扳到哪一层',nodes:[
-   {type:'battle',enemy:'kongqipanguan',name:'点卯代办铺掌柜',scale:0.95},
+   {type:'battle',enemy:'daibanpuzhanggui',name:'点卯代办铺掌柜',scale:0.95},
    {type:'event',text:'铺中用印记录直通三省九司经承房。扳到哪一层，你自己选。',
     choices:[
      {t:'只拿代办铺结案交差',r:{favor:{wang_lingguan:10},log:'雷祖与王灵官认可，却都有些遗憾。'}},
@@ -1886,7 +1983,7 @@ const MISSIONS = [
       why:'哮天犬（白毛细犬）随二郎猎妖拿怪，撕咬仙魔无算；读招之法，先学它伏低时那一瞬的动静。'}
     ],
     pass:{shield:0.25,enemyVuln:true,merit:8,favor:{er_lang:5},log:'磨刀声重新响起，却比方才多了一分节奏。你循着那节拍侧身——鱼精哨的第一下扑击，果然落了空。'}},
-   {type:'battle',enemy:'dafeng',name:'鱼精哨',scale:0.9}
+   {type:'battle',enemy:'yujingshao',name:'鱼精哨',scale:0.9}
   ]},
   {title:'二汛·溃堤抢修',nodes:[
    {type:'event',text:'江堤溃口，白浪蛟将裹着藤甲水压而来，兵系重击与火德烧甲是破防关键。',
@@ -1894,7 +1991,7 @@ const MISSIONS = [
    {type:'game',game:'lights',difficulty:2,
     text:'溃口处原布着灌江口「九桩锁浪灯」：踏一桩，此桩与上下左右四桩明灭齐翻，九桩全明，灯阵便能在决口前临时束起一道水栅，好叫你腾出手与蛟将放对。灯阵不亮，人浪两线便要一起压上来。',
     pass:{shield:0.3,enemyVuln:true,merit:8,log:'九灯连成一线，水栅在溃口处绷起半人高。白浪被拦在栅外，蛟将的藤甲水压先泄了三成。'}},
-   {type:'battle',enemy:'bashe',name:'白浪蛟将',scale:0.55}
+   {type:'battle',enemy:'bailangjiaojiang',name:'白浪蛟将',scale:0.55}
   ]},
   {title:'三汛·主浪翻江',nodes:[
    {type:'event',text:'蛟王亲至，翻江三连，必须在三次读招里打断它两次。磨刀声在最高处停了。',
@@ -1902,7 +1999,7 @@ const MISSIONS = [
    {type:'game',game:'memory',difficulty:3,
     text:'蛟王翻江三连，每连浪头都不同：第一连看鳍、第二连看潮眼、第三连看回水。灌江口读招牌三转渐长，须照浪序逐张复按，牌序不差，才算是在三次读招里咬住了蛟王的节拍、抢下两次打断的先手；错一张，主浪重卷、本轮重读。',
     pass:{shield:0.3,enemyVuln:true,merit:10,favor:{er_lang:8},log:'三转读招全中，你在第二、第三连各抢出一个空当，一脚踏在潮眼上。蛟王翻江之势为之一滞，高处的磨刀声，停了。'}},
-   {type:'battle',enemy:'jiuying',name:'蛟王',scale:0.7},
+   {type:'battle',enemy:'jiaowang',name:'蛟王',scale:0.7},
    {type:'event',text:'三汛皆平，该写报功文书了。',
     choices:[
      {t:'功劳全写草头神与梅山旧部',r:{favor:{er_lang:20},flags:{flag_erlang_respect:25,flag_mercy_cut:1},log:'二郎神第一次正眼看你。'}},
@@ -1928,7 +2025,7 @@ const MISSIONS = [
       why:'名册里三分之一小猴忘了本名、只报得出编号——编册先收名字，名字一没，猴也就成了可点可销的数目字。'}
     ],
     pass:{enemyVuln:true,merit:8,favor:{er_lang:5},log:'二将听得眼眶发红，齐齐把胸膛一挺。随员的壳神扑来时，漫山小猴替你看清了它每一个空门。'}},
-   {type:'battle',enemy:'xishenxiaoli',name:'招安随员',scale:1.1}
+   {type:'battle',enemy:'zhaoansuiyuan',name:'招安随员',scale:1.1}
   ]},
   {title:'三轮谈判',nodes:[
    {type:'event',text:'温有节派来的协办文吏法条陈，三轮措辞，每一步都是坑。',
@@ -1954,7 +2051,7 @@ const MISSIONS = [
    {type:'game',game:'pairs',difficulty:2,
     text:'编制兽点卯，全凭编号锁人：它每念一号，名册上便有一只小猴被拽去排队。破法只有一个——趁印玺未落下，把名册翻过来背置案上，猴名牌与编号牌两两配回：每翻两牌，名号相符则配住、失序则覆回。全案配齐，猴名便各归本主，点卯的锁链先断了一半。',
     pass:{shield:0.3,enemyVuln:true,merit:10,favor:{er_lang:8},log:'名号牌一对对合拢，小猴们陆续想起自己的名字。编制兽的卯册断了线，巨印举在半空，空门尽露。'}},
-   {type:'battle',enemy:'kongqipanguan',name:'编制兽',scale:0.95},
+   {type:'battle',enemy:'bianzhishou',name:'编制兽',scale:0.95},
    {type:'event',text:'自治契铺在石桌上，该署谁的名？',
     choices:[
      {t:'署你名，做花果山客卿军师',r:{favor:{er_lang:10},flags:{flag_monkey_debt:30},log:'崩芭二将把半根如意毫毛塞进你手里。'}},
@@ -1980,7 +2077,7 @@ const MISSIONS = [
      why:'文运凭文章才学、阴德厚薄，朱衣使者暗点头方定取舍；「特推」印掺了金银灰，正是坏了这条取士的根本。'}
    ],
    pass:{enemyVuln:true,merit:8,favor:{wen_chang:5},log:'帝君朱笔往卷先生面门遥遥一圈，墨封上先裂出一道缝：「他封你的技能，本帝君替你先破了。」'}},
-  {type:'battle',enemy:'kongqipanguan',name:'卷先生',scale:0.8},
+  {type:'battle',enemy:'juanxiansheng',name:'卷先生',scale:0.8},
   {type:'event',text:'供词上达：天曹新设「文运统筹捐」，功名明码标价，美其名曰「科举产能优化」。帝君翻出你生前那一科的旧卷——你本在榜上，被人顶替了。',
    choices:[
     {t:'帮帝君把铁证做扎实，联名实奏',r:{favor:{wen_chang:15},flags:{flag_stance:1,flag_refuse_count:1,flag_know_truth:1},log:'多名落榜寒士之魂远远叩谢。连你的落榜，都是这套机器的产物。'}},
@@ -2005,7 +2102,7 @@ const MISSIONS = [
      why:'秤与神皆无错，错在天曹新颁的那粒「公允星」——连「公允」都能统一发配重头，偏的便是定星的那只手。'}
    ],
    pass:{enemyVuln:true,merit:8,favor:{bi_gan:5},log:'比干微微颔首，秤杆在他掌中自己调平。星吏壳神扑来时，那粒假星先在秤上现了原形。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'公允星吏',scale:1.05},
+  {type:'battle',enemy:'gongyunxingli',name:'公允星吏',scale:1.05},
   {type:'event',text:'比干捏着那粒调偏配重的壳星问你：无心之神靠公道成神，如今连「公允」都发配重头，神还凭什么神？',
    choices:[
     {t:'「凭规矩里那句还没烂完的话」',r:{favor:{bi_gan:15},log:'比干笑了，挖出壳星，秤重新平了。'}},
@@ -2023,7 +2120,7 @@ const MISSIONS = [
   {type:'game',game:'lights',difficulty:3,
    text:'民船船阵在风暴眼里失了灯向。娘娘将九盏备用红灯标交到你手里：旧例「九转连灯」——每点一盏，此灯与上下左右四盏明灭齐翻，九灯尽数通红，灯阵才在浪墙上连成一条引民船避开暗礁的光道，你也才有余力腾身迎怪。风急浪高，灯位一乱便须重点。',
    pass:{shield:0.3,enemyVuln:true,merit:10,favor:{ma_zu:5},log:'九盏红灯在浪墙上连成一串温暖的光，民船船阵循着光掉头驶出暗礁。巽风怪卷着的风墙，被灯光切出一道缝隙。'}},
-  {type:'battle',enemy:'dafeng',name:'巽风怪',scale:1.1},
+  {type:'battle',enemy:'xunfengguai',name:'巽风怪',scale:1.1},
   {type:'event',text:'你发现熄灭的灯全被换成了天曹制式「贡道航灯」——灯还亮，却只给挂贡旗的船指路，民船等于被引去暗礁。',
    choices:[
     {t:'一盏盏换回民灯，连熬两夜',r:{favor:{ma_zu:18},flags:{flag_mercy_cut:1},log:'妈祖在风浪里冲你合十一礼。'}},
@@ -2049,7 +2146,7 @@ const MISSIONS = [
      why:'真武曾入山修道、磨尽自家脏腑之妖方得荡魔——「荡魔的最后一魔，是自己」；揣着满身别人神格的人，先得过这一问。'}
    ],
    pass:{shield:0.3,enemyVuln:true,merit:10,favor:{zhen_wu:5},log:'真武目光稍缓，剑未出鞘，一缕玄天真武之炁先覆上你周身。龟蛇合体的虚影压下时，你脚下竟纹丝不动。'}},
-  {type:'battle',enemy:'hundun',name:'龟蛇玄甲将',scale:0.8},
+  {type:'battle',enemy:'guishexuanjiajiang',name:'龟蛇玄甲将',scale:0.8},
   {type:'event',text:'真武收阵，只问一句：「你身上的格，是你的，还是他们的？」',
    choices:[
     {t:'「是债，我打算还。」',r:{favor:{zhen_wu:15},flags:{flag_mercy_cut:1},log:'真武久久看你，亲手解下玄甲。'}},
@@ -2074,7 +2171,7 @@ const MISSIONS = [
      why:'观音道场在南海普陀山紫竹林（普陀洛迦山）——紫竹林的慈悲，从来不是不挑人的滥施，而是明知只渡一半，仍要先渡眼前这一船。'}
    ],
    pass:{enemyVuln:true,merit:10,favor:{guan_yin:5},log:'观音微微颔首，柳枝轻挥，半滴甘露弹在回收使索套上——索套寸寸发软，满船残识得这一瞬喘息。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'天曹回收使',scale:0.95},
+  {type:'battle',enemy:'huishoushi',name:'天曹回收使',scale:0.95},
   {type:'event',text:'追兵退去，菩萨问你：「慈悲，要不要算成本？」',
    choices:[
     {t:'「要算，算了仍然渡。」',r:{favor:{guan_yin:18},flags:{flag_mercy_cut:1},log:'观音颔首，净瓶里抽出一枝柳枝给你。'}},
@@ -2099,7 +2196,7 @@ const MISSIONS = [
      why:'契卫的戟不按善恶出手，只认神格编号——一旦你名字旁那行《回收同意书》被填上编号，守规矩的它拖你便「合理合法」。'}
    ],
    pass:{shield:0.3,enemyVuln:true,merit:10,favor:{cui_jue:5},log:'符纸燃尽，一点崔判官的朱砂印落在你腕上。契卫重戟扫来，你贴着它编号认取的空隙，堪堪让过。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'契卫',scale:1.2},
+  {type:'battle',enemy:'qiwei',name:'契卫',scale:1.2},
   {type:'event',text:'名册《叙功叙用录》上，你名字前已有七任外包：红批分别为「已重封」「已任」「已任」「已重封」——任用与重封各半，正是肥羊与新刀两条流水线。',
    choices:[
     {t:'名册原件带走',r:{favor:{cui_jue:8},flags:{flag_know_truth:2,flag_refuse_count:1},log:'你把册子收进怀里，留待日后焚契。'}},
@@ -2130,7 +2227,7 @@ const MISSIONS = [
      why:'社日祭土地（社神），春社祈谷、秋报社稷——他记不清自己是谁了，却还惦记着那场全村分肉吃酒、热热闹闹的社饭。'}
    ],
    pass:{enemyVuln:true,merit:10,favor:{tudi_gong:10},log:'土地公笑得像个孩子，把怀里半块供糕全塞进你手里。回收小吏扑来时，你握着那块糕，一步也没有退。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'回收小吏',scale:1},
+  {type:'battle',enemy:'huishouxiaoli',name:'回收小吏',scale:1},
   {type:'event',text:'天快亮时，土地公忽然短暂地什么都想起来了一瞬。「小……小友啊。老夫想起来了。第一章那天，老夫要嘱咐你的那句话是——别学我们。要回来。」灯影一晃，他又忘了，只慈祥地笑：「远客来，好。喝茶，好。」',
    choices:[{t:'攥紧半块供糕，踏上云阶',r:{log:'你没有回头，怕一回头就走不动了。'}}]}
  ]},
@@ -2149,7 +2246,7 @@ const MISSIONS = [
   {type:'game',game:'lights',difficulty:1,
    text:'井口往下，泉眼九窍明灭不定。踏亮一窍，相邻四窍明暗齐翻——这是井泉童子守了百年的引泉老阵。令九窍尽通，被铁管嘬走的水脉才肯回头；阵不通，井里的水就得继续顺着管子，往天上流。',
    pass:{enemyVuln:true,merit:3,favor:{jing_shen:5},log:'九窍泉眼连珠亮起，井底闷雷似的响了一声，铁管尽头传来气急败坏的呛水声——嘬着水脉不放的东西，被你照见了。'}},
-  {type:'battle',enemy:'youhun',name:'管中溺魂',scale:1},
+  {type:'battle',enemy:'guanzhongnihun',name:'管中溺魂',scale:1},
   {type:'event',text:'铁管松动，井水在身后一寸寸涨回来。井泉童子扒着井栏看你，等你拿最后一个主意。',
    choices:[
     {t:'生拔铁管，还泉于井',r:{favor:{jing_shen:10},flags:{flag_refuse_count:1},log:'你一把薅出铁管，井水「咚」地涌回井口，溅了告示一身。童子破涕为笑，脚丫子拍得水花乱溅。天曹水务的车铃，在巷口恨恨拐去了别处。'}},
@@ -2178,7 +2275,7 @@ const MISSIONS = [
      why:'狱卒守的是流程的根：赦权在阴律司阎君殿，案卷、勾簿、验牌三关不缺；越权的文书印得再真，门也不能开。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:3,favor:{niu_tou:5},log:'阿旁听得牛眼发亮，把钢叉往你手里一塞：有学问！你替俺叉门，俺去后头把最能闹的几个捆结实些。'}},
-  {type:'battle',enemy:'changgui',name:'减函悍囚',scale:1.05},
+  {type:'battle',enemy:'jianhanhanqiu',name:'减函悍囚',scale:1.05},
   {type:'event',text:'悍囚被叉翻在地，怀里掉出半本《假释天函》存根——每封减函，都收了家属一笔「赦罪香火钱」。',
    choices:[
     {t:'把减函全叉在狱门上，原样发回阎君殿等勾簿',r:{favor:{niu_tou:12},flags:{flag_know_truth:1,flag_refuse_count:1},log:'阿傍把钢叉横过来当签条，几十封函一字排开叉在门上：没勾簿，谁来也不开。函上的天界邮戳，一路抖回了天上去。'}},
@@ -2200,7 +2297,7 @@ const MISSIONS = [
   {type:'game',game:'memory',difficulty:1,
    text:'乱坟岗子磷火幽幽，逃魂专走「之」字，每一步虚晃都在磷火里留个亮儿。马面的规矩：读招先读落脚——他把逃魂一连串虚晃的磷火序指给你看，法坛三转、序列渐长，你照序连环复按，把它的假步子背下来，真往哪个方向逃便瞒不过你。记错一环，本轮重转。',
    pass:{enemyVuln:true,merit:4,favor:{ma_mian:5},log:'三转磷火序你一记不差。马面长臂一振，锁链在坟头间绕成个活扣：它再虚晃，也撞进扣眼里。'}},
-  {type:'battle',enemy:'youhun',name:'持牒逃魂',scale:1.15},
+  {type:'battle',enemy:'chidietaohun',name:'持牒逃魂',scale:1.15},
   {type:'event',text:'逃魂被锁链缠了个结实，度牒飘落在地，夹层里抖出一张小票：「赎罪度牒·天曹良心价·不记名」。',
    choices:[
     {t:'销牒锁魂，牒纸封证',r:{favor:{ma_mian:10},flags:{flag_know_truth:1,flag_refuse_count:1},log:'你一把扯碎度牒，马面锁链顺势缠上逃魂脚踝。那张小票被他两指夹起，对着月光看了半天，脸色比平日更黑。'}},
@@ -2229,7 +2326,7 @@ const MISSIONS = [
      why:'记录不会自己消失——签押定人、时辰定空，两对勘合，哪个时辰换了人执笔，一查便知；替班的影子，就藏在申时那片浮墨里。'}
    ],
    pass:{enemyVuln:true,merit:5,favor:{ri_youshen:5},log:'日游神把腰牌摘下来递给你，难得说了句不那么公事公办的话：替我照着那影子，它怕人看。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'昼巡替影',scale:0.65},
+  {type:'battle',enemy:'zhouxuntiying',name:'昼巡替影',scale:0.65},
   {type:'event',text:'替影在日光下碎成一沓空白录帖——二十八笔小过，全被「合并优化」进了一个墨团。补与不补，笔在你手里。',
    choices:[
     {t:'连夜补回二十八笔，原册直送察查司',r:{favor:{ri_youshen:12},merit:6,flags:{flag_know_truth:1,flag_refuse_count:1},log:'日游神腰牌挺得笔直，一笔一划把二十八件小过补回原处——其中三件，记的是发壳替班的人自己。'}},
@@ -2251,7 +2348,7 @@ const MISSIONS = [
   {type:'game',game:'lights',difficulty:2,
    text:'通往残庙的夜路上，夜游神留下九盏绿灯。巡夜契丁一过，灯便被打翻一半——踏亮一盏，相邻四盏明暗齐翻。九灯尽绿，才照得出那条它们闻不见的路；灯阵不开，你与那一庙不敢见太阳的东西，谁也走不到天亮。',
    pass:{enemyVuln:true,merit:5,favor:{ye_youshen:5},log:'九盏绿灯幽幽连成一线，夜雾里浮出一条窄路。巡夜契丁循着灯响扑来——你早立在它看不见的光里。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'巡夜契卫',scale:1.05},
+  {type:'battle',enemy:'xunyeqiwei',name:'巡夜契卫',scale:1.05},
   {type:'event',text:'庙门推开半扇，微弱香火里坐着十数道模糊身影——被销了籍的旧神残念，一齐抬头看你手里的灯。',
    choices:[
     {t:'替它们抹去灯痕，让庙在夜里继续「不存在」',r:{favor:{ye_youshen:12},flags:{flag_mercy_cut:1},log:'绿灯在庙墙上轻轻一抹，连今夜有人来过的影子都没了。那些不敢见太阳的呼吸，在黑暗里又安稳了一夜。'}},
@@ -2280,7 +2377,7 @@ const MISSIONS = [
      why:'钟判官成名一战，便是梦中为唐明皇捉「虚耗」——此鬼专在喜事里作祟、耗人吉庆、窃人财物。如今坐在账房里合法耗人的，和它一路。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:6,favor:{zhong_kui:5},log:'钟馗大笑，鬼骨往你怀里一抛：痛快！拿着，权当本判官借你的胆。那持证的东西若敢亮证，你连证带鬼一起揍。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'持证虚耗',scale:1.1},
+  {type:'battle',enemy:'chizhengxuhao',name:'持证虚耗',scale:1.1},
   {type:'event',text:'虚耗被踩在地上，怀里掉出一本烫金证件——《捉鬼业务许可证》，盖着新成立的「降魔效率司」大印，附一页本月业绩指标。',
    choices:[
     {t:'连证带鬼，一路打去「降魔效率司」',r:{favor:{zhong_kui:15},merit:8,flags:{flag_know_truth:1,flag_refuse_count:1},log:'钟判官把鬼腿骨一扔，拔剑就走：好！俺这身官皮进不去的门，你这身外包的皮，正好替俺踹开！'}},
@@ -2309,7 +2406,7 @@ const MISSIONS = [
      why:'阴司四司各有分工：罚恶钟馗、察查陆判、阴律崔珏；魏征的赏善司专核善行真赝、定福报高下——善档一注水，轮回的公道就坏了。'}
    ],
    pass:{enemyVuln:true,merit:7,favor:{wei_zheng:5},log:'魏公难得地微微颔首，把笔交入你手中：字要正，心更要正。持着它去拆那些烫金册子，册子后头的东西自然会扑出来。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'认证壳吏',scale:0.85},
+  {type:'battle',enemy:'renzhengkeli',name:'认证壳吏',scale:0.85},
   {type:'event',text:'伪证扯碎，碎纸里滚出一枚「福报摇号代办」的铜戳——好胎名额，明码标价。怎么了这桩案，魏征在堂上等你回话。',
    choices:[
     {t:'当堂剔除伪档，穷魂善举逐一补录',r:{favor:{wei_zheng:15},merit:8,flags:{flag_know_truth:1,flag_refuse_count:1},log:'魏征一言不发，提笔在每份伪档上画了个硕大的「伪」字。人曹官的笔落下去，堂上浮金的「福报摇号代办」招牌无风自落。'}},
@@ -2338,7 +2435,7 @@ const MISSIONS = [
      why:'陆判验尸只替证据说话：缢痕走向、索沟深浅、骨中毒色都有定法。自缢提空分叉、勒毙平绕满圈——银钱和哭声，改不了刀下的伤痕。'}
    ],
    pass:{enemyVuln:true,merit:7,favor:{lu_zhidao:5},log:'陆判咧嘴一笑，赤须乱颤：行家！骨缝里那点东西，就交给你这双眼——本判倒要看看，谁敢半夜来抢尸。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'理赔契差',scale:1.1},
+  {type:'battle',enemy:'lipeiqichai',name:'理赔契差',scale:1.1},
   {type:'event',text:'契差倒地，陆判从骨缝里刮出一点泛青的残色，凑近鼻端：柏香墨的毒——天曹行文的墨。火化的时辰，只剩半夜。',
    choices:[
     {t:'顶住火化令，保全天尸翻案',r:{favor:{lu_zhidao:15},flags:{flag_know_truth:2,flag_refuse_count:1},log:'陆判把验状往堂中一拍，骨缝里的柏香墨毒色还泛着青：天曹的火化工一个时辰也没敢点火。这案子，从「自尽」改成了「他杀」。'}},
@@ -2360,7 +2457,7 @@ const MISSIONS = [
   {type:'game',game:'pairs',difficulty:2,
    text:'工地上万千榫卯构件背置成海，同模同卯者成对。鲁班把墨斗往构件堆上一弹：每翻两件，同模则配住留案、异模则覆回。满案配齐，剩下那几件配不上对家的，就是不吃劲的空瓤——空瓤找不出，神龛塌下来，正好砸在「验收合格」的签子上。',
    pass:{enemyVuln:true,merit:7,favor:{lu_ban:5},log:'满案构件两两归卯，最后孤零零剩出七件空瓤，在月色里对不出半点木纹。鲁班墨斗线一绷：空的自己凑成一堆——会动了。'}},
-  {type:'battle',enemy:'kongqipanguan',name:'合规模兽',scale:0.85},
+  {type:'battle',enemy:'heguimoshou',name:'合规模兽',scale:0.85},
   {type:'event',text:'模兽散成一地七分短料。鲁班蹲在梁上，把一张缩尺图样卷成筒递给你：报与不报，你是在籍的，俺是请来的匠人，这话该你说。',
    choices:[
     {t:'墨斗直线弹到底，缩尺图样直奏营造司存档',r:{favor:{lu_ban:15},merit:8,flags:{flag_know_truth:1,flag_refuse_count:1},log:'鲁班把墨线拉得笔直，一松手，黑线从这头的神龛一直弹到天库那本账上——百万座神龛省下的料，全在这一条线里。'}},
@@ -2389,7 +2486,7 @@ const MISSIONS = [
      why:'仙姑主女子生产之愿，引水先护两条命；硬来伤胎，唯有以荷露生息另开一脉暗泉回池，池子与人才两不妨——这就是「软着来」。'}
    ],
    pass:{shield:0.25,enemyVuln:true,merit:7,favor:{he_xiangu:5},log:'仙姑将一捧荷露弹在你眉心，你周身像被清晨的荷叶包住。水车边扑来的差丁，只闻得见一池清香，摸不准你在哪片叶下。'}},
-  {type:'battle',enemy:'xishenxiaoli',name:'征水差丁',scale:1.05},
+  {type:'battle',enemy:'zhengshuichaiding',name:'征水差丁',scale:1.05},
   {type:'event',text:'差丁退去，头顶水车还在哗哗地转。何仙姑看着半池枯荷，等你替她拿最后的主意。',
    choices:[
     {t:'以荷露为引，暗开一脉活泉回池，明池暗泉双活',r:{favor:{he_xiangu:15},flags:{flag_mercy_cut:1,flag_refuse_count:1},log:'仙姑指尖荷瓣漂入淤泥，清泉无声无息漫回半枯的荷塘。水车照旧在天上哗哗地抽，池面却一日日圆了回来——抽得走明水，抽不走生根的脉。'}},
