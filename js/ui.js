@@ -2228,6 +2228,7 @@ const UI = {
         <div class="round-tag">第 <span id="bRound">1</span> 回合</div>
         <div class="fighter" id="fPlayer">
           <div class="fig-body fig-player" id="figPlayer" style="color:var(--cinnabar-deep)">
+            ${auraHTML(playerAuraTheme(),playerAuraLv())}
             ${typeof ASSET!=='undefined'?ASSET.html(pKey,'fig-img',RANKS[Game.s.rank].name):''}
             <span class="fig-fallback">衙</span>
           </div>
@@ -2240,6 +2241,7 @@ const UI = {
         <div class="vs">战</div>
         <div class="fighter foe" id="fFoe">
           <div class="fig-body fig-foe" id="figFoe" style="color:${B.e.tint}">
+            ${auraHTML(B.e.kind||'yao',foeAuraLv(B.e.tier))}
             ${typeof ASSET!=='undefined'?ASSET.html(eKey,'fig-img',B.e.name):''}
             <span class="fig-fallback">${B.e.icon}</span>
           </div>
@@ -2434,6 +2436,74 @@ const UI = {
   },
 };
 
+/* ============ 周身神力光环：实力分 4 档，属性分 11 系 ============
+   玩家档：品秩为基，镶嵌宝/仙品神格提一档；敌方档：tier 1-5 映射
+   主题：神格五系 sheng/huo/bing/you/fa；妖邪六系 hun/gui/yao/xiong/zhan/ke */
+function playerAuraLv(){
+  let lv = Game.s.rank<=1?1 : Game.s.rank<=3?2 : Game.s.rank<=5?3 : 4;
+  const eq = Game.s.equipped||[];
+  if(typeof GODHOODS!=='undefined' && eq.some(id=>{const g=GODHOODS[id];return g&&(g.q==='宝'||g.q==='仙');}))
+    lv = Math.min(4, lv+1);
+  return lv;
+}
+/* 玩家光环主题＝镶嵌中数量最多的神格系；无镶嵌为圣（金德正神） */
+function playerAuraTheme(){
+  const c={};
+  (Game.s.equipped||[]).forEach(id=>{
+    const g=typeof GODHOODS!=='undefined' && GODHOODS[id];
+    if(!g) return;
+    if(g.fusion&&g.paths) g.paths.forEach(p=>c[p]=(c[p]||0)+1);
+    else c[g.path]=(c[g.path]||0)+1;
+  });
+  let best='sheng',n=0;
+  Object.keys(c).forEach(k=>{if(c[k]>n){n=c[k];best=k;}});
+  return best;
+}
+function foeAuraLv(tier){
+  return tier>=5?4 : tier===4?3 : tier===3?2 : 1;
+}
+/* 各系环绕符文（高阶可见） */
+const AURA_RUNES = {
+  sheng:['敕','令','神','罡','正','福'], bing:['兵','伐','武','锋','镇','威'],
+  fa:['法','雷','符','咒','箓','令'],     you:['幽','冥','魄','渡','奈','煞'],
+  huo:['火','炎','焱','离','朱','烽'],    hun:['魂','魄','离','散','幽','冥'],
+  gui:['役','索','缚','殃','判','缚'],    yao:['魅','魍','魉','妖','祟','劫'],
+  xiong:['凶','戮','血','饕','劫','煞'],  zhan:['战','破','摧','陷','锐','锋'],
+  ke:['壳','锢','傀','俑','牢','甲']
+};
+/* theme: 系别类名后缀；lv: 1-4。粒子数硬上限：光粒10/符文6/火花6 */
+function auraHTML(theme, lv){
+  const T = AURA_RUNES[theme] ? theme : 'sheng';
+  const L = Math.max(1, Math.min(4, lv|0));
+  const RUNES = AURA_RUNES[T];
+  const rings = L===1?1 : L===4?3 : 2;
+  const motes = [0,4,6,8,10][L];
+  const runeN = L===3?4 : L===4?6 : 0;
+  const sparks = L===4?6:0;
+  let h = `<div class="au au-${T} au-l${L}" aria-hidden="true"><i class="au-glow"></i>`;
+  for(let i=1;i<=rings;i++) h += `<i class="au-r au-r${i}"></i>`;
+  /* 双轨环绕光粒：外轨正向、内轨反向 */
+  for(let i=0;i<motes;i++){
+    const outer = i%2===0;
+    const w = outer?103:89;
+    const t = outer?7.4-(L>=3?0.7:0) : 10.8-(L>=3?1:0);
+    const d = -((i/motes)*t + (i%3)*0.65);
+    const s = outer?6:5;
+    h += `<span class="au-o${outer?'':' au-rev'}" style="--w:${w}%;--t:${t.toFixed(1)}s;--d:${d.toFixed(2)}s"><i class="au-m" style="--s:${s}px"></i></span>`;
+  }
+  /* 高阶：环绕符文（反向自转保持字正） */
+  for(let i=0;i<runeN;i++){
+    const t = 17+i*1.2, d = -(i/runeN)*t;
+    h += `<span class="au-o au-o-rune${i%2?' au-rev':''}" style="--w:77%;--t:${t.toFixed(1)}s;--d:${d.toFixed(2)}s"><b>${RUNES[i%RUNES.length]}</b></span>`;
+  }
+  /* 顶格：升腾火花 */
+  for(let i=0;i<sparks;i++){
+    const x = 15+i*12+(i*7)%9;
+    const t = 3.2+(i%3)*0.7, d = -(i*0.9);
+    h += `<i class="au-sp" style="--x:${x}%;--t:${t.toFixed(1)}s;--d:${d.toFixed(1)}s"></i>`;
+  }
+  return h+'</div>';
+}
 function fbarHTML(k, label){
   return `<div class="fbar">
     <div class="fl"><span class="fl-k">${k==='p'?'生命':(label||'气血')}</span><span class="fl-v" id="${k}Num"></span></div>

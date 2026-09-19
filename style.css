@@ -451,6 +451,136 @@ body::before{
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
 @keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes cast{0%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}50%{filter:drop-shadow(0 0 26px rgba(192,60,46,.85))}100%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}}
+
+/* ============ 周身神力光环（实力 4 档，纯 CSS 零请求，只动 transform/opacity） ============ */
+.au{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:visible}
+/* 中心光晕：双层辉核呼吸吐纳（亮核＋外晕），滤色加亮成"光" */
+.au-glow{position:absolute;left:50%;top:46%;width:86%;aspect-ratio:1/1;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:
+    radial-gradient(circle,var(--c2) 0%,transparent 24%),
+    radial-gradient(circle,var(--cg) 0%,transparent 68%);
+  mix-blend-mode:screen;
+  animation:au-breathe 3.4s ease-in-out infinite}
+@keyframes au-breathe{0%,100%{opacity:.55;filter:blur(7px);transform:translate(-50%,-50%) scale(.93)}
+  50%{opacity:1;filter:blur(4px);transform:translate(-50%,-50%) scale(1.06)}}
+/* 转环：锥形光弧＋环形遮罩 */
+.au-r{position:absolute;left:50%;top:46%;aspect-ratio:1/1;border-radius:50%;
+  transform:translate(-50%,-50%);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1.5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1.5px));
+  animation:au-rot var(--rt,9s) linear infinite}
+.au-r1{width:106%;--rt:9s;
+  background:conic-gradient(from 0deg,transparent 0deg,var(--c1) 46deg,transparent 120deg,
+    transparent 205deg,var(--c2) 262deg,transparent 325deg)}
+.au-r2{width:90%;--rt:14s;opacity:.8;animation-name:au-rot-b;
+  background:conic-gradient(from 90deg,transparent 0deg,var(--c1) 60deg,transparent 150deg,
+    var(--c2) 210deg,transparent 300deg)}
+.au-r3{width:120%;--rt:21s;opacity:.5;animation-name:au-rot-b;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - .5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - .5px));
+  background:conic-gradient(from 40deg,transparent 30deg,var(--c2) 90deg,transparent 170deg,
+    var(--c1) 240deg,transparent 320deg)}
+@keyframes au-rot{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes au-rot-b{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
+/* 轨道臂：绕身周周期旋转，光粒缀于臂端 */
+.au-o{position:absolute;left:50%;top:46%;width:var(--w,100%);aspect-ratio:1/1;
+  transform:translate(-50%,-50%);
+  animation:au-rot var(--t,8s) linear infinite;animation-delay:var(--d,0s)}
+.au-o.au-rev{animation-name:au-rot-b}
+.au-m{position:absolute;left:50%;top:0;width:var(--s,6px);height:var(--s,6px);
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fffaf0,var(--c2) 45%,var(--c1));
+  box-shadow:0 0 7px 1.5px var(--c1),0 0 15px 3px var(--c1),0 0 26px 6px var(--cg);
+  animation:au-twinkle 1.6s ease-in-out infinite}
+/* 彗星拖尾：沿公转切线方向甩出的光痕 */
+.au-m::after{content:"";position:absolute;right:42%;top:50%;width:17px;height:2.5px;
+  transform:translateY(-50%);border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--c1));
+  filter:blur(.6px);opacity:.8}
+@keyframes au-twinkle{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(.85)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}}
+/* 高阶环绕符文：同轨反向自转，字始终朝上 */
+.au-o-rune b{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);
+  font-family:var(--font-brush);font-size:13px;font-weight:700;font-style:normal;
+  color:var(--cr);text-shadow:0 0 6px var(--cr),0 1px 1px rgba(255,240,210,.65);
+  animation:au-rc var(--t,17s) linear infinite;animation-delay:var(--d,0s)}
+.au-o-rune.au-rev b{animation-name:au-rc-b}
+@keyframes au-rc{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
+@keyframes au-rc-b{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* 顶格：沿身侧升腾的火花 */
+.au-sp{position:absolute;left:var(--x,50%);bottom:4%;width:3px;height:11px;border-radius:2px;
+  background:linear-gradient(180deg,transparent,var(--c2));opacity:0;
+  animation:au-spark var(--t,3.4s) ease-in infinite;animation-delay:var(--d,0s)}
+@keyframes au-spark{0%{transform:translateY(24px) scale(.5);opacity:0}
+  25%{opacity:.95}100%{transform:translateY(-150px) scale(1.05);opacity:0}}
+/* 炫光·扫光光束：锥形光柱绕身缓扫，滤色叠加成眩光 */
+.au::before{content:"";position:absolute;left:50%;top:46%;width:128%;aspect-ratio:1/1;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0deg,transparent 300deg,
+    rgba(255,247,224,.05) 330deg,var(--c2) 352deg,rgba(255,250,232,.55) 358deg,#fffdf4 360deg);
+  -webkit-mask:radial-gradient(farthest-side,transparent 26%,#000 40%,#000 94%,transparent 100%);
+  mask:radial-gradient(farthest-side,transparent 26%,#000 40%,#000 94%,transparent 100%);
+  mix-blend-mode:screen;opacity:0;
+  animation:au-sweep 6.2s linear infinite,au-sweep-flash 6.2s ease-in-out infinite}
+@keyframes au-sweep{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes au-sweep-flash{0%{opacity:0}46%{opacity:0}52%{opacity:1}60%{opacity:.15}100%{opacity:0}}
+/* 炫光·十字星芒：头顶明灭的四射星花 */
+.au::after{content:"";position:absolute;left:50%;top:-1%;width:20px;height:20px;
+  transform:translateX(-50%) rotate(45deg);pointer-events:none;opacity:0;
+  background:
+    linear-gradient(90deg,transparent,var(--c2),transparent) center/100% 2px no-repeat,
+    linear-gradient(0deg,transparent,#fffdf2,transparent) center/2px 100% no-repeat,
+    radial-gradient(circle,#fffef8 0%,var(--c2) 30%,transparent 62%);
+  filter:drop-shadow(0 0 5px var(--c1));
+  animation:au-star 2.8s ease-in-out infinite}
+@keyframes au-star{0%,100%{opacity:0;transform:translateX(-50%) rotate(45deg) scale(.5)}
+  50%{opacity:.95;transform:translateX(-50%) rotate(45deg) scale(1.15)}}
+/* ===== 11 系属性光色（--c1 主色 / --c2 亮色 / --cr 符文色 / --cg 辉晕） ===== */
+/* 神格五系 */
+.au-sheng{--c1:#d4a13c;--c2:#f7e7ac;--cr:#b8801e;--cg:rgba(223,176,82,.42)}  /* 圣：金德 */
+.au-bing {--c1:#c4573a;--c2:#f2bd82;--cr:#9c4530;--cg:rgba(214,118,72,.40)}  /* 兵：赤铜锋火 */
+.au-fa   {--c1:#3f85a6;--c2:#aee0f4;--cr:#2c6686;--cg:rgba(84,172,214,.42)}  /* 法：雷法青 */
+.au-you  {--c1:#7a5a8c;--c2:#c6a8dc;--cr:#5f4470;--cg:rgba(132,98,162,.42)}  /* 幽冥：紫 */
+.au-huo  {--c1:#d2571c;--c2:#ffb268;--cr:#a83d12;--cg:rgba(224,104,42,.44)}  /* 火：朱焰 */
+/* 妖邪六系 */
+.au-hun  {--c1:#5d93ad;--c2:#d4ecf5;--cr:#3f6a80;--cg:rgba(124,184,208,.40)}  /* 魂：青白幽光 */
+.au-gui  {--c1:#4e8a5f;--c2:#bce8b6;--cr:#356845;--cg:rgba(112,182,132,.40)}  /* 鬼：磷火幽绿 */
+.au-yao  {--c1:#a63527;--c2:#a97bc4;--cr:#7a3b6e;--cg:rgba(150,92,150,.40)}  /* 妖：朱紫妖气 */
+.au-xiong{--c1:#9e2b22;--c2:#e66d55;--cr:#7e2018;--cg:rgba(192,62,46,.42)}    /* 凶：血煞暗赤 */
+.au-zhan {--c1:#8b8f99;--c2:#e6eaf2;--cr:#5f636c;--cg:rgba(152,162,178,.38)}  /* 战：兵铁冷银 */
+.au-ke   {--c1:#9c7a3e;--c2:#e2c68e;--cr:#755c2c;--cg:rgba(172,142,82,.40)}   /* 壳：古铜土金 */
+/* 档位强度：低阶淡而简，顶格加亮加辉 */
+.au-l1 .au-glow{width:68%}
+.au-l2 .au-glow{width:78%}
+.au-l3 .au-glow{width:88%}
+.au-l4 .au-glow{width:98%}
+/* 转环辉光逐档增强＋弧段明灭流明 */
+.au-l1 .au-r{filter:drop-shadow(0 0 2px var(--c1));animation:au-rot 9s linear infinite,au-shimmer 2.6s ease-in-out infinite}
+.au-l2 .au-r{filter:drop-shadow(0 0 4px var(--c1))}
+.au-l3 .au-r{filter:drop-shadow(0 0 6px var(--c1))}
+.au-l4 .au-r{filter:drop-shadow(0 0 7px var(--c1)) drop-shadow(0 0 3px var(--c2))}
+.au-l4 .au-r3{filter:drop-shadow(0 0 6px var(--c2))}
+@keyframes au-shimmer{0%,100%{opacity:.75}50%{opacity:1}}
+/* 炫光档位门槛：一阶不刺眼；二阶起扫光；三阶起星芒 */
+.au-l1::before{display:none}
+.au-l2::before{width:118%;opacity:.8}
+.au-l1::after,.au-l2::after{display:none}
+.au-l3::after{animation-duration:2.8s}
+.au-l4::before{animation-duration:5s,5s}
+.au-l4::after{width:26px;height:26px;animation-duration:2.1s}
+/* 顶格符文更亮、火花更密更亮 */
+.au-l4 .au-o-rune b{text-shadow:0 0 9px var(--cr),0 0 3px var(--cr),0 1px 1px rgba(255,240,210,.8)}
+.au-l4 .au-sp{width:4px;box-shadow:0 0 8px var(--c2)}
+/* 倒下即散功，光环熄灭 */
+.fig-body.down .au{display:none}
+@media (max-width:640px){.au{transform:scale(.85)}.au-o-rune b{font-size:11px}}
+@media (max-width:380px){.au{transform:scale(.74)}.au-o-rune b{font-size:10px}}
+@media (prefers-reduced-motion:reduce){
+  .au *,.au::before,.au::after{animation:none!important}
+  .au-r,.au-o{opacity:.35}.au-sp{display:none}.au-glow{opacity:.4}
+  .au::before,.au::after{display:none}
+}
 /* 信息卡：半透宣纸签——纸色淡承、墨线双勾，融进水墨战场而非白块覆盖
    调浓淡只改 --fp（纸底色）与 --fl（墨线色）两处 */
 .finfo{
