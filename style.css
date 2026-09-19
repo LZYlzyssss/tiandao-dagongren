@@ -451,13 +451,40 @@ body::before{
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
 @keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes cast{0%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}50%{filter:drop-shadow(0 0 26px rgba(192,60,46,.85))}100%{filter:drop-shadow(0 0 0 rgba(192,60,46,0))}}
-.fig-name{font-size:16px;font-weight:bold;letter-spacing:2px}
-.fbar{width:200px;max-width:100%}
-.fbar .fl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);margin-bottom:2px}
-.fbar .bar{height:10px;background:#d3c4a4;border-radius:5px;overflow:hidden}
-.fbar .bar i{display:block;height:100%;transition:width .35s}
-.fstatus{min-height:18px;font-size:12px;color:var(--purple)}
-.vs{font-family:var(--font-brush);font-size:40px;color:var(--cinnabar);text-align:center;z-index:1}
+/* 信息卡：名牌/血条/状态统一承托，任意战场背景上都清晰 */
+.finfo{
+  width:218px;max-width:100%;
+  background:linear-gradient(180deg,rgba(251,245,231,.96) 0%,rgba(244,233,210,.94) 100%);
+  border:1px solid rgba(60,50,35,.22);border-radius:10px;
+  padding:7px 12px 8px;
+  box-shadow:0 3px 10px rgba(35,27,16,.22),inset 0 1px 0 rgba(255,255,255,.55);
+  display:flex;flex-direction:column;gap:4px;
+}
+.finfo-top{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
+.fig-name{font-size:15px;font-weight:bold;letter-spacing:2px;color:#2b2620;line-height:1.25}
+.fbar{width:100%}
+.fbar .fl{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:2px}
+.fbar .fl-k{color:#5c5347;font-weight:bold;letter-spacing:2px}
+.fbar .fl-v{color:#2b2620;font-weight:bold;font-variant-numeric:tabular-nums}
+.fbar .fl-v .fl-sub{color:#2e6f8e;font-weight:bold;margin-left:6px;font-size:11px}
+.fbar .bar{height:11px;background:rgba(52,44,30,.24);border-radius:6px;overflow:hidden;
+  box-shadow:inset 0 1px 2px rgba(30,22,12,.30),0 1px 0 rgba(255,255,255,.4)}
+.fbar .bar i{display:block;height:100%;border-radius:6px;transition:width .35s;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+/* 状态徽标行：彩色 chip，替代原淡紫浮字 */
+.fstatus{min-height:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.fst{
+  font-size:11px;line-height:1;font-weight:bold;letter-spacing:1px;
+  padding:3px 8px;border-radius:9px;color:#fbf3e2;
+  box-shadow:0 1px 3px rgba(30,22,12,.28),inset 0 1px 0 rgba(255,255,255,.22);
+}
+.fst-shield{background:linear-gradient(180deg,#3f85a6,#2c6686)}
+.fst-mp{background:linear-gradient(180deg,#46608f,#32486e)}
+.fst-burn{background:linear-gradient(180deg,#d9702f,#b5491d)}
+.fst-stun{background:linear-gradient(180deg,#8a5aae,#6b3d8c)}
+.fst-vuln{background:linear-gradient(180deg,#c9962f,#a87416)}
+.vs{font-family:var(--font-brush);font-size:40px;color:var(--cinnabar);text-align:center;z-index:1;
+  text-shadow:0 2px 6px rgba(251,245,231,.8),0 0 2px rgba(251,245,231,1)}
 .battle-log{
   background:rgba(43,38,32,.85);color:#f2e9d4;border-radius:6px;padding:10px 16px;
   font-size:14px;line-height:1.9;min-height:104px;letter-spacing:1px;
@@ -465,7 +492,13 @@ body::before{
 .battle-log .lg-good{color:#e8b65a}
 .battle-log .lg-bad{color:#e08a7a}
 .battle-log .lg-sys{color:#9fc6dc}
-.round-tag{position:absolute;top:10px;left:14px;font-size:13px;color:var(--ink-faint);letter-spacing:2px}
+.round-tag{
+  position:absolute;top:10px;left:14px;z-index:4;
+  font-size:12px;font-weight:bold;color:#4a4236;letter-spacing:2px;
+  background:rgba(251,245,231,.88);border:1px solid rgba(60,50,35,.2);
+  border-radius:10px;padding:3px 11px;
+  box-shadow:0 2px 6px rgba(35,27,16,.18);
+}
 
 /* 关键时刻 */
 .moment{
@@ -800,9 +833,13 @@ body::before{
   .fig-body{width:90px;height:120px}
   .fig-body .fig-img{height:116%}
   .fig-body .fig-fallback{font-size:36px}
-  .fig-name{font-size:13px}
-  .fbar{width:100%;max-width:140px}
-  .fbar .fl{font-size:10px}
+  .fig-name{font-size:12.5px;letter-spacing:1px}
+  .finfo{width:158px;padding:6px 9px 7px;gap:3px}
+  .fbar .fl{font-size:10.5px}
+  .fbar .fl-v .fl-sub{display:block;margin-left:0;font-size:10px}
+  .fbar .bar{height:9px}
+  .fst{font-size:10px;padding:2px 6px}
+  .intent-bubble{font-size:10px;padding:2px 7px}
   .vs{font-size:28px}
   .battle-log{font-size:13px;line-height:1.7;padding:8px 12px;min-height:80px}
   .round-tag{font-size:11px}
@@ -844,7 +881,7 @@ body::before{
   .fig-body{width:76px;height:102px}
   .fig-body .fig-img{height:112%}
   .fig-body .fig-fallback{font-size:28px}
-  .fbar{max-width:100px}
+  .finfo{width:140px;padding:5px 8px 6px}
   .vs{font-size:22px}
   .stat-chip{padding:2px 6px;gap:4px}
   .stat-chip .sc-ico{width:18px;height:18px}
@@ -1225,19 +1262,19 @@ body::before{
 .contact-row.locked{opacity:.55;cursor:default}
 .contact-row:not(.locked):hover{background:rgba(43,38,32,.05)}
 
-/* ---- 14. v3 战斗意图气泡 ---- */
+/* ---- 14. v3 战斗意图徽标（名牌行内，不再压立绘头部） ---- */
 .intent-bubble{
-  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
-  font-size:11px;line-height:1;padding:3px 8px;border-radius:8px;
-  white-space:nowrap;z-index:5;color:#f7ead2;letter-spacing:1px;
-  box-shadow:0 1px 4px rgba(0,0,0,.25);pointer-events:none;
-  opacity:0;transition:opacity .3s;
+  display:none;
+  font-size:11px;line-height:1.2;font-weight:bold;padding:3px 9px;border-radius:9px;
+  white-space:nowrap;letter-spacing:1px;color:#fbf3e2;
+  box-shadow:0 1px 3px rgba(30,22,12,.30),inset 0 1px 0 rgba(255,255,255,.22);
+  pointer-events:none;
 }
-.intent-bubble:not(:empty){opacity:1}
-.intent-qiang{background:var(--cinnabar)}
-.intent-xu{background:var(--purple)}
-.intent-shou{background:var(--indigo)}
-.intent-mixed{background:var(--ink-soft)}
+.intent-bubble:not(:empty){display:inline-block}
+.intent-qiang{background:linear-gradient(180deg,#d4503f,#a83224)}
+.intent-xu{background:linear-gradient(180deg,#8a5aae,#6b3d8c)}
+.intent-shou{background:linear-gradient(180deg,#3f7ea6,#2c5d80)}
+.intent-mixed{background:linear-gradient(180deg,#6f675b,#524a40)}
 .fighter.foe{position:relative}
 
 /* ---- 15. v3 侵蚀条 / 顶栏侵蚀 ---- */
@@ -2839,6 +2876,9 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   .fig-body{width:68px;height:90px}
   .fig-body .fig-img{height:110%}
   .fig-body .fig-fallback{font-size:26px}
+  .finfo{width:150px;padding:5px 9px 6px;gap:2px}
+  .fbar .bar{height:8px}
+  .fst{font-size:9.5px;padding:2px 6px}
   .vs{font-size:20px}
   .battle-log{min-height:52px;padding:5px 10px;font-size:12px;line-height:1.55}
   .btn{min-height:36px}

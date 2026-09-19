@@ -2231,20 +2231,23 @@ const UI = {
             ${typeof ASSET!=='undefined'?ASSET.html(pKey,'fig-img',RANKS[Game.s.rank].name):''}
             <span class="fig-fallback">衙</span>
           </div>
-          <div class="fig-name">${Game.s.pname?('「'+Game.s.pname+'」 · '):('你 · ')}${RANKS[Game.s.rank].name}</div>
-          ${fbarHTML('p')}
-          <div class="fstatus" id="pStatus"></div>
+          <div class="finfo">
+            <div class="finfo-top"><span class="fig-name">${Game.s.pname?('「'+Game.s.pname+'」 · '):('你 · ')}${RANKS[Game.s.rank].name}</span></div>
+            ${fbarHTML('p')}
+            <div class="fstatus" id="pStatus"></div>
+          </div>
         </div>
         <div class="vs">战</div>
         <div class="fighter foe" id="fFoe">
-          <div class="intent-bubble" id="eIntent"></div>
           <div class="fig-body fig-foe" id="figFoe" style="color:${B.e.tint}">
             ${typeof ASSET!=='undefined'?ASSET.html(eKey,'fig-img',B.e.name):''}
             <span class="fig-fallback">${B.e.icon}</span>
           </div>
-          <div class="fig-name">${B.e.name}</div>
-          ${fbarHTML('e', B.e.hpLabel)}
-          <div class="fstatus" id="eStatus"></div>
+          <div class="finfo">
+            <div class="finfo-top"><span class="fig-name">${B.e.name}</span><span class="intent-bubble" id="eIntent"></span></div>
+            ${fbarHTML('e', B.e.hpLabel)}
+            <div class="fstatus" id="eStatus"></div>
+          </div>
         </div>
       </div>
       <div class="battle-log" id="battleLog"></div>
@@ -2275,15 +2278,16 @@ const UI = {
     $('bRound').textContent=B.round;
     setBar('p',B.p.hp,B.p.maxHp,B.p.mp,B.p.maxMp,B.p.shield);
     setBar('e',B.e.hp,B.e.maxHp);
-    $('pStatus').textContent=[
-      B.p.shield>0?`光盾 ${B.p.shield}`:'',
-      B.p.mp<B.p.maxMp?`神力 ${B.p.mp}`:''
-    ].filter(Boolean).join(' · ');
-    $('eStatus').textContent=[
-      B.e.burn>0?`燃烧 ${B.e.burn}回合`:'',
-      B.e.stun>0?`震骇 ${B.e.stun}回合`:'',
-      (B.e.vulnTurns>0||B.e.vulnFixed>1)?'破绽':''
-    ].filter(Boolean).join(' · ');
+    const fst=(cls,txt)=>`<span class="fst fst-${cls}">${txt}</span>`;
+    $('pStatus').innerHTML=[
+      B.p.shield>0?fst('shield',`光盾 ${B.p.shield}`):'',
+      B.p.mp<B.p.maxMp?fst('mp',`神力 ${B.p.mp}`):''
+    ].join('');
+    $('eStatus').innerHTML=[
+      B.e.burn>0?fst('burn',`燃烧 ${B.e.burn} 回合`):'',
+      B.e.stun>0?fst('stun',`震骇 ${B.e.stun} 回合`):'',
+      (B.e.vulnTurns>0||B.e.vulnFixed>1)?fst('vuln','破绽'):''
+    ].join('');
     /* v3：敌人意图气泡 */
     const ie=$('eIntent');
     if(ie){
@@ -2432,7 +2436,7 @@ const UI = {
 
 function fbarHTML(k, label){
   return `<div class="fbar">
-    <div class="fl"><span>${k==='p'?'生命':(label||'气血')}</span><span id="${k}Num"></span></div>
+    <div class="fl"><span class="fl-k">${k==='p'?'生命':(label||'气血')}</span><span class="fl-v" id="${k}Num"></span></div>
     <div class="bar"><i class="${k==='p'?'bar-hp':'bar-mp'}" id="${k}Bar" style="width:100%"></i></div>
   </div>`;
 }
@@ -2440,9 +2444,8 @@ function setBar(k,hp,max,mp,maxMp,shield){
   const bar=$(k+'Bar'), num=$(k+'Num');
   if(!bar) return;
   bar.style.width=Math.max(0,hp/max*100)+'%';
-  num.textContent = k==='p'
-    ? `${Math.round(hp)}/${max} ｜ 神力 ${mp}/${maxMp}`
-    : `${Math.round(hp)}/${max}`;
+  if(k==='p') num.innerHTML=`${Math.round(hp)}/${max}<span class="fl-sub">神力 ${mp}/${maxMp}</span>`;
+  else num.textContent=`${Math.round(hp)}/${max}`;
 }
 function floatNum(sel,text,color){
   const f=document.querySelector(sel); if(!f) return;
