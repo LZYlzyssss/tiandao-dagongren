@@ -2395,15 +2395,13 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   position:absolute;inset:0;z-index:1;pointer-events:none;
   transition:background .45s ease;
 }
-/* 封面屏：只压一条底边，最大程度露图 */
+/* 封面屏：不压暗，背景古画完整呈现（底部"轻触进入"自带深色 text-shadow，无需渐变衬底） */
 .login-overlay.is-cover .login-veil{
-  background:linear-gradient(180deg, rgba(14,10,6,0) 62%, rgba(14,10,6,.28) 86%, rgba(14,10,6,.52) 100%);
+  background:none;
 }
-/* 登录卡屏：卡片本身不透光，遮罩只需轻压，大幅露出背景古画 */
+/* 登录卡屏：彻底不要遮罩阴影，背景古画原样露出，只剩一张干净的登录卡片 */
 .login-overlay.is-login .login-veil{
-  background:
-    radial-gradient(120% 90% at 50% 18%, rgba(20,15,9,.08) 0%, rgba(20,15,9,.24) 68%, rgba(14,10,6,.42) 100%),
-    linear-gradient(180deg, rgba(14,10,6,.24) 0%, rgba(14,10,6,.10) 38%, rgba(14,10,6,.40) 100%);
+  background:none;
 }
 
 /* ---- 第一屏：纯封面 + 底部小字 ---- */
@@ -2470,7 +2468,7 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
 .login-card{
   width:100%;background:linear-gradient(180deg,rgba(251,245,230,.97),rgba(240,229,205,.97));
   border:1px solid rgba(60,45,28,.35);border-radius:12px;
-  padding:20px 22px;box-shadow:0 8px 24px rgba(0,0,0,.28);
+  padding:20px 22px;box-shadow:none;
   animation:panelIn .45s ease-out both;
 }
 .login-field{display:flex;gap:8px;margin-top:4px}
