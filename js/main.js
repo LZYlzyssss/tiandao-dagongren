@@ -95,7 +95,10 @@ const BOOT={
   run(){
     const bar=$('blBar'), pct=$('blPct'), tip=$('blTip'), loader=$('bootLoader');
     const hasSave=!!Game.s;
-    const keys=hasSave?this.requiredKeys():this.smallKeys(0);
+    /* 全量预载：核心骨架 + cover 最先，随后战斗图/卡牌/其余全部拉齐才进门；
+       相对路径经 ASSET.base() 补全，file:// 直开与 Capacitor 打包均可用 */
+    const core=(hasSave?this.requiredKeys():this.smallKeys(0))
+      .concat([ASSET.base()+'img/cover.png']);
     let finished=false, skip=false;
     const finish=()=>{
       if(finished) return; finished=true;
@@ -111,10 +114,10 @@ const BOOT={
     skipBtn.style.cssText='margin-top:14px;opacity:0;transition:opacity .4s;pointer-events:none';
     skipBtn.onclick=()=>{ skip=true; };
     loader.appendChild(skipBtn);
-    /* 硬门只剩约 3MB 骨架：6 秒可手动先进衙；9 秒仍未完则自动放行，
-       没拉到的图全部交给进门后的"视口 demand + warm 兜底"，绝不让进度条卡死 */
+    /* 全量素材（数十张卡牌/战斗图）：6 秒可手动先进衙；15 秒仍未完则自动放行，
+       没拉到的图由后台继续跑完的 preboot + 视口 demand + warm 兜底，绝不让进度条卡死 */
     const skipTimer=setTimeout(()=>{ skipBtn.style.opacity='1'; skipBtn.style.pointerEvents='auto'; },6000);
-    const autoTimer=setTimeout(()=>finish(),9000);
+    const autoTimer=setTimeout(()=>finish(),15000);
 
     const onprog=(d,t,st)=>{
       const p=t?d/t:1;
@@ -124,7 +127,9 @@ const BOOT={
       if(line && !st.fail) tip.textContent=line[1];
       if(st.fail) tip.textContent='南天门驿道拥堵，正在重拉掉队的卷宗…';
     };
-    const run=()=>ASSET.preload(keys,{conc:6,onprogress:onprog});
+    /* preboot 全量预载（4 并发，安卓 WebView 留连接给引擎/字体）；单例不 reject，
+       即使被 15 秒超时放行，队列仍在后台继续把剩余卡牌/战斗图下载完 */
+    const run=()=>ASSET.preboot({core,conc:4,onprogress:onprog});
     /* 引擎/字体并行，各自超时放行，不拖图的后腿 */
     const engine=waitUntil(()=>window.PIXI,8000);
     const fonts=(document.fonts&&document.fonts.ready)?withTimeout(document.fonts.ready,3000):Promise.resolve();
@@ -455,7 +460,10 @@ const Login={
 
 window.addEventListener('DOMContentLoaded', ()=>{
 
-  /* ---- Service Worker：图片持久缓存，二次访问本地秒开 ---- */
+  /* ---- Service Worker：浏览器/PWA 下图片持久落盘、二次访问秒开 ----
+     Capacitor WebView（https://localhost）可注册则注册，失败静默——APP 内不依赖 SW：
+     图片缓存由 ASSET 的 blob 内存层 + WebView 自身 HTTP 缓存双重保证，SW 缺席也不影响看图。
+     file:// 直开时浏览器不允许注册 SW，条件天然跳过。 */
   if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
     navigator.serviceWorker.register('sw.js').catch(()=>{});
   }

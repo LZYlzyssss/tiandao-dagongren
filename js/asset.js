@@ -21,12 +21,90 @@ const ASSET = {
     return 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt='
       + encodeURIComponent(a[0]) + '&image_size=' + a[1];
   },
-  file(key){ key=this.ALIAS[key]||key; return 'img/'+key+'.jpg'; },
-  avatarFile(gid){ return 'img/av_'+gid+'.jpg'; },
+  /* ---- 运行环境与资源根（兼容三种宿主） ----
+     1) 静态站 https://lzylzyssss.github.io/...  2) file:// 双击直开  3) Capacitor WebView（https://localhost）
+     所有图片 URL 一律基于 document.baseURI 推绝对路径：相对"img/x.jpg"写法在三种宿主下都稳，
+     且绝不使用"/"开头的根绝对路径（Capacitor 打包后根路径不指向 assets/public，必 404）。 */
+  _envCache:null,
+  _env(){
+    if(this._envCache) return this._envCache;
+    const proto=location.protocol;
+    let base=(document.baseURI||location.href).replace(/[^/]*$/,'');   /* 末尾带 / */
+    this._envCache={
+      proto,
+      isFile:proto==='file:',
+      isHttp:proto==='http:'||proto==='https:',
+      isCap:!!(window.Capacitor||window.androidBridge),
+      base
+    };
+    return this._envCache;
+  },
+  base(){ return this._env().base; },
+
+  /* ---- webp 协商：探针确认 img/ 下存在同名 .webp 才切换；探针前/无 webp 时一律 jpg（零行为变化）。
+     将来用 cwebp 把 img/*.jpg 批量转成同名 .webp（jpg 保留不删）后，下次启动自动全站切 webp。 */
+  _webp:null,
+  async _probeWebp(){
+    if(this._webp!==null) return this._webp;
+    if(!this._env().isHttp){ this._webp=false; return false; }   /* file:// 无法可靠验 404，保守不切 */
+    const samples=['p_r0','ui_main'];
+    const hit=await new Promise(res=>{
+      let left=samples.length, found=false;
+      const done=ok=>{ if(ok) found=true; if(--left<=0) res(found); };
+      samples.forEach(k=>{
+        const im=new Image();
+        const t=setTimeout(()=>{ im.onload=im.onerror=null; done(false); },1500);
+        im.onload =()=>{ clearTimeout(t); done(true); };
+        im.onerror=()=>{ clearTimeout(t); done(false); };
+        im.src=this.base()+'img/'+k+'.webp';
+      });
+    });
+    this._webp=hit;
+    if(hit) console.info('[ASSET] 检测到 webp 素材，启用 webp 管线');
+    return hit;
+  },
+
+  file(key){ key=this.ALIAS[key]||key; return this.base()+'img/'+key+'.'+(this._webp?'webp':'jpg'); },
+  avatarFile(gid){ return this.base()+'img/av_'+gid+'.jpg'; },
+
+  /* 任意入参 → 可直接请求的文件 URL：list key 走 file()；绝对 URL 原样；'img/' 相对路径补 base */
+  _toFile(v){
+    if(!v) return null;
+    if(this.list[v]) return this.file(v);
+    if(/^(https?:|file:|blob:|data:)/i.test(v)) return v;
+    if(v.slice(0,4)==='img/') return this.base()+v;
+    return null;
+  },
 
   /* ---- 本地图探测（Promise + 缓存） ----
      三种结论：true=有本地图(已下载) / false=坐实缺失(404，永久水墨兜底) / undefined=本次网络失败(不坐实，下次还能再试) */
   _probe:{}, _probeQueue:[], _probeInflight:{}, _missing:{},
+
+  /* ---- 内存级缓存（Capacitor / 移动端 WebView 的关键） ----
+     _loading  : url -> 在途 Promise，preload/demand/warm/挂载四路共用一条请求，绝不重复下载
+     _blobUrl  : url -> blob: 内存地址。http(s)（含 Capacitor https://localhost）下图到后转 blob，
+                 卡牌反复切换/页面重挂直接读内存，零网络、零解码等待，彻底绕开部分安卓 WebView 磁盘缓存异常
+     _failedLog: 失败名只在控制台打印一次 */
+  _loading:{}, _blobUrl:{}, _failedLog:{},
+
+  /* 失败/缺图终态的统一占位：米纸墨框 +「佚」字方印（自包含 data URI，不依赖任何网络文件） */
+  get PLACEHOLDER(){
+    if(this._ph) return this._ph;
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">'+
+      '<rect width="200" height="200" fill="#efe6d0"/><rect x="14" y="14" width="172" height="172" rx="10" fill="none" stroke="#8a7a5c" stroke-width="3" stroke-dasharray="8 7"/>'+
+      '<text x="100" y="128" font-size="86" text-anchor="middle" fill="#a9462f" font-family="serif">佚</text></svg>';
+    return this._ph='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+  },
+  /* 给挂载层用的最终 URL：优先内存 blob，其次原 URL */
+  _serve(url){ return this._blobUrl[url]||url; },
+  _shortName(url){
+    try{ return decodeURIComponent(String(url).split('/').pop().split('?')[0]); }catch(e){ return String(url); }
+  },
+  _logFail(url,reason){
+    if(this._failedLog[url]) return;
+    this._failedLog[url]=1;
+    console.warn('[ASSET] 图片加载失败，已替换占位骨架：'+this._shortName(url)+'（'+reason+'）');
+  },
 
   /* ---- 真图到达订阅（渐进挂载核心） ----
      页面挂载点先显示 SVG 骨架并订阅；真图在任意时刻（挂载直拉 / priority / warm）下载成功后，
@@ -35,12 +113,14 @@ const ASSET = {
   _waiters:{}, _pullInflight:{},
   _flushWaiters(file){
     const list=this._waiters[file]; if(!list||!list.length) return;
-    list.splice(0).forEach(cb=>{ try{ cb(file); }catch(e){} });
+    const serve=this._serve(file);
+    list.splice(0).forEach(cb=>{ try{ cb(serve); }catch(e){} });
   },
   /* 按文件 URL 订阅（av_ 等不在 list 中的直接路径也走这里） */
   onFile(file,cb){
     if(!file) return;
-    if(this._probe[file]===true){ cb(file); return; }
+    file=this._toFile(file)||file;
+    if(this._probe[file]===true){ cb(this._serve(file)); return; }
     if(this._probe[file]===false||this._missing[file]){ cb(null); return; }
     (this._waiters[file]=this._waiters[file]||[]).push(cb);
     this._pull(file);
@@ -73,7 +153,7 @@ const ASSET = {
   /* 批量高优先级：小并发池主动拉取一组 key（用于进门后在架工单图等）
      兼容两种入参：list 内的 key（'g_xxx'）或直接文件路径（'img/av_xxx.jpg'） */
   priority(keys,conc){
-    const fileOf=v=>this.list[v]?this.file(v):(/^img\//.test(v)?v:null);
+    const fileOf=v=>this._toFile(v);
     const q=(keys||[]).filter((v,i,a)=>{
       if(!v||a.indexOf(v)!==i) return false;
       const f=fileOf(v);
@@ -106,7 +186,7 @@ const ASSET = {
   demand(keys){
     (Array.isArray(keys)?keys:[keys]).forEach(k=>{
       if(!k || this._demandSet[k]) return;
-      const f=this.list[k]?this.file(k):(/^img\//.test(k)?k:null);
+      const f=this._toFile(k);
       if(!f) return;
       if(this._probe[f]===true || this._missing[f]) return;  /* 已成功 / 坐实缺图：无需再拉 */
       this._demandSet[k]=1;
@@ -131,7 +211,8 @@ const ASSET = {
     pump();
   },
   async _demandOne(k){
-    const f=this.list[k]?this.file(k):k;
+    const f=this._toFile(k);
+    if(!f) return;
     if(this._probe[f]===true){ this._warmDone[k]=1; return; }
     if(this._missing[f]){ this._demandSet[k]=0; return; }
     const st=await this._loadOnce(f,30000);   /* 可见大图给足 30s，弱网不误伤 */
@@ -154,26 +235,52 @@ const ASSET = {
     this.warm(k);
   },
 
-  /* 单次取图：区分 成功 / 404永久缺失 / 网络失败（用 HEAD 验明，HEAD 不经 SW 不耗流量）
-     硬超时 ms（默认 20s，可见大图 demand 传 30s）：弱网下 socket 半死不能无限挂住队列 */
-  async _loadOnce(url, ms){
-    const TO=ms||20000;
+  /* 单条取图的统一入口：终态缓存 + 全局唯一在途 + 超时。
+     返回 'ok' | 'missing'(永久缺图) | 'fail'(网络抖动)，永不 throw。
+     preload / demand / warm / 挂载探测四路全部收敛于此——同一 URL 全 App 同时只下载一次，
+     卡牌反复切换时第二次起直接命中，零网络请求。 */
+  _loadOnce(url, ms){
+    if(!url) return Promise.resolve('fail');
+    if(this._probe[url]===true) return Promise.resolve('ok');
+    if(this._missing[url]) return Promise.resolve('missing');
+    if(this._loading[url]) return this._loading[url];
+    const p=this._fetchImg(url,ms||20000).finally(()=>{ if(this._loading[url]===p) this._loading[url]=null; });
+    this._loading[url]=p;
+    return p;
+  },
+  async _fetchImg(url, TO){
     const done=await Promise.race([
       new Promise(res=>{
         const im=new Image();
+        im.decoding='async';                      /* 异步解码，不卡主线程/动画 */
         im.onload =()=>res(true);
         im.onerror=()=>res(false);
         im.src=url;
       }),
-      new Promise(res=>setTimeout(()=>res('timeout'),TO)),
+      new Promise(res=>setTimeout(()=>res('timeout'),TO)),   /* 弱网半死连接硬超时，不挂死队列 */
     ]);
-    if(done==='timeout') return 'fail';
-    if(done) return 'ok';
-    try{
-      const hr=await fetch(url,{method:'HEAD',cache:'no-store'});
-      if(hr.status===404) return 'missing';
-    }catch(e){ /* 断网时 HEAD 也失败 → 视为网络抖动 */ }
+    if(done==='timeout'){ this._logFail(url,'超时 '+(TO/1000)+' 秒'); return 'fail'; }
+    if(done){
+      this._blobize(url);                         /* http(s) 下异步转内存 blob，不阻塞回报 */
+      return 'ok';
+    }
+    /* error：HEAD 验明是否坐实 404（HEAD 不耗图片流量；file:// 无法 XHR，按网络抖动处理，不冤枉本地文件） */
+    if(this._env().isHttp){
+      try{
+        const hr=await fetch(url,{method:'HEAD',cache:'no-store'});
+        if(hr.status===404){ this._logFail(url,'404 素材缺失，永久水墨兜底'); return 'missing'; }
+      }catch(e){ /* 断网时 HEAD 也失败 → 网络抖动 */ }
+    }
+    this._logFail(url,'网络错误，稍后自动重试');
     return 'fail';
+  },
+  /* 成功图异步转 blob: 内存地址（仅 http(s)，含 Capacitor https://localhost；file:// fetch 受限时跳过）。
+     之后挂载/切换一律读内存 blob：零网络、零等待，绕开部分安卓 WebView 磁盘缓存读写异常。 */
+  _blobize(url){
+    if(this._blobUrl[url]||!this._env().isHttp||/^blob:/i.test(url)) return;
+    fetch(url,{cache:'force-cache'}).then(r=>r.ok?r.blob():null).then(b=>{
+      if(b&&!this._blobUrl[url]) this._blobUrl[url]=URL.createObjectURL(b);
+    }).catch(()=>{});
   },
 
   hasLocal(key){
@@ -249,8 +356,7 @@ const ASSET = {
       return this._missing[this.file(key)] ? 'missing' : 'fail';
     }
     if(typeof key==='string' && key.startsWith('data:')) return 'ok';
-    if(/^(img\/|https?:\/\/)/.test(key||'')) url=key;
-    else url=this.file(key);
+    url=this._toFile(key)||this.file(key);
     const st=await this._loadOnce(url);
     if(st==='ok'){ this._probe[url]=true; this._flushWaiters(url); return 'ok'; }
     if(st==='missing'){ this._missing[url]=1; this._probe[url]=false;
@@ -261,6 +367,78 @@ const ASSET = {
       return this._preloadOne(key,tries+1);
     }
     return 'fail';
+  },
+
+  /* ==================================================================
+     preboot —— 启动全量预载（启动进度条的真实数据源，战斗前拉齐所有卡牌/UI/战斗图）
+     - 先跑 webp 探针，再按 核心 → 战斗 → 卡牌 → 其余 排序；4 并发
+       （安卓 WebView 同域约 6 连接，留 2 条给引擎/字体，避免请求排队互锁）
+     - 已有终态的图零请求直接计完成；av_ 小头像 soft 探测（47 神仅 15 张真实存在，
+       缺文件立即按完成结算、不重试、不刷错误日志）
+     - 永不 reject；调用方即使超时先进游戏，本队列仍在后台继续跑完，warm/demand 共享在途去重
+     opt: { core:[list key 或直接文件 URL], conc:4, onprogress(done,total,{done,fail,missing}) }
+     ================================================================== */
+  preboot(opt){
+    opt=opt||{};
+    if(this._prebootRun) return this._prebootRun;
+    this._prebootRun=(async()=>{
+      await this._probeWebp();
+      const core=opt.core||[];
+      const coreFiles=core.filter(v=>!this.list[v]);
+      const coreKeys=new Set(core.filter(v=>!!this.list[v]));
+      const rank=k=>{
+        if(coreKeys.has(k)) return 0;
+        if(/^(e_|sk_|gh_|sol_|rp_|bf_|scene_)/.test(k)) return 1;   /* 战斗/过场：绝不在战斗中临时加载 */
+        if(/^(g_|it_)/.test(k)) return 2;                            /* 卡牌：神立绘 + 物品图标 */
+        return 3;                                                    /* 工单/属性/设施/其余 */
+      };
+      const keys=Object.keys(this.list).sort((a,b)=>rank(a)-rank(b)||(a<b?-1:a>b?1:0));
+      /* av_ 小头像全神 soft 探测 */
+      const avs=(typeof GODS!=='undefined')?Object.keys(GODS).map(g=>this.avatarFile(g)):[];
+      const q=[];
+      keys.forEach(k=>q.push(['key',k]));
+      coreFiles.forEach(f=>q.push(['file',f]));
+      avs.forEach(f=>q.push(['av',f]));
+      const total=q.length;
+      let done=0, fail=0, missing=0;
+      const tick=()=>{ try{ opt.onprogress&&opt.onprogress(done+missing,total,{done,fail,missing}); }catch(e){} };
+      /* av soft：自管 Image，不走 _loadOnce——缺失是常态（不刷警告日志、不坐实终态、不重试阻塞）；
+         成功才坐实并通知挂载点；失败仅按完成计数，进门后 warm 对仍需的头像还有一次正式兜底 */
+      const runAv=url=>new Promise(res=>{
+        if(this._probe[url]===true) return res('ok');
+        if(this._missing[url]) return res('missing');
+        const im=new Image(); im.decoding='async';
+        const t=setTimeout(()=>{ im.onload=im.onerror=null; res('fail'); },12000);
+        im.onload =()=>{ clearTimeout(t); this._probe[url]=true; this._blobize(url); this._flushWaiters(url); res('ok'); };
+        im.onerror=()=>{ clearTimeout(t); res('fail'); };
+        im.src=url;
+      });
+      const runJob=([type,v])=>{
+        if(type==='av') return runAv(v).then(st=>st==='ok'?'ok':'missing');   /* soft：缺失/超时计完成不挡门 */
+        return this._preloadOne(v);                       /* list key 与直接文件 URL 均支持，内含 2 次退避重试 */
+      };
+      let idx=0;
+      const worker=()=>{
+        const job=q[idx++];
+        if(job===undefined) return Promise.resolve();
+        /* 进门后业务取图（ASSET.src 会设 12 秒让路窗）优先：preboot 休眠让连接，
+           demand 不受让路窗影响，始终是最高优 */
+        const pause=()=>new Promise(r=>setTimeout(r,500));
+        const go=()=>{
+          if(Date.now()<this._warmPauseUntil) return pause().then(go);
+          return runJob(job).then(st=>{
+            if(st==='ok') done++; else if(st==='missing') missing++; else fail++;
+            tick();
+            return worker();
+          }).catch(()=>{ fail++; tick(); return worker(); });
+        };
+        return go();
+      };
+      tick();
+      await Promise.all(Array.from({length:Math.min(opt.conc||4,Math.max(1,q.length))},worker));
+      return {done,fail,missing,total};
+    })();
+    return this._prebootRun;
   },
 
   /* ---- 后台预热队列：单并发兜底全量；可见图由 demand 独立高优拉，互不抢连接 ---- */
@@ -297,20 +475,38 @@ const ASSET = {
     setTimeout(loop, 4000);                               /* 进门 4 秒、首屏稳定后开始兜底补齐 */
   },
 
-  /* ---- <img> 标签：html() 出骨架，scan() 挂载回退链 ---- */
+  /* ---- <img> 标签：html() 出骨架，scan() 挂载回退链 ----
+     decoding="async"：图片解码不卡主线程；尺寸由各容器 CSS 固定（宽高 100%/object-fit:cover），
+     骨架与真图同尺寸，src 切换不发生布局跳动（CLS=0），故无需再写死 width/height 属性 */
   html(key, cls, alt){
-    return `<img class="${cls||''}" alt="${alt||''}" data-asset="${key}" src="">`;
+    return `<img class="${cls||''}" alt="${alt||''}" data-asset="${key}" decoding="async" src="">`;
+  },
+
+  /* 真图到达后安全赋值：异步解码预载 → 成功替换淡入；失败换统一占位图，绝不留裂图 */
+  _assignReal(img,url){
+    const im=new Image();
+    im.decoding='async';
+    im.onload =()=>{ img.src=url; img.classList.add('loaded'); };
+    im.onerror=()=>{ if(!img.getAttribute('src')) img.src=this.PLACEHOLDER; };
+    im.src=url;
   },
 
   mount(img, key){
     if(!key || !this.list[key]){ img.style.display='none'; return; }
+    img.decoding='async';
     img.classList.add('asset-fade');
+    /* 总保险：任何真图 URL 赋给节点后再失败（blob 失效/磁盘缓存损坏），换占位图而非裂图 */
+    img.addEventListener('error',()=>{
+      if(img.dataset.phSet) return;
+      const s=img.getAttribute('src')||'';
+      if(s && s.slice(0,5)!=='data:'){ img.dataset.phSet='1'; img.src=this.PLACEHOLDER; }
+    },true);
     this.watchVis(img,[key]);          /* 进入视口即高优直拉并失败重试 */
     const f=this.file(key);
-    /* 快路径：真图已在缓存，直接挂，无闪烁 */
+    /* 快路径：真图已在内存/blob 缓存，直接挂，无闪烁 */
     if(this._probe[f]===true){
       img.addEventListener('load',()=>img.classList.add('loaded'),{once:true});
-      img.src=f; return;
+      img.src=this._serve(f); return;
     }
     /* 渐进：先挂水墨骨架并立即可见（绝不空白），真图到达后替换并保持可见 */
     const svg=this.svg(key);
@@ -319,10 +515,8 @@ const ASSET = {
       img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
     }
     this.onKeyReady(key,url=>{
-      if(!url) return;                       /* 坐实 404：骨架即终态 */
-      const im=new Image();
-      im.onload=()=>{ img.src=url; img.classList.add('loaded'); };
-      im.src=url;
+      if(!url){ if(!img.getAttribute('src')) img.src=this.PLACEHOLDER;  /* 坐实 404：墨字骨架即占位，无骨架时用通用占位 */ return; }
+      this._assignReal(img,url);
     });
   },
   /* ---- 视口感知：元素进入屏幕（含提前 240px）即 demand 高优拉取 ----
@@ -381,7 +575,7 @@ const ASSET = {
     const f=this.file(key);
     /* 快路径：真图已缓存 */
     if(this._probe[f]===true){
-      el.style.backgroundImage=`url("${f}")`;
+      el.style.backgroundImage=`url("${this._serve(f)}")`;
       el.style.opacity=target;
       return;
     }
@@ -390,10 +584,11 @@ const ASSET = {
     const svg=this.svg(key);
     if(svg) el.style.backgroundImage=`url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
     el.style.opacity=target;
-    /* 2) 真图到达后淡出骨架、换真图、淡入（SW 已缓存时这一拍几乎不可察觉） */
+    /* 2) 真图到达后淡出骨架、换真图、淡入（内存 blob/SW 命中时这一拍几乎不可察觉） */
     this.onKeyReady(key,url=>{
       if(!url || el._assetKey!==key) return;
       const im=new Image();
+      im.decoding='async';
       im.onload=()=>{
         if(el._assetKey!==key) return;
         el.style.opacity=0;
@@ -404,22 +599,27 @@ const ASSET = {
     });
   },
 
-  /* ---- 神头像（gh-ava）：墨字垫底 → av 小图 → g 大立绘两级渐进 ---- */
+  /* ---- 神头像（gh-ava）：墨字垫底 → av 小图 → g 大立绘渐进 ---- */
   mountAvatar(img, gid){
     const g=(typeof GODS!=='undefined')&&GODS[gid];
     if(!g){ img.remove(); return; }
+    img.decoding='async';
     const hasArt=(typeof GOD_ART!=='undefined')&&GOD_ART.includes(gid);
     const av=this.avatarFile(gid);
     /* 有真绘神：demand 只拉 g_ 大图（本地无 av_ 小图文件，跳过 av 省 demand 槽） */
     if(hasArt){
       this.watchVis(img,['g_'+gid]);
-      this.onKeyReady('g_'+gid,url=>{ if(!url){ img.remove(); return; }
-        const im=new Image(); im.onload=()=>{ img.src=url; img.classList.add('loaded'); }; im.src=url; });
+      this.onKeyReady('g_'+gid,url=>{
+        if(url) this._assignReal(img,url);
+        else img.remove();                 /* 坐实无图：移除 img 露底层墨字（即占位态） */
+      });
       return;
     }
-    /* 无真绘神：不 demand av（本地无 av_ 文件），仅挂订阅（若后续有 av 自动挂载；404 坐实则露字骨架） */
-    this.onFile(av,url=>{ if(!url){ img.remove(); return; }
-      const im=new Image(); im.onload=()=>{ img.src=url; img.classList.add('loaded'); }; im.src=url; });
+    /* 无真绘神：仅挂 av 订阅（preboot 已 soft 探测；404 坐实则露字骨架） */
+    this.onFile(av,url=>{
+      if(url) this._assignReal(img,url);
+      else img.remove();
+    });
   },
 
   /* ---- 便捷取 key ---- */

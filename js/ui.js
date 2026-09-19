@@ -127,7 +127,7 @@ const UI = {
     const s=Game.s, st=Stats.cur(), rk=RANKS[s.rank];
     /* 顶栏玩家立绘随品阶换装（立绘共五档，高品复用 r4） */
     const sealImg=$('brandSealImg');
-    if(sealImg) sealImg.src='img/p_r'+Math.min(s.rank||0,4)+'.jpg';
+    if(sealImg){ sealImg.decoding='async'; sealImg.src='img/p_r'+Math.min(s.rank||0,4)+'.jpg'; }
     const bp=$('brandPname');
     if(bp) bp.textContent=(s.pname?('典吏「'+s.pname+'」 · '):'')+rk.name;
     const target=monthTarget(s.month);
@@ -681,7 +681,7 @@ const UI = {
     const idp=h('div','panel me-head');
     idp.innerHTML=`
       <h2>身份卷宗</h2>
-      <div class="me-seal"><img src="img/p_r${Math.min(s.rank||0,4)}.jpg" alt="你"></div>
+      <div class="me-seal"><img src="img/p_r${Math.min(s.rank||0,4)}.jpg" alt="你" decoding="async"></div>
       <div class="me-id">
         <div class="me-pname">名号 · <b>${s.pname||'无名'}</b></div>
         <div class="me-rank">${rk.name}</div>
@@ -1060,7 +1060,7 @@ const UI = {
       /* 预载实景与新旧官身立绘，保证变身幕不断流 */
       const figI=Math.min(fromRank||0,4), figJ=Math.min(toRank||0,4);
       ['img/rp_descend.jpg','img/rp_receive.jpg',`img/p_r${figI}.jpg`,`img/p_r${figJ}.jpg`]
-        .forEach(u=>{ const im=new Image(); im.src=u; });
+        .forEach(u=>{ const im=new Image(); im.decoding='async'; im.src=u; });
 
       /* 恩典增量 */
       const gifts=[];
@@ -1124,8 +1124,8 @@ const UI = {
           <div class="rp-morph-tag">脱 胎 换 骨</div>
           <div class="rp-beam"></div>
           <div class="rp-figure">
-            <img class="rp-fig-old" src="img/p_r${figI}.jpg" alt="旧品官身" onerror="this.remove()">
-            <img class="rp-fig-new" src="img/p_r${figJ}.jpg" alt="新品官身" onerror="this.remove()">
+            <img class="rp-fig-old" src="img/p_r${figI}.jpg" alt="旧品官身" decoding="async" onerror="this.remove()">
+            <img class="rp-fig-new" src="img/p_r${figJ}.jpg" alt="新品官身" decoding="async" onerror="this.remove()">
           </div>
           <div class="rp-flash"></div>
           <div class="rp-idcard">
@@ -1780,7 +1780,7 @@ const UI = {
     const ov=h('div','overlay cx-zoom-ov');
     ov.innerHTML=`
       <div class="cx-zoom pp-zoom">
-        <div class="cx-zoom-face"><img alt="${rk.name}" src="img/p_r${robeIdx}.jpg" onload="this.classList.add('ok')"></div>
+        <div class="cx-zoom-face"><img alt="${rk.name}" src="img/p_r${robeIdx}.jpg" decoding="async" onload="this.classList.add('ok')"></div>
         <div class="cx-zoom-name">你 · ${rk.name}</div>
         <div class="pp-line">地府考公落榜，按了一纸《阴阳两界劳务契》，发配两界交界的破神衙——无编制的阴神，工单照接，香火照挣，转正遥遥。</div>
         <div class="pp-meta">第 ${s.month} 月 ${s.day} 日 ｜ 修为 ${s.cult} ｜ 神格位 ${rk.slots} ｜ 可领 ${rk.tierCap} 品神格</div>
