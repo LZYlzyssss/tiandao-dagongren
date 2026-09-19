@@ -7,7 +7,7 @@
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
    - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
    发版改下方 VERSION 即自动清旧桶 */
-const VERSION='xw-v23';
+const VERSION='xw-v24';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
   './','./index.html','./style.css','./manifest.json',

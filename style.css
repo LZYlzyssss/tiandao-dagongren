@@ -1939,8 +1939,8 @@ body.em-shake #app{animation:emShake .38s cubic-bezier(.36,.07,.19,.97) both}
 @keyframes emFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes emGoPulse{0%,100%{color:rgba(240,205,160,.6)}50%{color:#f3d6a8;text-shadow:0 0 14px rgba(201,150,47,.5)}}
 
-/* ---- 杂兵档：巨幅快切压屏（简化版登场卷，约占半屏；名号叠底，1.5s 自动隐去） ---- */
-.em-quick{display:block}
+/* ---- 杂兵档：巨幅快切压屏（简化版登场卷，约占半屏；名号叠底，停留不点不走） ---- */
+.em-quick{display:block;cursor:pointer}
 .em-quick .eq-face{
   position:absolute;left:50%;top:41%;transform:translate(-50%,-50%);
   width:min(56vw,70vh,580px);height:min(80vh,740px);
@@ -1968,6 +1968,12 @@ body.em-shake #app{animation:emShake .38s cubic-bezier(.36,.07,.19,.97) both}
   position:absolute;left:0;right:0;bottom:clamp(44px,7vh,72px);z-index:2;text-align:center;
   color:#c8412f;letter-spacing:4px;font-size:14px;text-shadow:0 0 10px rgba(180,40,28,.7);
   opacity:0;animation:emFadeUp .4s ease .5s forwards;
+}
+.eq-go{
+  position:absolute;left:0;right:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:3;text-align:center;
+  font-family:var(--font-brush);font-size:16px;letter-spacing:6px;text-indent:6px;
+  color:rgba(240,205,160,.85);pointer-events:none;
+  opacity:0;animation:emFadeUp .45s ease .55s forwards, emGoPulse 1.8s ease-in-out 1.05s infinite;
 }
 
 @media (max-width:640px){

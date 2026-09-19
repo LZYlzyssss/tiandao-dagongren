@@ -989,7 +989,7 @@ const UI = {
   },
 
   /* ================= 敌人登场（杀气压迫） =================
-     tier 1-2 杂兵：黑红场快切，立绘+名号压屏，约1.4s自动隐去（可点掉）；
+     tier 1-2 杂兵：黑红场快切，立绘+名号压屏，停留不自动跳过，点击/按键「迎战」方继续；
      tier 3+ 精英/Boss：全屏登场卷——立绘压顶→名号墨裂劈入→判语/特性/血量杀机，
      点击或按键「迎战」方揭幕开打。返回 Promise，由战斗引擎 await。 */
   showEnemyDebut(e){
@@ -1042,14 +1042,14 @@ const UI = {
             <div class="em-go">拔 刀 迎 战 ▸</div>
           </div>`;
       }else{
-        /* —— 杂兵档：快切压屏 —— */
+        /* —— 杂兵档：快切压屏，停留待玩家点按/按键迎战，不自动跳过 —— */
         ov=h('div','em-quick tier'+e.tier);
         ov.innerHTML=`
           <div class="em-wash"></div><div class="em-glow"></div>
           <div class="eq-face"><span class="em-char">${kd[0]}</span><img alt="${e.name}" data-asset="e_${e.id}"></div>
           <div class="eq-name">${e.name}</div>
-          <div class="eq-stars">${stars}</div>`;
-        setTimeout(finish,1500);
+          <div class="eq-stars">${stars}</div>
+          <div class="eq-go">点 按 迎 战 ▸</div>`;
       }
       ov.addEventListener('click',finish);
       document.addEventListener('keydown',onKey);
