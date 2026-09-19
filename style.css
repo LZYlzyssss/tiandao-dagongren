@@ -373,40 +373,65 @@ body::before{
 
 /* ============ 战斗 ============ */
 .battle-wrap{display:flex;flex-direction:column;gap:12px}
+/* 战场：弱框——细淡描边 + 圆角，允许溢出（overflow:visible），
+   背景改由 .battle-bg/.battle-veil 自带圆角铺底（不再依赖父级裁切） */
 .battle-field{
-  display:grid;grid-template-columns:1fr 120px 1fr;align-items:center;
-  background:linear-gradient(180deg,#f6eedb,#eaddc2);border:1px solid var(--line);border-radius:8px;
-  padding:20px 26px;position:relative;overflow:hidden;min-height:230px;
+  display:grid;grid-template-columns:1fr 108px 1fr;align-items:center;
+  background:linear-gradient(180deg,#f6eedb,#eaddc2);
+  border:1px solid rgba(60,45,28,.14);border-radius:12px;
+  padding:30px 26px 16px;position:relative;overflow:visible;min-height:250px;
 }
 .battle-field::before{ /* 远山墨痕 */
-  content:"";position:absolute;left:0;right:0;bottom:0;height:70px;opacity:.12;
+  content:"";position:absolute;left:0;right:0;bottom:0;height:70px;opacity:.10;
+  border-radius:0 0 12px 12px;
   background:
     radial-gradient(ellipse 200px 60px at 20% 100%, #2b2620, transparent),
     radial-gradient(ellipse 260px 70px at 75% 100%, #2b2620, transparent);
 }
-.fighter{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1}
+/* 战斗者整列：立绘为主视觉（z2 压在底框之上） */
+.fighter{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
 .fighter.foe{align-self:center}
-/* 立绘容器：矩形竖版，适配 portrait_4_3 水墨立绘 */
+/* 退化后的辅助底框：极淡的竖向圆角衬板，只界定站位，不抢人物 */
+.fighter::before{
+  content:"";position:absolute;left:50%;top:-16px;bottom:-8px;
+  width:min(88%,248px);transform:translateX(-50%);
+  border-radius:20px;pointer-events:none;z-index:-1;
+  background:linear-gradient(180deg,rgba(246,238,219,.08),rgba(246,238,219,.28));
+  border:1px solid rgba(60,45,28,.08);
+}
+/* 立绘锚点（原卡片框）：去厚边、去底色、去裁切——它现在只是定位锚，
+   真正的立绘 .fig-img 放大后从这里溢出，人物压在一切底框之上 */
 .fig-body{
   position:relative;
-  width:120px;height:160px;
+  width:148px;height:198px;margin-bottom:2px;
   display:grid;place-items:center;
-  background:linear-gradient(180deg,#f3e8cc,#d9c9a6);
-  border:2px solid var(--ink);border-radius:8px;
-  box-shadow:0 4px 14px var(--shadow);
-  overflow:hidden;transition:transform .15s;
+  background:linear-gradient(180deg,rgba(243,232,204,.5),rgba(217,201,166,.5));
+  border:none;border-radius:12px;
+  box-shadow:none;
+  overflow:visible;transition:transform .15s;z-index:2;
 }
-/* 玩家立绘：朱砂光晕 */
-.fig-player{box-shadow:0 4px 14px var(--shadow), 0 0 18px rgba(192,60,46,.25)}
-/* 敌人立绘：按 tint 染色光晕（由 inline style 控制 color，这里加通用墨影） */
-.fig-foe{box-shadow:0 4px 14px var(--shadow), 0 0 14px rgba(43,38,32,.35)}
-/* 立绘图片层 */
+/* 立绘图片层：object-fit:contain 保证全身/武器不被裁，
+   scale(1.14) 自底部向上放大溢出（上半身与武器更突出），软投影制造悬浮立牌感 */
 .fig-body .fig-img{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;z-index:1;opacity:0;transition:opacity .35s ease-out;
+  object-fit:contain;border-radius:10px;
+  z-index:1;opacity:0;
+  transform:scale(1.14);transform-origin:50% 100%;
+  box-shadow:0 12px 26px rgba(28,21,13,.30);
+  transition:opacity .35s ease-out;
   mix-blend-mode:normal;
 }
 .fig-body .fig-img.loaded{opacity:1}
+/* 玩家立绘：朱砂微光 */
+.fig-player .fig-img{box-shadow:0 12px 26px rgba(28,21,13,.30),0 0 22px rgba(192,60,46,.20)}
+/* 敌人立绘：幽蓝墨影微光 */
+.fig-foe .fig-img{box-shadow:0 12px 26px rgba(28,21,13,.34),0 0 18px rgba(40,60,72,.22)}
+/* 脚下接地投影：立牌"站"在战场上而非贴在卡片里 */
+.fig-body::after{
+  content:"";position:absolute;left:12%;right:12%;bottom:-9px;height:14px;z-index:0;
+  background:radial-gradient(ellipse at center,rgba(24,17,10,.32),transparent 70%);
+  filter:blur(2px);pointer-events:none;
+}
 /* 兜底文字层 */
 .fig-body .fig-fallback{
   position:relative;z-index:2;
@@ -421,17 +446,23 @@ body::before{
 /* 全局：img-failed 隐藏破图占位 */
 .asset-fade.img-failed{display:none}
 .fig-body.hit{animation:hit .3s}
-.fig-body.cast{animation:cast .4s}
+/* 施法光效改挂在图片层：用 drop-shadow 沿立绘轮廓发光，不再出现方框闪光 */
+.fig-body.cast .fig-img{animation:castImg .4s}
 .fig-body.down{filter:grayscale(1);opacity:.45;transform:rotate(90deg);transition:all .8s}
 @keyframes hit{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-@keyframes cast{0%{box-shadow:0 0 0 rgba(192,60,46,0)}50%{box-shadow:0 0 30px rgba(192,60,46,.7);transform:scale(1.08)}100%{box-shadow:0 0 0 rgba(192,60,46,0)}}
-.fig-name{font-size:16px;font-weight:bold;letter-spacing:2px}
-.fbar{width:200px;max-width:100%}
+@keyframes castImg{0%,100%{filter:none}50%{filter:drop-shadow(0 0 12px rgba(192,60,46,.8))}}
+.fig-name{font-size:16px;font-weight:bold;letter-spacing:2px;position:relative;z-index:2}
+.fbar{width:200px;max-width:100%;position:relative;z-index:2}
 .fbar .fl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);margin-bottom:2px}
 .fbar .bar{height:10px;background:#d3c4a4;border-radius:5px;overflow:hidden}
 .fbar .bar i{display:block;height:100%;transition:width .35s}
-.fstatus{min-height:18px;font-size:12px;color:var(--purple)}
-.vs{font-family:var(--font-brush);font-size:40px;color:var(--cinnabar);text-align:center;z-index:1}
+.fstatus{min-height:18px;font-size:12px;color:var(--purple);position:relative;z-index:2}
+/* 中央"战"字分隔：保持居中对峙结构，提到最上层不被立绘遮挡，淡墨晕衬底保证可读 */
+.vs{
+  font-family:var(--font-brush);font-size:42px;color:var(--cinnabar);
+  text-align:center;z-index:3;
+  text-shadow:0 2px 10px rgba(246,238,219,.85),0 0 18px rgba(192,60,46,.18);
+}
 .battle-log{
   background:rgba(43,38,32,.85);color:#f2e9d4;border-radius:6px;padding:10px 16px;
   font-size:14px;line-height:1.9;min-height:104px;letter-spacing:1px;
@@ -768,15 +799,17 @@ body::before{
 
   /* 战斗 */
   .battle-field{
-    grid-template-columns:1fr 60px 1fr;
-    padding:14px 10px;min-height:180px;
+    grid-template-columns:1fr 54px 1fr;
+    padding:20px 8px 12px;min-height:202px;
   }
-  .fig-body{width:80px;height:106px}
+  .fig-body{width:96px;height:128px}
+  .fig-body .fig-img{transform:scale(1.07)}
   .fig-body .fig-fallback{font-size:36px}
   .fig-name{font-size:13px}
   .fbar{width:100%;max-width:140px}
   .fbar .fl{font-size:10px}
   .vs{font-size:28px}
+  .intent-bubble{top:-20px}
   .battle-log{font-size:13px;line-height:1.7;padding:8px 12px;min-height:80px}
   .round-tag{font-size:11px}
   .moment h3{font-size:17px}
@@ -814,9 +847,10 @@ body::before{
 
 @media (max-width:380px){
   .ya-grid{grid-template-columns:1fr}
-  .fig-body{width:68px;height:90px}
-  .fig-body .fig-fallback{font-size:28px}
-  .fbar{max-width:100px}
+  .fig-body{width:82px;height:110px}
+  .fig-body .fig-img{transform:scale(1.05)}
+  .fig-body .fig-fallback{font-size:30px}
+  .fbar{max-width:108px}
   .vs{font-size:22px}
   .stat-chip{padding:2px 6px;gap:4px}
   .stat-chip .sc-ico{width:18px;height:18px}
@@ -1199,9 +1233,9 @@ body::before{
 
 /* ---- 14. v3 战斗意图气泡 ---- */
 .intent-bubble{
-  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+  position:absolute;top:-32px;left:50%;transform:translateX(-50%);
   font-size:11px;line-height:1;padding:3px 8px;border-radius:8px;
-  white-space:nowrap;z-index:5;color:#f7ead2;letter-spacing:1px;
+  white-space:nowrap;z-index:6;color:#f7ead2;letter-spacing:1px;
   box-shadow:0 1px 4px rgba(0,0,0,.25);pointer-events:none;
   opacity:0;transition:opacity .3s;
 }
@@ -1254,12 +1288,15 @@ body::before{
 .battle-bg{
   position:absolute;inset:0;z-index:0;
   background-size:cover;background-position:center;
+  border-radius:12px;
   opacity:0;transition:opacity .9s ease;
   filter:saturate(.9);
 }
 .battle-veil{
   position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(180deg, rgba(246,238,219,.66) 0%, rgba(234,221,194,.30) 100%);
+  border-radius:12px;
+  /* 降低泛白浓度（.66→.52/.30→.20）：场景更透，人物立绘更突出 */
+  background:linear-gradient(180deg, rgba(246,238,219,.52) 0%, rgba(234,221,194,.20) 100%);
 }
 
 /* ---- 水墨转场（章末/大事） ---- */
@@ -2741,9 +2778,10 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   .tab.active .tab-ico{transform:none}
 
   /* 战斗场景压缩 */
-  .battle-field{min-height:120px;padding:8px 10px}
-  .fig-body{width:60px;height:78px}
-  .fig-body .fig-fallback{font-size:26px}
+  .battle-field{min-height:132px;padding:12px 10px}
+  .fig-body{width:70px;height:92px}
+  .fig-body .fig-img{transform:scale(1.05)}
+  .fig-body .fig-fallback{font-size:28px}
   .vs{font-size:20px}
   .battle-log{min-height:52px;padding:5px 10px;font-size:12px;line-height:1.55}
   .btn{min-height:36px}
