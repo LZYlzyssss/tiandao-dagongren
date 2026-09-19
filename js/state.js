@@ -121,6 +121,7 @@ const Game = {
       recipes:{},         // 支线/初见获得的融合配方：out -> true（商店方按章节直接可见）
       tut:{done:false, stage:'start'},
       godsRel:{},         // godKey -> {met,favor(0~140),giftDay?}
+      enemyMet:{},        // enemyId -> {n:遭遇次数} 妖鬼收集录收录依据
       flags:{},
       chapter:1,
       mainDone:{},        // 主线幕 id -> true
@@ -156,7 +157,7 @@ const Game = {
     def('renqing', s.favor||0);
     def('erode',0); def('shards',{bing:0,fa:0,you:0,huo:0,sheng:0}); def('dshards',{});
     def('pills',{}); def('devour',{hp:0,atk:0,def:0,crit:0,lifesteal:0,zhanshen:false});
-    def('refining',null); def('recipes',{}); def('godsRel',{}); def('flags',{});
+    def('refining',null); def('recipes',{}); def('godsRel',{}); def('enemyMet',{}); def('flags',{});
     def('chapter',1); def('mainDone',{}); def('sideDone',{}); def('storyChoices',{}); def('gameOver',false);
     def('wear',{weapon:null,armor:null,trinket:null}); def('bag',{});
     def('pendingDebut',[]);   // 剧情中首次结识、待补播登场卷的神仙
@@ -182,6 +183,14 @@ const Game = {
     this.s.godsRel[g]={ met:1, favor: rel?rel.favor:0 };
     return true;
   },
+  /* ---------------- 妖鬼收集录：遭遇记录 ---------------- */
+  meetEnemy(id){
+    if(!id) return;
+    const m=this.s.enemyMet[id]||(this.s.enemyMet[id]={n:0});
+    m.n=(m.n||0)+1;
+  },
+  enemyCount(){ return Object.keys(this.s.enemyMet||{}).length; },
+
   favorOf(g){ const r=this.s.godsRel[g]; return r?r.favor:0; },
   favorLevel(f){ let l=0; for(let i=0;i<FAVOR_LEVELS.length;i++){ if(f>=FAVOR_LEVELS[i].v) l=i; } return l; },
   favorName(l){ return FAVOR_LEVELS[l]?FAVOR_LEVELS[l].name:'相识'; },

@@ -791,9 +791,25 @@ const UI = {
     const metN=Object.keys(s.godsRel).filter(g=>s.godsRel[g].met && GODS[g]).length;
     rp.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
         <h2 style="margin:0">神明人脉 <span class="sub">已识 ${metN} 位 · 点头像可送礼</span></h2>
-        <button class="btn btn-primary btn-sm" id="btnGodCodex">📖 神仙图鉴</button>
+      </div>
+      <div class="codex-entrys">
+        <button class="codex-entry" id="btnYaoguaiCodex" type="button">
+          <span class="codex-ico"><img src="img/icon_yaoguai.jpg" alt="妖鬼收集录"></span>
+          <span class="codex-label">妖鬼收集录<small>已录 ${Game.enemyCount()} 妖</small></span>
+        </button>
+        <button class="codex-entry" id="btnGodCodex" type="button">
+          <span class="codex-ico codex-ico-god"><span class="codex-emoji">📖</span></span>
+          <span class="codex-label">神明宗卷<small>已识 ${metN} 位仙僚</small></span>
+        </button>
       </div>
       <div class="section-tip">交情至「相熟」，战斗关键时刻可呼叫其援助。送礼偏好：挚爱 +18 / 喜欢 +8 / 无感 +4 / 忌讳 +1，每日一礼。</div>`;
+    rp.querySelector('#btnYaoguaiCodex').onclick=()=>{
+      /* 收集录墙是已遭遇敌人立绘：先过点卯门，墙开即满画 */
+      const ids=Object.keys(Game.s.enemyMet||{}).filter(id=>ENEMIES[id]);
+      const keys=ids.map(id=>'e_'+id);
+      try{ ASSET.demand(keys); }catch(e){}
+      gate(keys,'翻阅妖鬼卷宗…').then(()=>this.openYaoguaiCodex());
+    };
     rp.querySelector('#btnGodCodex').onclick=()=>{
       /* 图鉴墙全是神立绘大图：先过点卯门，墙开即满画，不看空框 */
       const met=Object.keys(GODS).filter(g=>{ const r=Game.s.godsRel[g]; return r&&r.met; });
@@ -978,6 +994,8 @@ const UI = {
      点击或按键「迎战」方揭幕开打。返回 Promise，由战斗引擎 await。 */
   showEnemyDebut(e){
     return new Promise(resolve=>{
+      /* 妖鬼收集录：登场即收录（遭遇次数 +1） */
+      try{ if(Game&&Game.meetEnemy) Game.meetEnemy(e.id); }catch(_){}
       const ml=$('modalLayer'); ml.innerHTML=''; ml.classList.remove('hidden');
       const KIND={hun:['魂','游魂野魄'],gui:['鬼','阴司鬼类'],yao:['妖','山野妖修'],xiong:['凶','上古凶兽'],zhan:['战','战魂英灵'],ke:['壳','空壳神僚']};
       const INTENT={qiang:'强攻',xu:'蓄力',shou:'守势',mixed:'游斗'};
@@ -1709,7 +1727,7 @@ const UI = {
     const box=h('div','paper m-box god-codex');
     box.innerHTML=`
       <div class="gg-head">
-        <h2>神仙图鉴</h2>
+        <h2>神明宗卷</h2>
         <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
       </div>
       <div class="gg-tip">一面之缘亦入图鉴 · 点击立绘可放大观摩</div>
@@ -1733,6 +1751,89 @@ const UI = {
     });
     ov.appendChild(box); ml.appendChild(ov);
     ml.classList.remove('hidden');
+  },
+
+  /* ================= 妖鬼收集录 ================= */
+  /* 已遭遇妖鬼的志怪档案：按妖/鬼/凶/战/壳分组，未遭遇为暗影未收录，点击已录者看小传 */
+  openYaoguaiCodex(){
+    const s=Game.s;
+    const metMap=s.enemyMet||{};
+    const GROUPS=[['yao','妖 · 山野妖修'],['gui','鬼 · 阴司鬼类'],['hun','魂 · 游魂野魄'],['xiong','凶 · 上古凶兽'],['zhan','战 · 战魂英灵'],['ke','壳 · 空壳神僚']];
+    const stars=t=>'✦'.repeat(t)+'✧'.repeat(Math.max(0,5-t));
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay');
+    ov.onclick=(e)=>{ if(e.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); } };
+    const box=h('div','paper m-box god-codex yg-codex');
+    box.innerHTML=`
+      <div class="gg-head">
+        <h2>妖鬼收集录</h2>
+        <span class="gc-skip" onclick="document.getElementById('modalLayer').innerHTML='';document.getElementById('modalLayer').classList.add('hidden');">✕</span>
+      </div>
+      <div class="gg-tip">狭路相逢便录此卷 · 已收 <b class="yg-count">${Game.enemyCount()}</b> / ${Object.keys(ENEMIES).length} 妖 · 点击观其来历</div>
+      <div class="yg-body"></div>`;
+    const body=box.querySelector('.yg-body');
+    GROUPS.forEach(([kind,label])=>{
+      const ids=Object.keys(ENEMIES).filter(id=>ENEMIES[id].kind===kind);
+      if(!ids.length) return;
+      const sec=h('div','yg-sec');
+      sec.innerHTML=`<div class="yg-sec-t">${label}</div>`;
+      const grid=h('div','cx-grid');
+      ids.forEach(id=>{
+        const e=ENEMIES[id];
+        const rec=metMap[id];
+        const card=h('div','cx-card'+(rec?'':' yg-lock'));
+        if(rec){
+          card.innerHTML=`
+            <div class="cx-face"><span class="cx-char yg-char">${(e.kind==='hun'?'魂':e.kind==='gui'?'鬼':e.kind==='yao'?'妖':e.kind==='xiong'?'凶':e.kind==='zhan'?'战':'壳')}</span><img alt="${e.name}" data-asset="e_${id}"></div>
+            <div class="cx-name">${e.name}</div>
+            <div class="cx-rel yg-stars">${stars(e.tier)}</div>`;
+          card.onclick=()=>this.openYaoguaiZoom(id);
+        }else{
+          card.innerHTML=`
+            <div class="cx-face yg-lock-face"><span class="cx-char">？</span></div>
+            <div class="cx-name">未收录</div>
+            <div class="cx-rel yg-stars">${stars(e.tier)}</div>`;
+        }
+        grid.appendChild(card);
+      });
+      sec.appendChild(grid);
+      body.appendChild(sec);
+    });
+    ov.appendChild(box); ml.appendChild(ov);
+    ml.classList.remove('hidden');
+    /* 墙内立绘随挂载懒拉 */
+    try{ ASSET.scan(box); }catch(e){}
+  },
+
+  /* 妖鬼详情：立绘 + 名号 + 星级 + 遭遇次数 + 志怪小传 */
+  openYaoguaiZoom(id){
+    const e=ENEMIES[id]; if(!e) return;
+    const rec=(Game.s.enemyMet||{})[id];
+    if(!rec) return;
+    const stars='✦'.repeat(e.tier)+'✧'.repeat(Math.max(0,5-e.tier));
+    const KIND={hun:'游魂野魄',gui:'阴司鬼类',yao:'山野妖修',xiong:'上古凶兽',zhan:'战魂英灵',ke:'空壳神僚'};
+    const lore=(typeof ENEMY_LORE!=='undefined'&&ENEMY_LORE[id])||'';
+    const dread=(typeof ENEMY_DREAD!=='undefined'&&ENEMY_DREAD[id])||'';
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay cx-zoom-ov');
+    ov.innerHTML=`
+      <div class="yg-zoom paper m-box">
+        <span class="gc-skip yg-zoom-x">✕</span>
+        <div class="yg-zoom-face"><span class="cx-char yg-char">${(e.kind==='hun'?'魂':e.kind==='gui'?'鬼':e.kind==='yao'?'妖':e.kind==='xiong'?'凶':e.kind==='zhan'?'战':'壳')}</span><img alt="${e.name}" data-asset="e_${id}"></div>
+        <div class="yg-zoom-meta">
+          <div class="yg-zoom-kind">${KIND[e.kind]||'邪祟'} <span class="yg-stars">${stars}</span></div>
+          <div class="yg-zoom-name">${e.name}</div>
+          <div class="yg-zoom-count">卷宗第 ${rec.n} 次照面</div>
+          ${lore?`<div class="yg-zoom-lore">${lore}</div>`:''}
+          ${dread?`<div class="yg-zoom-dread">「${dread}」</div>`:''}
+          <div class="cx-zoom-hint">轻触合卷</div>
+        </div>
+      </div>`;
+    ov.onclick=(ev)=>{ if(ev.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCodex(); } };
+    ov.querySelector('.yg-zoom-x').onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCodex(); };
+    ml.appendChild(ov);
+    ml.classList.remove('hidden');
+    try{ ASSET.scan(ov); ASSET.priority(['e_'+id],1); }catch(e2){}
   },
 
   /* 图鉴放大：纯大图 + 名字，点击任意处合上；「翻开仙录」可重温该神登场卷 */

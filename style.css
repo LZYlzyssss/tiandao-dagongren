@@ -1742,6 +1742,68 @@ body::before{
 }
 .cx-zoom-book:hover{background:rgba(201,150,47,.16);color:#ecd7a6;}
 
+/* ============ 双卷宗入口（我的页） ============ */
+.codex-entrys{display:flex;gap:12px;margin:12px 0 8px;flex-wrap:wrap}
+.codex-entry{
+  flex:1 1 200px;min-width:180px;display:flex;align-items:center;gap:12px;
+  padding:10px 14px 10px 10px;text-align:left;cursor:pointer;
+  background:linear-gradient(135deg,#fbf4e2,#efe1c0);
+  border:1px solid rgba(43,38,32,.22);border-radius:10px;
+  box-shadow:0 2px 8px rgba(60,45,20,.10);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.codex-entry:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(60,45,20,.18)}
+.codex-entry:active{transform:translateY(0)}
+.codex-ico{flex:0 0 52px;width:52px;height:52px;border-radius:9px;overflow:hidden;
+  display:grid;place-items:center;background:#2b2620;box-shadow:inset 0 0 0 1px rgba(201,150,47,.4)}
+.codex-ico img{width:100%;height:100%;object-fit:cover;display:block}
+.codex-ico-god{background:radial-gradient(circle at 35% 30%,#4a3f2a,#241d12)}
+.codex-emoji{font-size:28px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.codex-label{display:flex;flex-direction:column;gap:2px;
+  font-family:var(--font-brush);font-size:19px;letter-spacing:2px;color:var(--ink);text-indent:2px}
+.codex-label small{font-family:var(--font-body);font-size:11px;letter-spacing:1px;color:var(--ink-soft);font-weight:normal}
+
+/* ============ 妖鬼收集录 ============ */
+.yg-codex .yg-body{display:flex;flex-direction:column;gap:18px;margin-top:6px}
+.yg-sec-t{font-family:var(--font-brush);font-size:18px;letter-spacing:3px;color:var(--cinnabar-deep,#8c2f1d);
+  border-left:3px solid var(--cinnabar,#b3402a);padding-left:10px;margin:0 0 10px}
+.yg-count{color:var(--cinnabar,#b3402a);font-size:15px}
+.yg-stars{color:#c9962f;letter-spacing:1px;font-size:12px}
+.yg-char{color:#dfe9e2!important}
+/* 未收录：暗影问号 */
+.yg-lock{cursor:default;opacity:.62}
+.yg-lock-face{background:radial-gradient(circle at 50% 40%,#3a352d,#17130d)!important;
+  border-color:rgba(255,255,255,.08)!important}
+.yg-lock-face .cx-char{color:rgba(235,225,200,.28);font-size:40px}
+.yg-lock .cx-name{color:rgba(43,38,32,.4)}
+/* 详情页 */
+.yg-zoom{position:relative;width:680px;max-width:94vw;max-height:88vh;overflow-y:auto;
+  display:flex;gap:18px;padding:22px 22px 20px;align-items:flex-start}
+.yg-zoom-x{position:absolute;top:10px;right:14px;z-index:2}
+.yg-zoom-face{position:relative;flex:0 0 240px;width:240px;aspect-ratio:3/4;border-radius:8px;overflow:hidden;
+  display:grid;place-items:center;border:1px solid rgba(43,38,32,.2);
+  background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
+.yg-zoom-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+.yg-zoom-face img.ok,.yg-zoom-face img.loaded{opacity:1}
+.yg-zoom-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.yg-zoom-kind{font-size:13px;letter-spacing:2px;color:var(--ink-soft)}
+.yg-zoom-name{font-family:var(--font-brush);font-size:30px;letter-spacing:4px;color:var(--ink);line-height:1.1}
+.yg-zoom-count{font-size:12px;color:var(--ink-soft);letter-spacing:1px}
+.yg-zoom-lore{font-size:15px;line-height:1.95;color:#33291d;
+  background:rgba(196,170,120,.16);border-left:3px solid rgba(179,64,42,.55);
+  padding:10px 12px;border-radius:0 6px 6px 0;margin-top:4px}
+.yg-zoom-dread{font-size:13.5px;line-height:1.8;color:var(--cinnabar-deep,#8c2f1d);
+  font-style:italic;opacity:.85}
+.yg-zoom .cx-zoom-hint{color:rgba(43,38,32,.4);margin-top:4px}
+@media (max-width:640px){
+  .codex-entrys{gap:10px}
+  .codex-entry{flex:1 1 100%}
+  .yg-zoom{flex-direction:column;align-items:center;padding:26px 16px 16px}
+  .yg-zoom-face{flex:none;width:200px}
+  .yg-zoom-meta{width:100%;align-items:center;text-align:center}
+  .yg-zoom-lore{text-align:left}
+}
+
 @media (max-width:640px){
   .db-seal span{letter-spacing:5px;text-indent:5px;font-size:12px;}
   .db-stage{flex-direction:column;gap:16px;text-align:center;}
