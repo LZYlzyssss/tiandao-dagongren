@@ -837,11 +837,23 @@ const UI = {
     /* 立刻把全套卷宗交给视口 demand（30s 超时+退避重试）：点卯门最多 6 秒就放行，
        玩家看下凡过场/故事/神登场卷期间，场景与立绘自动补齐淡入，不再被大图卡住 */
     try{ ASSET.demand(keys); }catch(e){}
+    this._missionGuard=(this._missionGuard||0)+1;
+    const token=this._missionGuard;
     /* gate 已保证只 resolve 不 reject；再兜一层：任何意外都解锁并回滚，绝不死在工单架 */
     gate(keys,'架起遁光，下凡途中…').then(()=>{
       try{
         this._startMissionRun(idx);
         this._missionLock=false;
+        /* 看门狗：8 秒后若过场层与任务节点都没呈现、busy 却仍锁住，
+           说明下凡链在某处意外中断（历史上 modalLayer.hidden 残留曾导致此死锁）。
+           强制复位回案牍并提示重试——玩家永远不需要靠刷新页面脱困 */
+        setTimeout(()=>{
+          if(token!==this._missionGuard) return;   /* 已被更新的一次接单顶替 */
+          const presented=document.querySelector('.m-intro')
+            || (this.view==='battle')
+            || (this.view==='mission'&&document.querySelector('#pageStage .mish-god'));
+          if(!presented && Game.s.busy) this._abortMission(idx,new Error('mission-guard: 过场/节点 8 秒未呈现'));
+        },8000);
       }catch(err){
         this._abortMission(idx, err);
       }
@@ -1243,6 +1255,10 @@ const UI = {
         ${storyHtml}
       </div>
       <div class="mi-go"><span class="mi-go-1">轻触继续 ▸</span><span class="mi-go-2">轻触，前往办差 ▸</span></div>`;
+    /* 关键：与其他弹窗一致先解除 hidden。此前只 appendChild 未 remove，
+       若玩家接案前用 ✕ 关过任意弹窗（会给 modalLayer 加 hidden），
+       过场会挂进 display:none 的层——不可见也收不到点击，busy 永久锁死（接案下凡卡死） */
+    ml.classList.remove('hidden');
     ml.appendChild(ov);
     ASSET.bg(ov.querySelector('.m-intro-bg'), bgKey, 1);
 
