@@ -1314,8 +1314,7 @@ const UI = {
         ch.appendChild(b);
       });
       wrap.appendChild(ch);
-      const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
-      quit.style.marginTop='10px';
+      const quit=h('button','btn btn-quit','暂 离 回 衙');
       quit.title='本次办理暂告段落，工单留在工单架，之后可重新接案（本幕进度从头计）';
       quit.onclick=()=>this.quitMission();
       wrap.appendChild(quit);
@@ -1351,8 +1350,7 @@ const UI = {
     const qs=node.qs||[node];
     let qi=0;
     const box=h('div','quiz-box');
-    const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
-    quit.style.marginTop='10px';
+    const quit=h('button','btn btn-quit','暂 离 回 衙');
     quit.title='考校未完，工单留在工单架，之后可重新接案（本幕进度从头计）';
     quit.onclick=()=>this.quitMission();
     const draw=()=>{
@@ -1432,7 +1430,7 @@ const UI = {
       });
     };
     startRow.appendChild(btn);
-    const quit=h('button','btn btn-ghost btn-sm','⌂ 暂离回衙 · 单留案头');
+    const quit=h('button','btn btn-quit','暂 离 回 衙');
     quit.style.marginLeft='10px';
     quit.title='关卡未破，工单留在工单架，之后可重新接案（本幕进度从头计）';
     quit.onclick=()=>this.quitMission();

@@ -303,6 +303,20 @@ body::before{
 .btn-ghost{background:transparent;box-shadow:none;border-color:transparent;color:var(--ink-soft)}
 .btn-ghost:hover{background:rgba(60,45,28,.07);box-shadow:none}
 .btn-ghost:active{box-shadow:none}
+/* 剧情中「暂离回衙」：次要退出键。
+   强制系统楷体栈——不经过 Google 分片书法字体，弱网/APP WebView 下杜绝缺字黑块(tofu)；
+   虚线墨边弱化层级，38px 高保证手机触控热区 */
+.btn-quit{
+  font-family:"KaiTi","STKaiti","楷体","Noto Serif CJK SC","Songti SC",serif;
+  font-size:13px;letter-spacing:4px;text-indent:4px;
+  color:var(--ink-faint);
+  background:rgba(245,236,215,.62);
+  border:1px dashed var(--line);
+  box-shadow:none;
+  min-height:38px;padding:8px 18px;margin-top:12px;
+}
+.btn-quit:hover{color:var(--ink-soft);background:#ecdfc2;border-color:var(--ink-faint);box-shadow:none;transform:none}
+.btn-quit:active{background:#e4d6b8;box-shadow:none;transform:scale(.985)}
 .btn-sell{background:transparent;color:var(--cinnabar);border-color:var(--cinnabar);
   box-shadow:0 2px 0 rgba(150,48,31,.12),inset 0 1px 0 rgba(255,255,255,.4);}
 .btn-sell:hover{background:rgba(192,60,46,.10);box-shadow:0 3px 0 rgba(150,48,31,.12),0 6px 12px rgba(150,48,31,.12);}
