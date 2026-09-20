@@ -17,10 +17,23 @@ const MiniGame = {
     host.appendChild(MG_EL('div','mg-mask'));
     const panel=MG_EL('div','mg-panel');
     host.appendChild(panel);
-    this._engines[type](panel, Object.assign({difficulty:2}, opts||{}), (rating)=>{
+    /* 通关回调只发一次；且若玩家已在淡出间隙暂离回衙（host 脱离文档），
+       绝不再延迟触发结算，避免 applyNodePass 跑在已作废的工单上 */
+    let ended=false;
+    const safeWin=(rating)=>{
+      if(ended) return; ended=true;
       panel.classList.add('mg-done');
-      setTimeout(()=>onWin(rating), 420);
-    });
+      setTimeout(()=>{ if(host.isConnected) onWin(rating); }, 420);
+    };
+    const engine=this._engines[type];
+    if(!engine){
+      /* 未知关卡类型不白屏：给出说明，局外「暂离回衙」仍可退出 */
+      panel.appendChild(MG_EL('div','mg-tag','关 · 机 关 异 象'));
+      panel.appendChild(MG_EL('div','mg-title','此关机关形制未录'));
+      panel.appendChild(MG_EL('div','mg-sub','仙录中查无此阵，可暂离回衙后重新接案。'));
+      return;
+    }
+    engine(panel, Object.assign({difficulty:2}, opts||{}), safeWin);
   },
 
   _engines:{
@@ -126,12 +139,20 @@ const MiniGame = {
         board.appendChild(b); lamps.push(b);
       }
       const reset=()=>{
-        lit=new Array(S).fill(true); moves=0;
-        let last=-1;
-        for(let n=0;n<K;n++){ let i; do{ i=Math.floor(Math.random()*S); }while(i===last); last=i;
-          const r=Math.floor(i/3),c=i%3;
-          [i, r>0?i-3:-1, r<2?i+3:-1, c>0?i-1:-1, c<2?i+1:-1].forEach(j=>{ if(j>=0) toggle(j); });
+        /* 随机踏 K 盏生阵（灯操作为自逆，重演此序列必可解）。
+           极小概率 XOR 后仍是全亮（开局即"已胜"却无胜局判定，像卡死），
+           故重摆到非全亮为止；多次不中则强制翻角上一盏，保证有暗灯 */
+        for(let attempt=0; attempt<30; attempt++){
+          lit=new Array(S).fill(true); moves=0;
+          let last=-1;
+          for(let n=0;n<K;n++){ let i; do{ i=Math.floor(Math.random()*S); }while(i===last); last=i;
+            const r=Math.floor(i/3),c=i%3;
+            [i, r>0?i-3:-1, r<2?i+3:-1, c>0?i-1:-1, c<2?i+1:-1].forEach(j=>{ if(j>=0) toggle(j); });
+          }
+          if(!lit.every(x=>x)){ render(); return; }
         }
+        lit=new Array(S).fill(true); moves=0;
+        [0,1,3].forEach(j=>toggle(j));
         render();
       };
       const bReset=MG_EL('button','btn btn-ghost mg-btn','重摆灯阵');

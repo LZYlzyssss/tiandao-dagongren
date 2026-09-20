@@ -1465,6 +1465,8 @@ const UI = {
     btn.onclick=()=>{
       if(started) return; started=true; btn.disabled=true; btn.textContent='破局中……';
       MiniGame.run(node.game, arena, {difficulty:node.difficulty||2}, (rating)=>{
+        /* 淡出间隙可能已点暂离（rt 被清空）；过期通关回调一律丢弃 */
+        if(!this.rt) return;
         this.applyNodePass(node,rating);
         arena.innerHTML='';
         arena.style.minHeight='0';          /* 法坛已撤，空舞台不再把结果行顶到屏外 */
