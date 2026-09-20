@@ -5,6 +5,27 @@
    3) 进门后：剩余素材后台单线程预热，真实请求让路 12 秒
    4) Service Worker 持久缓存 + 在途请求去重，二次访问本地秒开 */
 
+/* ================= 全局 <img> 兜底网（capture 阶段，一处管住静态标签+所有动态插入图片） =================
+   任何加载失败的图片元素都换成自包含「佚」字米纸占位（data URI，零网络依赖），页面绝不留裂图。
+   - data:/blob: 不处理（水墨骨架/占位图自身失败，防无限循环）
+   - dataset.ph 保证同一张图只兜底一次
+   - ASSET 管线内的缺图在内部 Image 上就已回退骨架、不会把坏 URL 挂到页面，故两者不冲突 */
+document.addEventListener('error',function(e){
+  var t=e&&e.target;
+  if(!t||t.tagName!=='IMG'||(t.dataset&&t.dataset.ph==='1'))return;
+  var s=t.src||'';
+  if(s.indexOf('data:image/')===0||s.indexOf('blob:')===0)return;
+  if(t.dataset)t.dataset.ph='1';
+  try{
+    var ph=(typeof ASSET!=='undefined'&&ASSET.PLACEHOLDER)?ASSET.PLACEHOLDER:
+      'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">'+
+        '<rect width="200" height="200" fill="#efe6d0"/><rect x="14" y="14" width="172" height="172" rx="10" fill="none" stroke="#8a7a5c" stroke-width="3" stroke-dasharray="8 7"/>'+
+        '<text x="100" y="128" font-size="86" text-anchor="middle" fill="#a9462f" font-family="serif">佚</text></svg>');
+    t.src=ph;
+  }catch(_){}
+},true);
+
 /* 轮询等待某条件成立（带超时） */
 function waitUntil(pred, ms, step){
   return new Promise(res=>{

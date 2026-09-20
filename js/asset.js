@@ -42,11 +42,22 @@ const ASSET = {
   base(){ return this._env().base; },
 
   /* ---- webp 协商：探针确认 img/ 下存在同名 .webp 才切换；探针前/无 webp 时一律 jpg（零行为变化）。
-     将来用 cwebp 把 img/*.jpg 批量转成同名 .webp（jpg 保留不删）后，下次启动自动全站切 webp。 */
+     将来用 cwebp 把 img/*.jpg 批量转成同名 .webp（jpg 保留不删）后，下次启动自动全站切 webp。
+     探针结果写 localStorage（7 天）：当前无 webp 素材时不再每次冷启动刷 2 条 404；
+     批量转完 webp 后最多 7 天自动识别，想立刻生效可抬 _WEBP_CACHE_VER。 */
   _webp:null,
+  _WEBP_CACHE_VER:'webp-v0',
   async _probeWebp(){
     if(this._webp!==null) return this._webp;
     if(!this._env().isHttp){ this._webp=false; return false; }   /* file:// 无法可靠验 404，保守不切 */
+    /* 1) 先问缺图负缓存：已知 p_r0.webp 缺失（jpg 都在、webp 未转换时）则连探都不探 */
+    this._missInit();
+    if(this._isMissing(this.base()+'img/p_r0.webp')){ this._webp=false; this._cacheWebp(false); return false; }
+    /* 2) 再读 7 日内的探针结论 */
+    try{
+      const c=JSON.parse(localStorage.getItem(this._WEBP_CACHE_VER)||'null');
+      if(c && Date.now()-c.t<7*864e5){ this._webp=!!c.ok; return this._webp; }
+    }catch(e){}
     const samples=['p_r0','ui_main'];
     const hit=await new Promise(res=>{
       let left=samples.length, found=false;
@@ -60,8 +71,12 @@ const ASSET = {
       });
     });
     this._webp=hit;
+    this._cacheWebp(hit);
     if(hit) console.info('[ASSET] 检测到 webp 素材，启用 webp 管线');
     return hit;
+  },
+  _cacheWebp(ok){
+    try{ localStorage.setItem(this._WEBP_CACHE_VER, JSON.stringify({t:Date.now(),ok:!!ok})); }catch(e){}
   },
 
   /* key 可带 '#sprite' 后缀：战斗专用抠底立牌，取独立库 img/bsprite/<key>.png；
@@ -87,6 +102,71 @@ const ASSET = {
   /* ---- 本地图探测（Promise + 缓存） ----
      三种结论：true=有本地图(已下载) / false=坐实缺失(404，永久水墨兜底) / undefined=本次网络失败(不坐实，下次还能再试) */
   _probe:{}, _probeQueue:[], _probeInflight:{}, _missing:{},
+
+  /* ---- 缺图负缓存（消除「已知缺图」的重复 404 请求与控制台红错） ----
+     _KNOWN_MISSING：发版时按磁盘实测的内置清单（相对路径，命中直接终态，零请求）。
+       补图后把对应项删掉即可；批量补图后直接抬 _MISSING_VER 清空全部历史结论。
+     localStorage：运行期新坐实的 404 也记下来（7 天后重验一次），换设备/清缓存才会再探。 */
+  _MISSING_VER:'miss-20260920',
+  _KNOWN_MISSING:[
+    /* 32 张旧版 av_ 头像：47 神一律走 g_ 立绘，av_ 永不挂载（15 张阎罗体系旧档仍保留在盘） */
+    'img/av_ao_guang.jpg','img/av_bi_gan.jpg','img/av_di_zang.jpg','img/av_dian_mu.jpg',
+    'img/av_dong_yue.jpg','img/av_duo_wen.jpg','img/av_er_lang.jpg','img/av_feng_du.jpg',
+    'img/av_guan_yin.jpg','img/av_guan_yu.jpg','img/av_he_xiangu.jpg','img/av_lei_zu.jpg',
+    'img/av_lu_ban.jpg','img/av_lu_zhidao.jpg','img/av_lv_dongbin.jpg','img/av_ma_zu.jpg',
+    'img/av_ne_zha.jpg','img/av_qin_guang.jpg','img/av_sun_simiao.jpg','img/av_sun_wukong.jpg',
+    'img/av_wei_tuo.jpg','img/av_wei_zheng.jpg','img/av_wen_chang.jpg','img/av_xi_wangmu.jpg',
+    'img/av_xi_yue.jpg','img/av_xuan_nv.jpg','img/av_zeng_zhang.jpg','img/av_zhao_gongming.jpg',
+    'img/av_zhen_wu.jpg','img/av_zhong_kui.jpg','img/av_zhong_yue.jpg','img/av_zhuan_lun.jpg',
+    /* 玩家品阶 5-9 立绘/立牌（当前版本未开放，开放补图后删此 10 项） */
+    'img/p_r5.jpg','img/p_r6.jpg','img/p_r7.jpg','img/p_r8.jpg','img/p_r9.jpg',
+    'img/bsprite/p_r5.png','img/bsprite/p_r6.png','img/bsprite/p_r7.png','img/bsprite/p_r8.png','img/bsprite/p_r9.png',
+    /* 程序化水墨图：由 INKSVG 实时生成，不需要 jpg 文件 */
+    'img/bf_c1n.jpg','img/stat_mp.jpg',
+    /* webp 尚未批量转换：探针样本当前必 404，转换后删此 2 项 */
+    'img/p_r0.webp','img/ui_main.webp',
+  ],
+  _missStore:{}, _missHydrated:false,
+  _missInit(){
+    if(this._missHydrated) return;
+    this._missHydrated=true;
+    /* 内置项：永久终态（exp=0） */
+    this._KNOWN_MISSING.forEach(rel=>{ this._missStore[rel]=0; });
+    /* 学习项：7 天有效期；版本不符整体丢弃 */
+    try{
+      const raw=JSON.parse(localStorage.getItem(this._MISSING_VER)||'null');
+      if(raw&&raw.v===this._MISSING_VER&&raw.t){
+        const now=Date.now();
+        Object.keys(raw.t).forEach(rel=>{
+          const ts=raw.t[rel];
+          if(ts&&now-ts<7*864e5) this._missStore[rel]=ts;
+        });
+      }
+    }catch(e){}
+    /* 坐实进运行时 _missing（绝对 URL） */
+    Object.keys(this._missStore).forEach(rel=>{ this._missing[this.base()+rel]=1; });
+  },
+  _missRel(url){
+    const b=this.base();
+    return url&&url.indexOf(b)===0 ? url.slice(b.length) : null;
+  },
+  _isMissing(url){
+    this._missInit();
+    return !!this._missing[url];
+  },
+  /* 新坐实的 404：运行时 + localStorage 双写（内置项不落盘） */
+  missLearn(url){
+    if(!url) return;
+    this._missing[url]=1;
+    const rel=this._missRel(url);
+    if(!rel||this._missStore[rel]===0) return;
+    this._missStore[rel]=Date.now();
+    try{
+      const raw={v:this._MISSING_VER,t:{}};
+      Object.keys(this._missStore).forEach(k=>{ if(this._missStore[k]!==0) raw.t[k]=this._missStore[k]; });
+      localStorage.setItem(this._MISSING_VER, JSON.stringify(raw));
+    }catch(e){}
+  },
 
   /* ---- 内存级缓存（Capacitor / 移动端 WebView 的关键） ----
      _loading  : url -> 在途 Promise，preload/demand/warm/挂载四路共用一条请求，绝不重复下载
@@ -128,6 +208,7 @@ const ASSET = {
   onFile(file,cb){
     if(!file) return;
     file=this._toFile(file)||file;
+    this._missInit();
     if(this._probe[file]===true){ cb(this._serve(file)); return; }
     if(this._probe[file]===false||this._missing[file]){ cb(null); return; }
     (this._waiters[file]=this._waiters[file]||[]).push(cb);
@@ -250,6 +331,7 @@ const ASSET = {
      卡牌反复切换时第二次起直接命中，零网络请求。 */
   _loadOnce(url, ms){
     if(!url) return Promise.resolve('fail');
+    this._missInit();
     if(this._probe[url]===true) return Promise.resolve('ok');
     if(this._missing[url]) return Promise.resolve('missing');
     if(this._loading[url]) return this._loading[url];
@@ -277,7 +359,7 @@ const ASSET = {
     if(this._env().isHttp){
       try{
         const hr=await fetch(url,{method:'HEAD',cache:'no-store'});
-        if(hr.status===404){ this._logFail(url,'404 素材缺失，永久水墨兜底'); return 'missing'; }
+        if(hr.status===404){ this._logFail(url,'404 素材缺失，永久水墨兜底'); this.missLearn(url); return 'missing'; }
       }catch(e){ /* 断网时 HEAD 也失败 → 网络抖动 */ }
     }
     this._logFail(url,'网络错误，稍后自动重试');
@@ -402,8 +484,12 @@ const ASSET = {
         return 3;                                                    /* 工单/属性/设施/其余 */
       };
       const keys=Object.keys(this.list).sort((a,b)=>rank(a)-rank(b)||(a<b?-1:a>b?1:0));
-      /* av_ 小头像全神 soft 探测 */
-      const avs=(typeof GODS!=='undefined')?Object.keys(GODS).map(g=>this.avatarFile(g)):[];
+      /* av_ 小头像 soft 探测：仅探「无 g_ 立绘」的神。
+         GOD_ART 诸神一律挂载 g_ 大图（main.js/ui.js 均不取 av_），其 av_ 旧档即使在盘也永不显示，
+         再去软探只会刷一排 404，故整体排除 */
+      const avs=(typeof GODS!=='undefined')
+        ? Object.keys(GODS).filter(g=>!(typeof GOD_ART!=='undefined'&&GOD_ART.includes(g))).map(g=>this.avatarFile(g))
+        :[];
       const q=[];
       keys.forEach(k=>q.push(['key',k]));
       coreFiles.forEach(f=>q.push(['file',f]));
@@ -414,6 +500,7 @@ const ASSET = {
       /* av soft：自管 Image，不走 _loadOnce——缺失是常态（不刷警告日志、不坐实终态、不重试阻塞）；
          成功才坐实并通知挂载点；失败仅按完成计数，进门后 warm 对仍需的头像还有一次正式兜底 */
       const runAv=url=>new Promise(res=>{
+        this._missInit();
         if(this._probe[url]===true) return res('ok');
         if(this._missing[url]) return res('missing');
         const im=new Image(); im.decoding='async';
