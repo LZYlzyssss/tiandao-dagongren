@@ -106,11 +106,11 @@ const FX = {
     if(!key){ el.style.opacity=0; el._assetKey=''; return; }
     ASSET.bg(el, key, opacity!=null?opacity:.2);
   },
-  /* 战场底图（战斗场地内） */
+  /* 战场底图（战斗场地内）：高清实景，只压一点点，保证现场感且不盖立绘 */
   setBattleBG(key){
     const el=document.getElementById('battleBg');
     if(!el) return;
-    ASSET.bg(el, key, .55);
+    ASSET.bg(el, key, .86);
   },
 
   /* ================= 水墨转场 ================= */

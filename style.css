@@ -464,27 +464,60 @@ body::before{
   animation:au-breathe 3.4s ease-in-out infinite}
 @keyframes au-breathe{0%,100%{opacity:.55;filter:blur(7px);transform:translate(-50%,-50%) scale(.93)}
   50%{opacity:1;filter:blur(4px);transform:translate(-50%,-50%) scale(1.06)}}
-/* 转环：锥形光弧＋环形遮罩 */
-.au-r{position:absolute;left:50%;top:46%;aspect-ratio:1/1;border-radius:50%;
+/* 转环：锥形光弧＋环形遮罩。圈心在 38% 处（肩胸之间），配合大圈径保证光弧露出身外 */
+.au-r{position:absolute;left:50%;top:38%;aspect-ratio:1/1;border-radius:50%;
   transform:translate(-50%,-50%);
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1.5px));
   mask:radial-gradient(farthest-side,transparent calc(100% - 2.5px),#000 calc(100% - 1.5px));
   animation:au-rot var(--rt,9s) linear infinite}
-.au-r1{width:106%;--rt:9s;
+/* 五圈共用弧段样式：正反向交替缓转；宽度由档位表 .au-lN .au-rN 控制 */
+.au-r1{--rt:9s;
   background:conic-gradient(from 0deg,transparent 0deg,var(--c1) 46deg,transparent 120deg,
     transparent 205deg,var(--c2) 262deg,transparent 325deg)}
-.au-r2{width:90%;--rt:14s;opacity:.8;animation-name:au-rot-b;
+.au-r2{--rt:13s;opacity:.9;animation-name:au-rot-b;
   background:conic-gradient(from 90deg,transparent 0deg,var(--c1) 60deg,transparent 150deg,
     var(--c2) 210deg,transparent 300deg)}
-.au-r3{width:120%;--rt:21s;opacity:.5;animation-name:au-rot-b;
-  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - .5px));
-  mask:radial-gradient(farthest-side,transparent calc(100% - 1.5px),#000 calc(100% - .5px));
+.au-r3{--rt:17s;opacity:.8;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.8px),#000 calc(100% - .8px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 1.8px),#000 calc(100% - .8px));
   background:conic-gradient(from 40deg,transparent 30deg,var(--c2) 90deg,transparent 170deg,
     var(--c1) 240deg,transparent 320deg)}
+.au-r4{--rt:22s;opacity:.6;animation-name:au-rot-b;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1.3px),#000 calc(100% - .4px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 1.3px),#000 calc(100% - .4px));
+  background:conic-gradient(from 20deg,transparent 24deg,var(--c2) 44deg,transparent 72deg,
+    transparent 148deg,var(--c1) 172deg,transparent 202deg,
+    transparent 258deg,var(--c2) 282deg,transparent 312deg)}
+.au-r5{--rt:28s;opacity:.5;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 1px),#000 calc(100% - .2px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 1px),#000 calc(100% - .2px));
+  background:conic-gradient(from 66deg,transparent 18deg,var(--c1) 34deg,transparent 58deg,
+    transparent 130deg,var(--c2) 150deg,transparent 178deg,
+    transparent 246deg,var(--c1) 268deg,transparent 296deg)}
+/* 档级圈径表（直径＝fig-body 宽的百分比，圈心 38%）：
+   最外圈恒定 ≥145%（半径96px）确保哪怕一阶一圈也露出身外；越强向内逐圈追加 */
+/* 一阶仅一圈：加宽两段光弧（总弧长约 55%），宽袍小怪在任意旋转相位都有弧段露在身外 */
+.au-l1 .au-r1{width:145.5%;
+  background:conic-gradient(from 0deg,transparent 0deg,var(--c1) 30deg,transparent 135deg,
+    transparent 240deg,var(--c2) 240deg,transparent 340deg)}
+.au-l2 .au-r1{width:124.2%}
+.au-l2 .au-r2{width:148.5%}
+.au-l3 .au-r1{width:112.1%}
+.au-l3 .au-r2{width:130.3%}
+.au-l3 .au-r3{width:151.5%}
+.au-l4 .au-r1{width:106.1%}
+.au-l4 .au-r2{width:124.2%}
+.au-l4 .au-r3{width:142.4%}
+.au-l4 .au-r4{width:160.6%}
+.au-l5 .au-r1{width:100%}
+.au-l5 .au-r2{width:115.2%}
+.au-l5 .au-r3{width:130.3%}
+.au-l5 .au-r4{width:145.5%}
+.au-l5 .au-r5{width:163.6%}
 @keyframes au-rot{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
 @keyframes au-rot-b{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(-360deg)}}
-/* 轨道臂：绕身周周期旋转，光粒缀于臂端 */
-.au-o{position:absolute;left:50%;top:46%;width:var(--w,100%);aspect-ratio:1/1;
+/* 轨道臂：绕身周周期旋转，光粒缀于臂端；轨心同圈心 38%，轨道半径整体外移到身外 */
+.au-o{position:absolute;left:50%;top:38%;width:var(--w,100%);aspect-ratio:1/1;
   transform:translate(-50%,-50%);
   animation:au-rot var(--t,8s) linear infinite;animation-delay:var(--d,0s)}
 .au-o.au-rev{animation-name:au-rot-b}
@@ -514,13 +547,13 @@ body::before{
   animation:au-spark var(--t,3.4s) ease-in infinite;animation-delay:var(--d,0s)}
 @keyframes au-spark{0%{transform:translateY(24px) scale(.5);opacity:0}
   25%{opacity:.95}100%{transform:translateY(-150px) scale(1.05);opacity:0}}
-/* 炫光·扫光光束：锥形光柱绕身缓扫，滤色叠加成眩光 */
-.au::before{content:"";position:absolute;left:50%;top:46%;width:128%;aspect-ratio:1/1;
+/* 炫光·扫光光束：锥形光柱绕身缓扫，滤色叠加成眩光；环带外移与星轨同心 */
+.au::before{content:"";position:absolute;left:50%;top:38%;width:138%;aspect-ratio:1/1;
   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
   background:conic-gradient(from 0deg,transparent 0deg,transparent 300deg,
     rgba(255,247,224,.05) 330deg,var(--c2) 352deg,rgba(255,250,232,.55) 358deg,#fffdf4 360deg);
-  -webkit-mask:radial-gradient(farthest-side,transparent 26%,#000 40%,#000 94%,transparent 100%);
-  mask:radial-gradient(farthest-side,transparent 26%,#000 40%,#000 94%,transparent 100%);
+  -webkit-mask:radial-gradient(farthest-side,transparent 30%,#000 44%,#000 92%,transparent 100%);
+  mask:radial-gradient(farthest-side,transparent 30%,#000 44%,#000 92%,transparent 100%);
   mix-blend-mode:screen;opacity:0;
   animation:au-sweep 6.2s linear infinite,au-sweep-flash 6.2s ease-in-out infinite}
 @keyframes au-sweep{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
@@ -546,32 +579,52 @@ body::before{
 /* 妖邪六系 */
 .au-hun  {--c1:#5d93ad;--c2:#d4ecf5;--cr:#3f6a80;--cg:rgba(124,184,208,.40)}  /* 魂：青白幽光 */
 .au-gui  {--c1:#4e8a5f;--c2:#bce8b6;--cr:#356845;--cg:rgba(112,182,132,.40)}  /* 鬼：磷火幽绿 */
-.au-yao  {--c1:#a63527;--c2:#a97bc4;--cr:#7a3b6e;--cg:rgba(150,92,150,.40)}  /* 妖：朱紫妖气 */
+.au-yao  {--c1:#8e3a5e;--c2:#c79ad8;--cr:#6e2c4c;--cg:rgba(160,84,128,.40)}  /* 妖：紫绛妖气（避血煞赤红） */
 .au-xiong{--c1:#9e2b22;--c2:#e66d55;--cr:#7e2018;--cg:rgba(192,62,46,.42)}    /* 凶：血煞暗赤 */
 .au-zhan {--c1:#8b8f99;--c2:#e6eaf2;--cr:#5f636c;--cg:rgba(152,162,178,.38)}  /* 战：兵铁冷银 */
 .au-ke   {--c1:#9c7a3e;--c2:#e2c68e;--cr:#755c2c;--cg:rgba(172,142,82,.40)}   /* 壳：古铜土金 */
-/* 档位强度：低阶淡而简，顶格加亮加辉 */
-.au-l1 .au-glow{width:68%}
-.au-l2 .au-glow{width:78%}
-.au-l3 .au-glow{width:88%}
-.au-l4 .au-glow{width:98%}
-/* 转环辉光逐档增强＋弧段明灭流明 */
-.au-l1 .au-r{filter:drop-shadow(0 0 2px var(--c1));animation:au-rot 9s linear infinite,au-shimmer 2.6s ease-in-out infinite}
-.au-l2 .au-r{filter:drop-shadow(0 0 4px var(--c1))}
-.au-l3 .au-r{filter:drop-shadow(0 0 6px var(--c1))}
+/* 下级小怪颜色细化（仅敌方，玩家正神不罩雾）：
+   t1 六系罩青灰雾＝未成气候，仅一缕本系色相；t2 淡彩＝初开灵智；t3 起方显正色 */
+.fig-foe .au-l1.au-hun  {--c1:#93aab6;--c2:#e6eff3;--cr:#6c8491;--cg:rgba(150,175,188,.26)}
+.fig-foe .au-l1.au-gui  {--c1:#8ba794;--c2:#e4f0e2;--cr:#6f8a74;--cg:rgba(140,175,146,.26)}
+.fig-foe .au-l1.au-yao  {--c1:#a695ac;--c2:#efe6f2;--cr:#87748c;--cg:rgba(168,152,178,.26)}
+.fig-foe .au-l1.au-xiong{--c1:#ab8278;--c2:#f3e6e0;--cr:#8f6a60;--cg:rgba(178,140,130,.26)}
+.fig-foe .au-l1.au-zhan {--c1:#a6abb3;--c2:#f0f2f5;--cr:#868c95;--cg:rgba(164,170,180,.24)}
+.fig-foe .au-l1.au-ke   {--c1:#ab9a72;--c2:#f0e8d2;--cr:#8c7d58;--cg:rgba(178,162,120,.26)}
+.fig-foe .au-l2.au-hun  {--c1:#6fa0b8;--c2:#dcf0f7;--cr:#4f7a90;--cg:rgba(120,175,200,.32)}
+.fig-foe .au-l2.au-gui  {--c1:#5f9c72;--c2:#d4f0d2;--cr:#447556;--cg:rgba(110,178,136,.32)}
+.fig-foe .au-l2.au-yao  {--c1:#a05e86;--c2:#e3c4ec;--cr:#7c4a68;--cg:rgba(170,120,160,.32)}
+.fig-foe .au-l2.au-xiong{--c1:#b04a38;--c2:#f29d86;--cr:#8e3022;--cg:rgba(198,96,70,.34)}
+.fig-foe .au-l2.au-zhan {--c1:#8f9bad;--c2:#e6ecf3;--cr:#6f7d8e;--cg:rgba(150,162,178,.30)}
+.fig-foe .au-l2.au-ke   {--c1:#ac8c4e;--c2:#eddcaa;--cr:#866c38;--cg:rgba(180,156,98,.34)}
+/* 档位强度（敌方 t1-t5 ／ 玩家 l1-l4）：低阶淡而简，顶格加亮加辉 */
+.au-l1 .au-glow{width:62%}
+.au-l2 .au-glow{width:72%}
+.au-l3 .au-glow{width:82%}
+.au-l4 .au-glow{width:92%}
+.au-l5 .au-glow{width:102%}
+/* 转环辉光逐档增强＋低阶弧段明灭流明；一阶仅一圈，辉光加重确保看得清 */
+.au-l1 .au-r{filter:drop-shadow(0 0 5px var(--c1)) drop-shadow(0 0 2px var(--c2));animation:au-rot 9s linear infinite,au-shimmer 2.6s ease-in-out infinite}
+.au-l2 .au-r{filter:drop-shadow(0 0 3px var(--c1))}
+.au-l3 .au-r{filter:drop-shadow(0 0 5px var(--c1))}
 .au-l4 .au-r{filter:drop-shadow(0 0 7px var(--c1)) drop-shadow(0 0 3px var(--c2))}
-.au-l4 .au-r3{filter:drop-shadow(0 0 6px var(--c2))}
+.au-l5 .au-r{filter:drop-shadow(0 0 9px var(--c1)) drop-shadow(0 0 4px var(--c2))}
+.au-l4 .au-r3,.au-l5 .au-r3{filter:drop-shadow(0 0 6px var(--c2))}
 @keyframes au-shimmer{0%,100%{opacity:.75}50%{opacity:1}}
-/* 炫光档位门槛：一阶不刺眼；二阶起扫光；三阶起星芒 */
+/* 炫光档位门槛：一阶不刺眼；二阶起扫光；三阶起星芒；五阶扫光更宽更急、星芒更大 */
 .au-l1::before{display:none}
 .au-l2::before{width:118%;opacity:.8}
 .au-l1::after,.au-l2::after{display:none}
 .au-l3::after{animation-duration:2.8s}
 .au-l4::before{animation-duration:5s,5s}
 .au-l4::after{width:26px;height:26px;animation-duration:2.1s}
-/* 顶格符文更亮、火花更密更亮 */
-.au-l4 .au-o-rune b{text-shadow:0 0 9px var(--cr),0 0 3px var(--cr),0 1px 1px rgba(255,240,210,.8)}
-.au-l4 .au-sp{width:4px;box-shadow:0 0 8px var(--c2)}
+.au-l5::before{width:152%;animation-duration:4.2s,4.2s}
+.au-l5::after{width:32px;height:32px;animation-duration:1.7s}
+/* 高阶符文更亮、火花更密更亮 */
+.au-l4 .au-o-rune b,.au-l5 .au-o-rune b{text-shadow:0 0 9px var(--cr),0 0 3px var(--cr),0 1px 1px rgba(255,240,210,.8)}
+.au-l4 .au-sp,.au-l5 .au-sp{width:4px;box-shadow:0 0 8px var(--c2)}
+.au-l5 .au-o-rune b{text-shadow:0 0 11px var(--cr),0 0 4px var(--cr),0 1px 1px rgba(255,240,210,.9)}
+.au-l5 .au-sp{box-shadow:0 0 10px var(--c2),0 0 4px var(--c2)}
 /* 倒下即散功，光环熄灭 */
 .fig-body.down .au{display:none}
 @media (max-width:640px){.au{transform:scale(.85)}.au-o-rune b{font-size:11px}}
@@ -753,10 +806,10 @@ body::before{
 .review-list{text-align:left;display:inline-block;font-size:16px;line-height:2.2;margin:10px 0}
 
 /* ============ 弹窗 / Overlay ============ */
-#modalLayer{position:fixed;inset:0;z-index:2100;pointer-events:none}
+#modalLayer{position:fixed;inset:0;z-index:2400;pointer-events:none}
 #modalLayer>*{pointer-events:auto}
 .overlay{
-  position:fixed;inset:0;z-index:2100;display:grid;place-items:center;
+  position:fixed;inset:0;z-index:2400;display:grid;place-items:center;
   background:rgba(30,26,20,.55);backdrop-filter:blur(2px);
 }
 .paper{
@@ -1377,8 +1430,11 @@ body::before{
 /* ---- 神仙图鉴（已结识立绘墙 + 纯大图放大） ---- */
 .god-codex{width:780px;max-width:92vw;max-height:84vh;overflow-y:auto}
 .cx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.cx-card{cursor:pointer;text-align:center;padding:8px 6px 9px;border-radius:8px;background:rgba(255,255,255,.55);border:1px solid rgba(43,38,32,.12);transition:all .2s}
+.cx-card{cursor:pointer;text-align:center;padding:11px 8px 12px;border-radius:8px;background:rgba(255,255,255,.55);border:1px solid rgba(43,38,32,.12);transition:all .2s;touch-action:manipulation;-webkit-tap-highlight-color:rgba(179,64,42,.18)}
 .cx-card:hover{background:rgba(255,255,255,.95);box-shadow:0 3px 10px rgba(0,0,0,.1);transform:translateY(-2px)}
+.cx-card:active{transform:translateY(0) scale(.97);background:rgba(255,255,255,.95)}
+/* 窄屏三列，触控目标更大 */
+@media (max-width:560px){.cx-grid{grid-template-columns:repeat(3,1fr);gap:10px}.cx-card{padding:10px 6px 11px}.cx-name{font-size:13.5px}}
 .cx-face{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;display:grid;place-items:center;border:1px solid rgba(43,38,32,.18);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
 .cx-face.cx-round{aspect-ratio:1/1;width:74%;margin:0 auto;border-radius:50%;border:1.5px solid var(--ink-soft)}
 .cx-face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
@@ -1386,10 +1442,10 @@ body::before{
 .cx-char{font-family:var(--font-brush);color:var(--cinnabar-deep);font-size:34px}
 .cx-name{margin-top:7px;font-weight:bold;font-size:14px;letter-spacing:1px;color:var(--ink)}
 .cx-rel{font-size:11px;color:var(--ink-faint);margin-top:2px;letter-spacing:1px}
-.cx-zoom-ov{background:rgba(24,20,15,.9);cursor:pointer}
-.cx-zoom{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:92vw}
+.cx-zoom-ov{background:rgba(24,20,15,.9);cursor:pointer;overflow-y:auto;overscroll-behavior:contain;padding:24px 12px}
+.cx-zoom{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:92vw;margin:auto}
 .cx-zoom-face{position:relative;display:grid;place-items:center;min-width:180px;min-height:240px;border-radius:8px;overflow:hidden;border:1px solid rgba(247,234,210,.25);background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
-.cx-zoom-face img{display:block;max-width:82vw;max-height:74vh;object-fit:contain}
+.cx-zoom-face img{display:block;max-width:82vw;max-height:60vh;object-fit:contain}
 .cx-zoom-face img:not(.ok):not(.loaded){width:180px;height:240px}
 .cx-zoom-name{font-family:var(--font-brush);font-size:26px;letter-spacing:4px;color:#f7ead2;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 .cx-zoom-hint{font-size:12px;color:rgba(247,234,210,.45);letter-spacing:2px}
@@ -1486,16 +1542,18 @@ body::before{
   mix-blend-mode:multiply;
 }
 
-/* ---- 战场底图（battle-field 内） ---- */
+/* ---- 战场底图（battle-field 内）：实景清晰有现场感，仅覆极薄一层米纱＋暗角，不抢立绘 ---- */
 .battle-bg{
   position:absolute;inset:0;z-index:0;border-radius:8px;
   background-size:cover;background-position:center;
   opacity:0;transition:opacity .9s ease;
-  filter:saturate(.9);
+  filter:saturate(1.06) contrast(1.02);
 }
 .battle-veil{
   position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:8px;
-  background:linear-gradient(180deg, rgba(246,238,219,.66) 0%, rgba(234,221,194,.30) 100%);
+  background:
+    radial-gradient(120% 90% at 50% 42%, transparent 55%, rgba(40,32,22,.16) 100%),
+    linear-gradient(180deg, rgba(246,238,219,.20) 0%, rgba(234,221,194,.07) 100%);
 }
 
 /* ---- 水墨转场（章末/大事） ---- */
@@ -1961,15 +2019,17 @@ body::before{
 .debut.out{animation:miFade .46s ease-in forwards;}
 @keyframes dbIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 
-/* 图鉴大图页「翻开仙录」 */
+/* 图鉴大图页「翻开仙录」（触控热区 ≥46px，避免被浮条遮挡后误合卷） */
 .cx-zoom-book{
-  margin-top:6px;padding:8px 28px;
-  background:transparent;border:1px solid var(--gold);border-radius:2px;
+  margin-top:8px;padding:11px 40px;min-height:46px;
+  background:transparent;border:1.5px solid var(--gold);border-radius:3px;
   color:var(--gold);font-family:var(--font-brush);
-  font-size:18px;letter-spacing:5px;text-indent:5px;cursor:pointer;
-  transition:background .2s ease, color .2s ease;
+  font-size:19px;letter-spacing:5px;text-indent:5px;cursor:pointer;
+  touch-action:manipulation;-webkit-tap-highlight-color:rgba(201,150,47,.25);
+  transition:background .2s ease, color .2s ease, transform .12s ease;
 }
 .cx-zoom-book:hover{background:rgba(201,150,47,.16);color:#ecd7a6;}
+.cx-zoom-book:active{transform:scale(.96);background:rgba(201,150,47,.28);color:#f3e3b4;}
 /* 大封面顶部姓字朱题（神仙/妖鬼通用） */
 .cx-zoom-surname{
   font-family:var(--font-brush);font-size:44px;line-height:1;
@@ -2020,7 +2080,10 @@ body::before{
 /* 详情页 */
 .yg-zoom{position:relative;width:680px;max-width:94vw;max-height:88vh;overflow-y:auto;
   display:flex;gap:18px;padding:22px 22px 20px;align-items:flex-start}
-.yg-zoom-x{position:absolute;top:10px;right:14px;z-index:2}
+.yg-zoom-x{position:absolute;top:8px;right:10px;z-index:2;min-width:38px;min-height:38px;display:grid;place-items:center;font-size:15px;border-radius:50%}
+.yg-zoom-x:hover{background:rgba(140,47,34,.12)}
+/* 图鉴头部 ✕：放大触控热区 */
+.gg-head .gc-skip{display:inline-grid;place-items:center;min-width:38px;min-height:38px;font-size:15px;padding:0;border-radius:50%}
 .yg-zoom-face{position:relative;flex:0 0 240px;width:240px;aspect-ratio:3/4;border-radius:8px;overflow:hidden;
   display:grid;place-items:center;border:1px solid rgba(43,38,32,.2);
   background:radial-gradient(circle at 35% 30%,#fffdf4,#d9c9a6)}
@@ -2964,6 +3027,8 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
   transform:translateY(16px);opacity:0;
   transition:transform .35s cubic-bezier(.34,1.4,.64,1),opacity .3s;
 }
+/* 下凡/战斗/结算沉浸页不显示安装浮条，杜绝它压住底部按键 */
+body.in-flow .pwa-bar{display:none!important}
 .pwa-bar.show{transform:translateY(0);opacity:1}
 .pwa-ico{
   flex:none;width:36px;height:36px;border-radius:8px;

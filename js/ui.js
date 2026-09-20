@@ -86,6 +86,8 @@ const UI = {
   /* ================= 总渲染 ================= */
   render(){
     if(!Game.s) return;
+    /* 沉浸视图（下凡/战斗/结算）隐藏 PWA 安装浮条，避免遮挡底部「继续前行」等关键按键 */
+    document.body.classList.toggle('in-flow', this.view!=='office');
     this.renderTop();
     const flowing=this.view!=='office';
     $('tabbar').classList.toggle('hidden', flowing);
@@ -1368,6 +1370,7 @@ const UI = {
         next.style.marginTop='10px';
         next.onclick=()=>this.nextNode();
         wrap.appendChild(next);
+        requestAnimationFrame(()=>next.scrollIntoView({block:'center',behavior:'smooth'}));
       }
     }
     if(node.type==='quiz') this.renderQuiz(wrap,node);
@@ -1409,6 +1412,7 @@ const UI = {
         next.onclick=()=>this.nextNode();
         box.appendChild(next);
         box.appendChild(quit);
+        requestAnimationFrame(()=>next.scrollIntoView({block:'center',behavior:'smooth'}));
         return;
       }
       const it=qs[qi];
@@ -1463,6 +1467,8 @@ const UI = {
       MiniGame.run(node.game, arena, {difficulty:node.difficulty||2}, (rating)=>{
         this.applyNodePass(node,rating);
         arena.innerHTML='';
+        arena.style.minHeight='0';          /* 法坛已撤，空舞台不再把结果行顶到屏外 */
+        startRow.style.display='none';      /* 「破局中/暂离」行通关后即收起 */
         const perfect=rating>=1;
         const rl=h('div','result-line','▸ '+(node.pass&&node.pass.log||'机关已破，前行无碍。')+(perfect?' <span style="color:var(--gold)">（完美破局，赏罚从优）</span>':''));
         wrap.appendChild(rl);
@@ -1470,6 +1476,8 @@ const UI = {
         next.style.marginTop='10px';
         next.onclick=()=>this.nextNode();
         wrap.appendChild(next);
+        /* 长面板时把结果行与按键滚进视口，避免「按钮在屏外」误判卡死 */
+        requestAnimationFrame(()=>next.scrollIntoView({block:'center',behavior:'smooth'}));
       });
     };
     startRow.appendChild(btn);
@@ -2466,8 +2474,9 @@ const UI = {
   },
 };
 
-/* ============ 周身神力光环：实力分 4 档，属性分 11 系 ============
-   玩家档：品秩为基，镶嵌宝/仙品神格提一档；敌方档：tier 1-5 映射
+/* ============ 周身神力光环：玩家 4 档 / 敌方 5 档（＝tier），属性 11 系 ============
+   玩家档：品秩为基，镶嵌宝/仙品神格提一档（最高 4）；敌方档：tier 1-5 直通
+   星轨圈数＝档位：怪越强，背后圈数越多（1-5 圈内亮外淡逐层外张）
    主题：神格五系 sheng/huo/bing/you/fa；妖邪六系 hun/gui/yao/xiong/zhan/ke */
 function playerAuraLv(){
   let lv = Game.s.rank<=1?1 : Game.s.rank<=3?2 : Game.s.rank<=5?3 : 4;
@@ -2489,8 +2498,9 @@ function playerAuraTheme(){
   Object.keys(c).forEach(k=>{if(c[k]>n){n=c[k];best=k;}});
   return best;
 }
+/* 敌方光环档＝tier 直通（1-5）：星轨圈数随之走 */
 function foeAuraLv(tier){
-  return tier>=5?4 : tier===4?3 : tier===3?2 : 1;
+  return Math.max(1, Math.min(5, tier|0));
 }
 /* 各系环绕符文（高阶可见） */
 const AURA_RUNES = {
@@ -2501,21 +2511,26 @@ const AURA_RUNES = {
   xiong:['凶','戮','血','饕','劫','煞'],  zhan:['战','破','摧','陷','锐','锋'],
   ke:['壳','锢','傀','俑','牢','甲']
 };
-/* theme: 系别类名后缀；lv: 1-4。粒子数硬上限：光粒10/符文6/火花6 */
+/* theme: 系别类名后缀；lv: 玩家 1-4 / 敌方 1-5。粒子数硬上限：光粒10/符文6/火花6 */
 function auraHTML(theme, lv){
   const T = AURA_RUNES[theme] ? theme : 'sheng';
-  const L = Math.max(1, Math.min(4, lv|0));
+  const L = Math.max(1, Math.min(5, lv|0));
   const RUNES = AURA_RUNES[T];
-  const rings = L===1?1 : L===4?3 : 2;
-  const motes = [0,4,6,8,10][L];
-  const runeN = L===3?4 : L===4?6 : 0;
-  const sparks = L===4?6:0;
+  /* 星轨圈数＝档位：t1 一圈 … t5 五圈 */
+  const rings = L;
+  /* 双轨环绕光粒：外轨正向、内轨反向；t1 三粒起，t5 满十粒 */
+  const motes = [0,3,5,7,9,10][L];
+  /* 符文 t3 起（3→5→6），升腾火花 t4 起（4→6） */
+  const runeN = [0,0,0,3,5,6][L];
+  const sparks = [0,0,0,0,4,6][L];
+  /* 光粒双轨半径外移到身外（圈心 38%）：外轨与最外星轨齐，内轨沿肩线 */
+  const wOut = 140, wIn = 118;
   let h = `<div class="au au-${T} au-l${L}" aria-hidden="true"><i class="au-glow"></i>`;
   for(let i=1;i<=rings;i++) h += `<i class="au-r au-r${i}"></i>`;
   /* 双轨环绕光粒：外轨正向、内轨反向 */
   for(let i=0;i<motes;i++){
     const outer = i%2===0;
-    const w = outer?103:89;
+    const w = outer?wOut:wIn;
     const t = outer?7.4-(L>=3?0.7:0) : 10.8-(L>=3?1:0);
     const d = -((i/motes)*t + (i%3)*0.65);
     const s = outer?6:5;
@@ -2524,7 +2539,7 @@ function auraHTML(theme, lv){
   /* 高阶：环绕符文（反向自转保持字正） */
   for(let i=0;i<runeN;i++){
     const t = 17+i*1.2, d = -(i/runeN)*t;
-    h += `<span class="au-o au-o-rune${i%2?' au-rev':''}" style="--w:77%;--t:${t.toFixed(1)}s;--d:${d.toFixed(2)}s"><b>${RUNES[i%RUNES.length]}</b></span>`;
+    h += `<span class="au-o au-o-rune${i%2?' au-rev':''}" style="--w:132%;--t:${t.toFixed(1)}s;--d:${d.toFixed(2)}s"><b>${RUNES[i%RUNES.length]}</b></span>`;
   }
   /* 顶格：升腾火花 */
   for(let i=0;i<sparks;i++){
