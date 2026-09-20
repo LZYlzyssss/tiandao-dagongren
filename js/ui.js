@@ -1798,7 +1798,7 @@ const UI = {
             <div class="cx-face"><span class="cx-char yg-char">${(e.kind==='hun'?'魂':e.kind==='gui'?'鬼':e.kind==='yao'?'妖':e.kind==='xiong'?'凶':e.kind==='zhan'?'战':'壳')}</span><img alt="${e.name}" data-asset="e_${id}"></div>
             <div class="cx-name">${e.name}</div>
             <div class="cx-rel yg-stars">${stars(e.tier)}</div>`;
-          card.onclick=()=>this.openYaoguaiZoom(id);
+          card.onclick=()=>this.openYaoguaiCover(id);
         }else{
           card.innerHTML=`
             <div class="cx-face yg-lock-face"><span class="cx-char">？</span></div>
@@ -1814,6 +1814,35 @@ const UI = {
     ml.classList.remove('hidden');
     /* 墙内立绘随挂载懒拉 */
     try{ ASSET.scan(box); }catch(e){}
+  },
+
+  /* 妖鬼封面：全屏大立绘卡（与神仙宗卷同款），「翻开卷宗」进横版详情 */
+  openYaoguaiCover(id){
+    const e=ENEMIES[id]; if(!e) return;
+    const rec=(Game.s.enemyMet||{})[id];
+    if(!rec) return;
+    const star='✦'.repeat(e.tier)+'✧'.repeat(Math.max(0,5-e.tier));
+    const KIND={hun:'游魂野魄',gui:'阴司鬼类',yao:'山野妖修',xiong:'上古凶兽',zhan:'战魂英灵',ke:'空壳神僚'};
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay cx-zoom-ov');
+    ov.innerHTML=`
+      <div class="cx-zoom">
+        <div class="cx-zoom-surname">${e.name[0]}</div>
+        <div class="cx-zoom-face"><span class="cx-char yg-char">${(e.kind==='hun'?'魂':e.kind==='gui'?'鬼':e.kind==='yao'?'妖':e.kind==='xiong'?'凶':e.kind==='zhan'?'战':'壳')}</span><img alt="${e.name}" data-asset="e_${id}"></div>
+        <div class="cx-zoom-name">${e.name}</div>
+        <div class="yg-zoom-cover-sub"><span class="yg-stars">${star}</span> · ${KIND[e.kind]||'邪祟'} · 卷宗第 ${rec.n} 次照面</div>
+        <button class="cx-zoom-book" type="button">翻开卷宗</button>
+        <div class="cx-zoom-hint">轻触任意处合上</div>
+      </div>`;
+    ov.onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCodex(); };
+    ov.querySelector('.cx-zoom-book').onclick=(ev)=>{
+      ev.stopPropagation();
+      if(typeof SFX!=='undefined') SFX.play('pop');
+      this.openYaoguaiZoom(id);
+    };
+    ml.appendChild(ov);
+    ml.classList.remove('hidden');
+    try{ ASSET.scan(ov); ASSET.priority(['e_'+id],1); }catch(e2){}
   },
 
   /* 妖鬼详情：立绘 + 名号 + 星级 + 遭遇次数 + 志怪小传 */
@@ -1840,8 +1869,8 @@ const UI = {
           <div class="cx-zoom-hint">轻触合卷</div>
         </div>
       </div>`;
-    ov.onclick=(ev)=>{ if(ev.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCodex(); } };
-    ov.querySelector('.yg-zoom-x').onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCodex(); };
+    ov.onclick=(ev)=>{ if(ev.target===ov){ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCover(id); } };
+    ov.querySelector('.yg-zoom-x').onclick=()=>{ ml.innerHTML=''; ml.classList.add('hidden'); this.openYaoguaiCover(id); };
     ml.appendChild(ov);
     ml.classList.remove('hidden');
     try{ ASSET.scan(ov); ASSET.priority(['e_'+id],1); }catch(e2){}
@@ -1855,6 +1884,7 @@ const UI = {
     const hasArt = typeof GOD_ART!=='undefined' && GOD_ART.includes(g);
     ov.innerHTML=`
       <div class="cx-zoom">
+        <div class="cx-zoom-surname">${gd.name[0]}</div>
         <div class="cx-zoom-face"><span class="cx-char">${gd.icon}</span><img alt="${gd.name}" data-gava="${g}"></div>
         <div class="cx-zoom-name">${gd.name}</div>
         <button class="cx-zoom-book" type="button">翻开仙录</button>

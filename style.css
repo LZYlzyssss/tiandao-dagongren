@@ -1970,6 +1970,20 @@ body::before{
   transition:background .2s ease, color .2s ease;
 }
 .cx-zoom-book:hover{background:rgba(201,150,47,.16);color:#ecd7a6;}
+/* 大封面顶部姓字朱题（神仙/妖鬼通用） */
+.cx-zoom-surname{
+  font-family:var(--font-brush);font-size:44px;line-height:1;
+  color:rgba(172,52,38,.92);letter-spacing:0;
+  text-shadow:0 2px 14px rgba(0,0,0,.55);
+  margin:-6px 0 -2px;
+}
+/* 妖鬼封面副信息：星级 · 系别 · 照面次数 */
+.yg-zoom-cover-sub{
+  font-size:12.5px;letter-spacing:2px;color:rgba(247,234,210,.62);
+  display:flex;align-items:center;gap:4px;
+}
+.yg-zoom-cover-sub .yg-stars{color:var(--gold);letter-spacing:1px;font-size:13px}
+@media (max-width:640px){.cx-zoom-surname{font-size:38px}}
 
 /* ============ 双卷宗入口（我的页） ============ */
 .codex-entrys{display:flex;gap:12px;margin:12px 0 8px;flex-wrap:wrap}
