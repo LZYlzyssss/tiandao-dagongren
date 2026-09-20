@@ -135,14 +135,14 @@ const UI = {
     const target=monthTarget(s.month);
     const eb=ERODE_BANDS[Game.erodeLevel()];
     const erodeHot = Game.erodeLevel()>=2;
-    /* 辅助：生成 stat-chip（图片图标 + 点击弹窗） */
+    /* 辅助：生成 stat-chip（图片图标 + 点击弹窗）；sc-<key> 供按内容配色 */
     const chip=(key, titleHTML, cls='')=>{
       const info=STAT_INFO[key];
       const imgHTML=typeof ASSET!=='undefined' && ASSET.list[info.img]
         ? ASSET.html(info.img,'sc-img',info.fallback)
         : '';
-      return `<div class="stat-chip${cls?' '+cls:''}" data-stat="${key}" style="cursor:pointer">
-        <span class="sc-ico">${imgHTML}<span class="sc-fallback" style="color:var(--ink)">${info.fallback}</span></span>
+      return `<div class="stat-chip sc-${key}${cls?' '+cls:''}" data-stat="${key}" style="cursor:pointer">
+        <span class="sc-ico">${imgHTML}<span class="sc-fallback">${info.fallback}</span></span>
         <span class="sc-txt">${titleHTML}</span></div>`;
     };
     $('topStats').innerHTML =
@@ -152,10 +152,10 @@ const UI = {
       chip('money',   `<span class="k">香火钱</span><span class="v">${s.money}<small> 文</small></span>`) +
       chip('favor',   `<span class="k">人情</span><span class="v">${s.renqing}</span>`) +
       chip('erode',   `<span class="k">侵蚀</span><span class="v">${s.erode}<small> ${eb.name}</small></span>`, erodeHot?'erode-hot':'') +
-      chip('merit',   `<span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>`, s.merit>=target?'':'kpi-hot') +
+      chip('merit',   `<span class="k">本月功过</span><span class="v">${s.merit}/${target}</span>`, s.merit>=target?'kpi-ok':'kpi-hot') +
       /* 神躯/神力 chip 特殊：带血条 */
-      `<div class="stat-chip bar-chip" data-stat="hp" style="cursor:pointer">
-        <span class="sc-ico">${typeof ASSET!=='undefined'?ASSET.html('stat_hp','sc-img','躯'):''}<span class="sc-fallback" style="color:#a8382c">躯</span></span>
+      `<div class="stat-chip bar-chip sc-hp" data-stat="hp" style="cursor:pointer">
+        <span class="sc-ico">${typeof ASSET!=='undefined'?ASSET.html('stat_hp','sc-img','躯'):''}<span class="sc-fallback">躯</span></span>
         <span class="sc-txt" style="flex:1"><span class="k">神躯 ${Math.max(0,Math.round(s.hp))}/${st.maxHp} ｜ 神力 ${st.maxMp}</span>
         <div class="bar"><i class="bar-hp" style="width:${Math.max(0,s.hp/st.maxHp*100)}%"></i></div></span>
       </div>`;
@@ -203,14 +203,22 @@ const UI = {
   renderDesk(c){
     const s=Game.s, target=monthTarget(s.month);
     const kpi=h('div','panel kpi-panel');
+    const meritOk=s.merit>=target;
+    const kc=[
+      {cls:'kc-merit'+(meritOk?' is-ok':' is-hot'), lab:'本月功过', val:`${s.merit}<em>/${target}</em>`, bg:'kc-bg1'},
+      {cls:'kc-days',  lab:'本月还有', val:`${MONTH_DAYS - s.day + 1}<em> 日</em>`, bg:'kc-bg2'},
+      {cls:'kc-tasks', lab:'在册工单', val:`${s.shelf.length}<em> 张</em>`, bg:'kc-bg3'},
+      {cls:'kc-strike'+(s.strikes?' is-hot':' is-ok'), lab:'记过', val:`${s.strikes}<em>/2</em>`, bg:'kc-bg4'}
+    ];
     kpi.innerHTML=`
       <h2>案头工单 <span class="sub">三十日一考 · 阎魔王亲阅</span>
         ${s.tut&&s.tut.done?'<button class="tut-replay">重看指引</button>':''}</h2>
-      <div class="kpi-row">
-        <div><span class="kpi-k">本月功过</span><b style="color:var(--${s.merit>=target?'jade':'cinnabar'})">${s.merit}/${target}</b></div>
-        <div><span class="kpi-k">本月还剩</span><b>${MONTH_DAYS - s.day + 1} 日</b></div>
-        <div><span class="kpi-k">在架工单</span><b>${s.shelf.length} 张</b></div>
-        <div><span class="kpi-k">记过</span><b style="color:var(--${s.strikes?'cinnabar':'ink-faint'})">${s.strikes}/2</b></div>
+      <div class="kpi-grid">
+        ${kc.map(c=>`<div class="kpi-cell ${c.cls}">
+          <span class="kc-label">${c.lab}</span>
+          <span class="kc-val">${c.val}</span>
+          <i class="${c.bg}" aria-hidden="true"></i>
+        </div>`).join('')}
       </div>
       ${s.strikes>0?'<div class="clash-warn" style="margin-top:8px">你已被记过，本月再不合格就要被贬作孤魂野鬼。</div>':''}`;
     const rb=kpi.querySelector('.tut-replay');
