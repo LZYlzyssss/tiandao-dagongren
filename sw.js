@@ -6,13 +6,18 @@
    - 页面(HTML)：网络优先，断网回退本地壳
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
    - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
-   发版改下方 VERSION 即自动清旧桶 */
-const VERSION='xw-v28';
+   发版两步（缺一不可）：
+   1) 抬下方 VERSION（自动清旧桶）
+   2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档） */
+const VERSION='xw-v29';
+const ASSET_VER='20260920';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
-  './','./index.html','./style.css','./manifest.json',
-  './js/data.js','./js/lore.js','./js/asset.js','./js/fx.js','./js/state.js',
-  './js/sfx.js','./js/battle.js','./js/minigames.js','./js/ui.js','./js/guide.js','./js/main.js',
+  './','./index.html','./style.css?v='+ASSET_VER,'./manifest.json?v='+ASSET_VER,
+  './js/data.js?v='+ASSET_VER,'./js/lore.js?v='+ASSET_VER,'./js/asset.js?v='+ASSET_VER,
+  './js/fx.js?v='+ASSET_VER,'./js/state.js?v='+ASSET_VER,'./js/sfx.js?v='+ASSET_VER,
+  './js/battle.js?v='+ASSET_VER,'./js/minigames.js?v='+ASSET_VER,'./js/ui.js?v='+ASSET_VER,
+  './js/guide.js?v='+ASSET_VER,'./js/main.js?v='+ASSET_VER,
   './img/p_r0.jpg','./img/cover.png',
   './img/icon-192.png','./img/icon-512.png','./img/icon-maskable-512.png','./img/apple-touch-icon.png',
 ];
