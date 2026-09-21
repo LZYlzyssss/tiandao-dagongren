@@ -7,11 +7,16 @@
    - 仅缓存 GET 且成功(含 opaque)的响应，404 绝不落盘
    - 同一 URL 的在途请求全局复用：预载与界面挂载绝不重复下载大图
    发版两步（缺一不可）：
-   1) 抬下方 VERSION（自动清旧桶）
-   2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档） */
-const VERSION='xw-v33';
-const ASSET_VER='20260921c';
+   1) 抬下方 VERSION（自动清旧代码桶）
+   2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档）
+   图片桶 IMG 固定名跨版本存活：发版只清代码桶，已缓存图片不再被清——
+   教训：v33 抬号删旧桶把用户已缓存图片全清了，慢网络等于每次发版全量重拉（v34 修正） */
+const VERSION='xw-v34';
+const ASSET_VER='20260921d';
 const RT='xw-runtime-'+VERSION;
+const IMG='xw-img';
+/* 判定"图片类"URL：本站 img/ 与 CDN 字体/引擎——进 IMG 桶；代码进 RT 桶 */
+const isImgUrl=u=>/\/img\/|cdn\.jsdelivr\.net|fonts\.gstatic\.com/.test(u);
 const CORE=[
   './','./index.html','./style.css?v='+ASSET_VER,'./manifest.json?v='+ASSET_VER,
   './js/data.js?v='+ASSET_VER,'./js/lore.js?v='+ASSET_VER,'./js/asset.js?v='+ASSET_VER,
@@ -24,17 +29,30 @@ const CORE=[
 
 self.addEventListener('install', e=>{
   e.waitUntil((async()=>{
-    const cache=await caches.open(RT);
-    /* 逐个缓存，任一失败不阻塞安装 */
-    await Promise.all(CORE.map(u=>cache.add(u).catch(()=>{})));
+    const rt=await caches.open(RT), img=await caches.open(IMG);
+    /* 逐个缓存，任一失败不阻塞安装；图片类进 IMG 桶（跨版本存活），代码进 RT 桶 */
+    await Promise.all(CORE.map(u=>(isImgUrl(u)?img:rt).add(u).catch(()=>{})));
     await self.skipWaiting();
   })());
 });
 
 self.addEventListener('activate', e=>{
   e.waitUntil((async()=>{
+    const img=await caches.open(IMG);
     const keys=await caches.keys();
-    await Promise.all(keys.filter(k=>k!==RT).map(k=>caches.delete(k)));
+    await Promise.all(keys.filter(k=>k!==RT&&k!==IMG).map(async k=>{
+      /* 旧桶（含历史 xw-runtime-*）里的图片条目先救进 IMG 再删桶：
+         老客户端升级不丢已缓存图片，慢网络不必全量重拉 */
+      try{
+        const old=await caches.open(k);
+        const reqs=await old.keys();
+        await Promise.all(reqs.filter(r=>isImgUrl(r.url)).map(async r=>{
+          const res=await old.match(r);
+          if(res && !(await img.match(r))) await img.put(r,res);
+        }));
+      }catch(_){}
+      return caches.delete(k);
+    }));
     await self.clients.claim();
   })());
 });
@@ -52,7 +70,7 @@ function sharedFetch(req){
   const p=fetch(req).then(res=>{
     if(cacheable(res)){
       const copy=res.clone();
-      caches.open(RT).then(c=>c.put(req,copy)).catch(()=>{});  /* 配额满/写失败不影响看图 */
+      caches.open(isImgUrl(req.url)?IMG:RT).then(c=>c.put(req,copy)).catch(()=>{});  /* 配额满/写失败不影响看图 */
     }
     return res;
   }).finally(()=>{ inflight.delete(key); });
@@ -60,9 +78,9 @@ function sharedFetch(req){
   return p;
 }
 
-/* 图片/固定版本 CDN：缓存优先，未命中走在途去重的网络 */
+/* 图片/固定版本 CDN：缓存优先（IMG 桶跨版本永久落盘），未命中的网络请求也落 IMG */
 async function cacheFirst(req){
-  const cache=await caches.open(RT);
+  const cache=await caches.open(IMG);
   const hit=await cache.match(req);
   if(hit) return hit;
   return sharedFetch(req);

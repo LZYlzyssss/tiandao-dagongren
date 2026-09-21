@@ -522,11 +522,12 @@ const ASSET = {
       const worker=()=>{
         const job=q[idx++];
         if(job===undefined) return Promise.resolve();
-        /* 进门后业务取图（ASSET.src 会设 12 秒让路窗）优先：preboot 休眠让连接，
-           demand 不受让路窗影响，始终是最高优 */
+        /* 进门后业务取图（ASSET.src/demand 会设让路窗）优先：preboot 让路，
+           但单任务最多让 2.5s 必须放行——否则持续滚动窗下回填近乎停摆，
+           缓存迟迟补不齐，翻到未取过的图就得现场走慢网络（v33 实测教训） */
         const pause=()=>new Promise(r=>setTimeout(r,500));
-        const go=()=>{
-          if(Date.now()<this._warmPauseUntil) return pause().then(go);
+        const go=(waited=0)=>{
+          if(Date.now()<this._warmPauseUntil && waited<2500) return pause().then(()=>go(waited+500));
           return runJob(job).then(st=>{
             if(st==='ok') done++; else if(st==='missing') missing++; else fail++;
             tick();
@@ -543,7 +544,7 @@ const ASSET = {
   },
 
   /* ---- 后台预热队列：单并发兜底全量；可见图由 demand 独立高优拉，互不抢连接 ---- */
-  _warmQ:[], _warmDone:{}, _warmBusy:0, _warmStarted:false, _warmPauseUntil:0,
+  _warmQ:[], _warmDone:{}, _warmBusy:0, _warmStarted:false, _warmPauseUntil:0, _warmWaitSince:0,
   warm(keys, front){
     if(!keys) return;
     (Array.isArray(keys)?keys:[keys]).forEach(k=>{
@@ -557,7 +558,13 @@ const ASSET = {
     this._warmStarted=true;
     const idle=cb=>{ (window.requestIdleCallback||setTimeout)(cb,{timeout:2000}); };
     const loop=()=>idle(()=>{
-      if(Date.now()<this._warmPauseUntil || this._warmBusy>=1){ setTimeout(loop,500); return; }
+      /* 让路窗内最多连等 2.5s（与 preboot 同规）：兜底回填有下限速度，不因持续窗全停 */
+      const paused=Date.now()<this._warmPauseUntil;
+      if(paused){
+        if(!this._warmWaitSince) this._warmWaitSince=Date.now();
+        if(Date.now()-this._warmWaitSince<2500){ setTimeout(loop,500); return; }
+      } else this._warmWaitSince=0;
+      if(this._warmBusy>=1){ setTimeout(loop,500); return; }
       const k=this._warmQ.shift();
       if(k===undefined){ setTimeout(loop,1200); return; }
       this._warmBusy++;
