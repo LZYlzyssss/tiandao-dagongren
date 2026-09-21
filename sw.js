@@ -9,8 +9,8 @@
    发版两步（缺一不可）：
    1) 抬下方 VERSION（自动清旧桶）
    2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档） */
-const VERSION='xw-v31';
-const ASSET_VER='20260921';
+const VERSION='xw-v32';
+const ASSET_VER='20260921b';
 const RT='xw-runtime-'+VERSION;
 const CORE=[
   './','./index.html','./style.css?v='+ASSET_VER,'./manifest.json?v='+ASSET_VER,

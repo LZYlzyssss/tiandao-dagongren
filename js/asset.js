@@ -79,13 +79,14 @@ const ASSET = {
     try{ localStorage.setItem(this._WEBP_CACHE_VER, JSON.stringify({t:Date.now(),ok:!!ok})); }catch(e){}
   },
 
-  /* key 可带 '#sprite' 后缀：战斗专用抠底立牌，取独立库 img/bsprite/<key>.png；
+  /* key 可带 '#sprite' 后缀：战斗专用抠底立牌，取独立库 img/bsprite/<key>.png|webp；
      不带后缀的原图（登场/过场/图鉴）路径完全不变 */
   file(key){
     const sp=typeof key==='string'&&key.endsWith('#sprite');
     if(sp) key=key.slice(0,-7);
     key=this.ALIAS[key]||key;
-    return this.base()+'img/'+(sp?'bsprite/':'')+key+'.'+(sp?'png':(this._webp?'webp':'jpg'));
+    const ext=this._webp?'webp':(sp?'png':'jpg');
+    return this.base()+'img/'+(sp?'bsprite/':'')+key+'.'+ext;
   },
   avatarFile(gid){ return this.base()+'img/av_'+gid+'.jpg'; },
 
@@ -118,11 +119,14 @@ const ASSET = {
     'img/av_wei_tuo.jpg','img/av_wei_zheng.jpg','img/av_wen_chang.jpg','img/av_xi_wangmu.jpg',
     'img/av_xi_yue.jpg','img/av_xuan_nv.jpg','img/av_zeng_zhang.jpg','img/av_zhao_gongming.jpg',
     'img/av_zhen_wu.jpg','img/av_zhong_kui.jpg','img/av_zhong_yue.jpg','img/av_zhuan_lun.jpg',
-    /* 玩家品阶 5-9 立绘/立牌（当前版本未开放，开放补图后删此 10 项） */
+    /* 玩家品阶 5-9 立绘/立牌（当前版本未开放，开放补图后删此 20 项）；
+       jpg/png 与 webp 孪生成对：file() 按探针结果切后缀，两种管线都要命中负缓存 */
     'img/p_r5.jpg','img/p_r6.jpg','img/p_r7.jpg','img/p_r8.jpg','img/p_r9.jpg',
+    'img/p_r5.webp','img/p_r6.webp','img/p_r7.webp','img/p_r8.webp','img/p_r9.webp',
     'img/bsprite/p_r5.png','img/bsprite/p_r6.png','img/bsprite/p_r7.png','img/bsprite/p_r8.png','img/bsprite/p_r9.png',
-    /* 程序化水墨图：由 INKSVG 实时生成，不需要 jpg 文件 */
-    'img/bf_c1n.jpg','img/stat_mp.jpg',
+    'img/bsprite/p_r5.webp','img/bsprite/p_r6.webp','img/bsprite/p_r7.webp','img/bsprite/p_r8.webp','img/bsprite/p_r9.webp',
+    /* 程序化水墨图：由 INKSVG 实时生成，不需要图片文件（双后缀同理成对） */
+    'img/bf_c1n.jpg','img/stat_mp.jpg','img/bf_c1n.webp','img/stat_mp.webp',
   ],
   _missStore:{}, _missHydrated:false,
   _missInit(){
@@ -212,7 +216,7 @@ const ASSET = {
     (this._waiters[file]=this._waiters[file]||[]).push(cb);
     this._pull(file);
   },
-  /* 按资产 key 订阅（'#sprite' 变体按原图 key 验籍，文件走 bsprite png） */
+  /* 按资产 key 订阅（'#sprite' 变体按原图 key 验籍，文件走 bsprite png/webp） */
   onKeyReady(key,cb){
     const b=typeof key==='string'?key.replace(/#sprite$/,''):key;
     if(!key||!this.list[b]){ cb(null); return; }
