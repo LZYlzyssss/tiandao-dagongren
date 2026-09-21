@@ -307,6 +307,9 @@ const ASSET = {
     if(!f) return;
     if(this._probe[f]===true){ this._warmDone[k]=1; return; }
     if(this._missing[f]){ this._demandSet[k]=0; return; }
+    /* 前台可见图开拉即滚动续 2s 让路窗：preboot/warm 后台队列感知后休眠让连接，
+       弱网下立绘不再被全量预载挤慢；前台停歇 2s 后后台自动恢复，全量落盘目标不变 */
+    this._warmPauseUntil=Math.max(this._warmPauseUntil,Date.now()+2000);
     const st=await this._loadOnce(f,30000);   /* 可见大图给足 30s，弱网不误伤 */
     if(st==='ok'){
       this._probe[f]=true; this._warmDone[k]=1; this._flushWaiters(f); return;
