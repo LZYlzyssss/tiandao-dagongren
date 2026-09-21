@@ -119,7 +119,7 @@ const BOOT={
     /* 全量预载：核心骨架 + cover 最先，随后战斗图/卡牌/其余全部拉齐才进门；
        相对路径经 ASSET.base() 补全，file:// 直开与 Capacitor 打包均可用 */
     const core=(hasSave?this.requiredKeys():this.smallKeys(0))
-      .concat([ASSET.base()+'img/cover.png']);
+      .concat([ASSET.base()+'img/cover.webp']);
     let finished=false, skip=false;
     const finish=()=>{
       if(finished) return; finished=true;

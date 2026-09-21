@@ -2729,7 +2729,7 @@ body.rp-shake #app{animation:emShake .46s cubic-bezier(.36,.07,.19,.97) both}
 }
 .login-bg{
   position:absolute;inset:-4%;z-index:0;
-  background:#1a1510 url('img/cover.png') center/cover no-repeat;
+  background:#1a1510 url('img/cover.webp') center/cover no-repeat;
   will-change:transform;
   animation:
     loginBgIn 1.4s ease-out both,

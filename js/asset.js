@@ -42,15 +42,15 @@ const ASSET = {
   base(){ return this._env().base; },
 
   /* ---- webp 协商：探针确认 img/ 下存在同名 .webp 才切换；探针前/无 webp 时一律 jpg（零行为变化）。
-     将来用 cwebp 把 img/*.jpg 批量转成同名 .webp（jpg 保留不删）后，下次启动自动全站切 webp。
-     探针结果写 localStorage（7 天）：当前无 webp 素材时不再每次冷启动刷 2 条 404；
-     批量转完 webp 后最多 7 天自动识别，想立刻生效可抬 _WEBP_CACHE_VER。 */
+     2026-09-21 已用 ffmpeg 全量生成 img/*.webp（bf_ 保原尺寸、其余长边≤1280，q82；jpg 原图保留未删），
+     webp 管线自此常态启用：带宽降到约 1/7，首访设备图片加载提速明显。
+     探针结果写 localStorage（7 天）；若再批量重转 webp，抬 _WEBP_CACHE_VER 立刻生效。 */
   _webp:null,
-  _WEBP_CACHE_VER:'webp-v0',
+  _WEBP_CACHE_VER:'webp-v1',
   async _probeWebp(){
     if(this._webp!==null) return this._webp;
     if(!this._env().isHttp){ this._webp=false; return false; }   /* file:// 无法可靠验 404，保守不切 */
-    /* 1) 先问缺图负缓存：已知 p_r0.webp 缺失（jpg 都在、webp 未转换时）则连探都不探 */
+    /* 1) 先问缺图负缓存：若 p_r0.webp 被坐实缺失则连探都不探（webp 全量在库，正常不会命中） */
     this._missInit();
     if(this._isMissing(this.base()+'img/p_r0.webp')){ this._webp=false; this._cacheWebp(false); return false; }
     /* 2) 再读 7 日内的探针结论 */
@@ -107,7 +107,7 @@ const ASSET = {
      _KNOWN_MISSING：发版时按磁盘实测的内置清单（相对路径，命中直接终态，零请求）。
        补图后把对应项删掉即可；批量补图后直接抬 _MISSING_VER 清空全部历史结论。
      localStorage：运行期新坐实的 404 也记下来（7 天后重验一次），换设备/清缓存才会再探。 */
-  _MISSING_VER:'miss-20260920',
+  _MISSING_VER:'miss-20260921',
   _KNOWN_MISSING:[
     /* 32 张旧版 av_ 头像：47 神一律走 g_ 立绘，av_ 永不挂载（15 张阎罗体系旧档仍保留在盘） */
     'img/av_ao_guang.jpg','img/av_bi_gan.jpg','img/av_di_zang.jpg','img/av_dian_mu.jpg',
@@ -123,8 +123,6 @@ const ASSET = {
     'img/bsprite/p_r5.png','img/bsprite/p_r6.png','img/bsprite/p_r7.png','img/bsprite/p_r8.png','img/bsprite/p_r9.png',
     /* 程序化水墨图：由 INKSVG 实时生成，不需要 jpg 文件 */
     'img/bf_c1n.jpg','img/stat_mp.jpg',
-    /* webp 尚未批量转换：探针样本当前必 404，转换后删此 2 项 */
-    'img/p_r0.webp','img/ui_main.webp',
   ],
   _missStore:{}, _missHydrated:false,
   _missInit(){
