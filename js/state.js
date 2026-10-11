@@ -461,6 +461,7 @@ const Game = {
   buyItem(id){
     if(this.s.bag[id]){ this.toast('铺中只剩样品，这一件你已购入'); return; }
     const it=ITEMS[id];
+    if(it.reqChapter && this.s.chapter<it.reqChapter){ this.toast(`老道把东西往袖里一收：「机缘未至——主线第 ${it.reqChapter} 章后再来。」`); return; }
     if(this.s.money<it.price){ this.toast('香火钱不足'); return; }
     this.s.money-=it.price; this.s.bag[id]=true;
     this.save(); if(typeof UI!=='undefined') UI.render();
@@ -533,7 +534,10 @@ const Game = {
     Stats.recalc();
     if(g) this.s.hp+=g.hp;   /* 神躯凝实：体魄成长同步回血 */
     if(this.s.hp>Stats.cur().maxHp) this.s.hp=Stats.cur().maxHp;
-    this.toast(`敕封：${RANKS[this.s.rank].name}！${g?`神躯凝实——体魄+${g.hp}、攻伐+${g.atk}、护身+${g.def}。`:''}`);
+    /* 升官赏赐：天曹按新品阶发放安家香火（80文/阶） */
+    const bounty=80*this.s.rank;
+    this.s.money+=bounty; this._promoBounty=bounty;
+    this.toast(`敕封：${RANKS[this.s.rank].name}！${g?`神躯凝实——体魄+${g.hp}、攻伐+${g.atk}、护身+${g.def}；`:''}天曹赏香火钱 ${bounty} 文。`);
     this.save();
     return true;
   },
@@ -567,7 +571,8 @@ const Game = {
     const reviewed=this.advanceDay();
     return {lostMoney, reviewed};
   },
-  /** 月末 KPI（03册）：评级上考/称职/下考/不称职；连续两次不称职即 gameOver。晋升走主线。 */
+  /** 月末 KPI（03册）：评级上考/称职/下考/不称职；连续两次不称职即 gameOver。晋升走主线。
+      人人皆有月俸（60文+30文/品阶，九品60 → 酆都丞300），赏罚另算。 */
   review(){
     const s=this.s, target=monthTarget(s.month), ratio=s.merit/target;
     let grade, bonus=0, fine=0;
@@ -576,7 +581,8 @@ const Game = {
     else if(ratio>=0.7){ grade='xia'; }
     else { grade='bu'; fine=Math.floor(s.money*0.2); s.strikes++; }
     if(grade==='shang'||grade==='ping') s.strikes=0;
-    s.money=Math.max(0,s.money+bonus-fine);
+    const stipend=60+s.rank*30;   /* 月俸：官身俸禄，旱涝保收 */
+    s.money=Math.max(0,s.money+stipend+bonus-fine);
     /* 侵蚀自然回落：每月 -3（04册第七节） */
     this.addErode(-3);
     s.month++; s.merit=0; s.day=1;
@@ -584,7 +590,19 @@ const Game = {
     Shelf.refresh();
     if(s.strikes>=2) s.gameOver=true;
     this.save();
-    if(typeof UI!=='undefined' && UI.showReview) UI.showReview({grade,target,bonus,fine,strikes:s.strikes,gameOver:s.gameOver});
+    if(typeof UI!=='undefined' && UI.showReview) UI.showReview({grade,target,bonus,fine,stipend,strikes:s.strikes,gameOver:s.gameOver});
+  },
+
+  /** 战斗胜利掉落：按敌人品阶掷香火钱（tier 越高概率与数额越大，scale 放大），返回 0 表示未掉 */
+  dropLoot(enemyId, scale){
+    const t=ENEMIES[enemyId]; if(!t) return 0;
+    const tier=t.tier||1;
+    const chance=[0,0.35,0.45,0.55,0.65,0.75][Math.min(tier,5)];
+    if(Math.random()>=chance) return 0;
+    const range=[0,[8,16],[16,30],[32,55],[60,105],[115,185]][Math.min(tier,5)];
+    const gain=Math.max(1, Math.round((range[0]+Math.random()*(range[1]-range[0]))*(scale||1)));
+    this.s.money+=gain;
+    return gain;
   },
 };
 
@@ -673,12 +691,15 @@ const Stats = {
       if(it.stat){
         v.maxHp+=it.stat.hp||0; v.atk+=it.stat.atk||0; v.def+=it.stat.def||0;
         v.crit+=it.stat.crit||0; v.lifesteal+=it.stat.lifesteal||0;
+        v.critDmg+=(it.stat.critDmg||0); v.maxMp+=(it.stat.maxMp||0); v.trueDmg+=(it.stat.trueDmg||0);
       }
       if(it.proc){
         v.stunProc=Math.max(v.stunProc,it.proc.stun||0);
         v.healStart=Math.max(v.healStart,it.proc.healStart||0);
         v.dmgReduce=Math.max(v.dmgReduce,it.proc.dmgReduce||0);
         if(it.proc.burnOnHit) v.burnOnHit=it.proc.burnOnHit;
+        /* 昆仑镜类：法宝自带的一次免死（战斗引擎读 st.saves） */
+        if(it.proc.firstSave) v.saves.push({gh:id, ...it.proc.firstSave});
       }
     });
 

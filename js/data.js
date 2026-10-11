@@ -1222,16 +1222,27 @@ const ITEMS = {
   /* 兵刃 */
   pan:    { name:'判官笔', slot:'weapon', grade:'凡品', price:200, icon:'笔', desc:'攻击 +8。朱笔一点，即定生死。', stat:{atk:8} },
   zhan:   { name:'斩妖剑', slot:'weapon', grade:'灵品', price:460, icon:'剑', desc:'攻击 +13，暴击率 +5%。', stat:{atk:13,crit:0.05} },
+  fuosuo: { name:'缚妖索', slot:'weapon', grade:'凡品', price:300, icon:'索', desc:'攻击 +9，命中时 12% 概率缚魂，令敌 1 回合不能行动。', stat:{atk:9}, proc:{stun:0.12} },
+  xiangmo:{ name:'降魔杵', slot:'weapon', grade:'灵品', price:560, icon:'杵', desc:'攻击 +14，暴击伤害 +25%。雷音寺淘汰下来的旧物，专敲妖魔天灵盖。', stat:{atk:14,critDmg:0.25} },
   chui:   { name:'碎岳锤', slot:'weapon', grade:'宝品', price:780, icon:'锤', desc:'攻击 +20，暴击率 +8%。一锤落下，山灵也要矮三分。', stat:{atk:20,crit:0.08} },
+  duannian:{ name:'断念妖刀', slot:'weapon', grade:'宝品', price:840, icon:'刀', desc:'攻击 +19，攻击附带 6% 吸血。刀身低语，劝人放下执念——连同性命一起。', stat:{atk:19,lifesteal:0.06} },
+  zhuxian:{ name:'诛仙剑残锋', slot:'weapon', grade:'仙品', price:1500, icon:'锋', desc:'攻击 +28，暴击率 +10%，暴击伤害 +20%。昔年诛仙阵上崩落的一截剑锋，锋刃所指，神魔辟易。（主线第四章后开售）', stat:{atk:28,crit:0.10,critDmg:0.20}, reqChapter:4 },
   /* 护身 */
   jia:    { name:'锁子黄金甲', slot:'armor', grade:'凡品', price:380, icon:'甲', desc:'防御 +10。', stat:{def:10} },
+  xuangui:{ name:'玄龟盾佩', slot:'armor', grade:'凡品', price:320, icon:'龟', desc:'防御 +8，神躯上限 +30。玄龟甲磨成的旧佩，厚实可靠。', stat:{def:8,hp:30} },
   pei:    { name:'龟息玉佩', slot:'armor', grade:'灵品', price:520, icon:'佩', desc:'神躯上限 +45。', stat:{hp:45} },
+  hanyu:  { name:'寒玉冰绡', slot:'armor', grade:'灵品', price:580, icon:'绡', desc:'神躯上限 +65，防御 +7。鲛人冰蚕丝织就，寒气护体。', stat:{hp:65,def:7} },
   yi:     { name:'八卦紫绶仙衣', slot:'armor', grade:'宝品', price:680, icon:'衣', desc:'受到的所有伤害降低 12%。', proc:{dmgReduce:0.12} },
+  longlin:{ name:'龙鳞软甲', slot:'armor', grade:'宝品', price:800, icon:'鳞', desc:'防御 +16，神躯上限 +45。东海龙宫淘汰的护身甲，鳞片还会自己呼吸。', stat:{def:16,hp:45} },
+  hechang:{ name:'鹤氅仙裳', slot:'armor', grade:'仙品', price:1400, icon:'氅', desc:'神躯上限 +90，防御 +10，受到的所有伤害降低 14%。云中鹤羽织成，行走间自带仙风。（主线第四章后开售）', stat:{hp:90,def:10}, proc:{dmgReduce:0.14}, reqChapter:4 },
   /* 奇物 */
+  tongling:{ name:'阴阳铜铃', slot:'trinket', grade:'凡品', price:260, icon:'铃', desc:'神力上限 +45。铃舌分阴阳两面，摇一摇，神清气爽。', stat:{maxMp:45} },
   chen:   { name:'太乙拂尘', slot:'trinket', grade:'凡品', price:260, icon:'尘', desc:'每场战斗开始时恢复 25% 生命。', proc:{healStart:0.25} },
   suo:    { name:'锁魂链', slot:'trinket', grade:'凡品', price:320, icon:'链', desc:'攻击命中时 18% 概率锁魂，令敌 1 回合不能行动。', proc:{stun:0.18} },
+  shihun: { name:'噬魂灯', slot:'trinket', grade:'灵品', price:540, icon:'灯', desc:'勾魂类真实伤害 +12%。灯芯里供着一只不肯投胎的老魂，见谁咬谁。', stat:{trueDmg:0.12} },
   hu:     { name:'聚魂葫芦', slot:'trinket', grade:'灵品', price:560, icon:'葫', desc:'攻击附带 8% 吸血。', stat:{lifesteal:0.08} },
   yin:    { name:'神火印', slot:'trinket', grade:'宝品', price:900, icon:'印', desc:'命中时 30% 概率以火星点燃敌人，2 回合内每回合受你攻击 30% 的灼烧伤害。', proc:{burnOnHit:0.3} },
+  kunlun: { name:'昆仑镜', slot:'trinket', grade:'仙品', price:1350, icon:'镜', desc:'神躯上限 +40；每场战斗首次濒死时，镜中仙影替你挡下致命一击并回复 30% 神躯。（主线第四章后开售）', stat:{hp:40}, proc:{firstSave:{heal:0.3}}, reqChapter:4 },
   /* 礼物（七样白名单，诸神偏好见 GODS[g].gifts；loved+18 / liked+8 / 忌讳+1 / 其余+4） */
   taomu:   { name:'桃木如意', slot:'gift', grade:'凡品', price:150, icon:'桃', desc:'老桃木雕的小如意，平实讨喜，各路神明都不至于嫌弃。' },
   wugu:    { name:'五谷福袋', slot:'gift', grade:'凡品', price:200, icon:'谷', desc:'新粟新稻缝成的福袋，盛满人间烟火气。' },

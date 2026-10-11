@@ -360,6 +360,11 @@ const UI = {
       const eb=h('button','btn btn-sm', eq?'取下':'镶嵌');
       eb.disabled=rec.sleep>0;
       eb.onclick=()=>Game.toggleEquip(id); row.appendChild(eb);
+      if(rec.awakened && g.active){
+        const sb=h('button','btn btn-indigo btn-sm','神通详情');
+        sb.title='查看神通与被动详情';
+        sb.onclick=()=>this.openSkillModal(id); row.appendChild(sb);
+      }
       if(!rec.awakened && rec.sleep<=0){
         const aw=AWAKE_RATE[g.q]||AWAKE_RATE['凡'];
         const pb=h('button','btn btn-indigo btn-sm',`参悟 · ${aw.cost}文`);
@@ -478,6 +483,44 @@ const UI = {
     c.appendChild(fp);
   },
 
+  /* ================= 神通详情（修行页 · 觉醒神格可查看主动/被动全貌） ================= */
+  openSkillModal(id){
+    const g=GODHOODS[id]; if(!g || !g.active) return;
+    const s=Game.s, rec=s.gh[id]||{};
+    const a=g.active;
+    const TYPE_NAME={nuke:'攻伐',percent:'勾魂·真伤',percentStun:'勾魂·震慑',percentHeal:'勾魂·回生',
+      nukeStun:'攻伐·震慑',nukeHeal:'攻伐·回生',control:'震控',heal:'回生',shield:'护体',
+      healShield:'回生·护体',burn:'灼烧',vuln:'点破',cleanse:'净化',buff:'增益',debuff:'削弱'};
+    /* 读招克制反查：该神通类型克制哪些敌方意图（COUNTER/INTENT_INFO 定义在 battle.js） */
+    let counterTxt='';
+    try{
+      const hits=Object.entries(COUNTER).filter(([,cv])=>cv.skill&&cv.skill.includes(a.type));
+      if(hits.length) counterTxt=hits.map(([k,cv])=>{
+        const nm=(typeof INTENT_INFO!=='undefined'&&INTENT_INFO[k])?INTENT_INFO[k].name:k;
+        return cv.dmgReduce?`克制【${nm}】（承伤减半）`:`克制【${nm}】（效果+40%）`;
+      }).join('；');
+    }catch(_){}
+    const ml=$('modalLayer'); ml.innerHTML='';
+    const ov=h('div','overlay'), box=h('div','paper m-box');
+    box.innerHTML=`
+      <h2 style="margin-bottom:6px">神通 · ${g.name}</h2>
+      <div style="font-size:12px;color:var(--ink-faint);margin-bottom:10px">${g.fusion?'融合神格':PATHS[g.path].name+'系'} · ${g.q}品${rec.sleep>0?` · 沉睡中（${rec.sleep} 日）`:''}</div>
+      <div class="gm-block">
+        <div class="gm-label">主动 · ${a.name}（${TYPE_NAME[a.type]||a.type}）</div>
+        <div style="line-height:1.9;font-size:14px">${a.desc||'—'}</div>
+        <div style="font-size:12px;color:var(--ink-soft);margin-top:4px">耗神 ${a.cost} ｜ 冷却 ${a.cd||0} 回合 ｜ 战斗「祭法宝」中催动</div>
+        ${counterTxt?`<div style="font-size:13px;color:var(--jade);margin-top:4px">◆ 读招：${counterTxt}</div>`:''}
+      </div>
+      <div class="gm-block" style="margin-top:10px">
+        <div class="gm-label">被动</div>
+        <div style="font-size:13px;color:var(--ink-soft)">${g.passive&&g.passive.labels?g.passive.labels.join('，'):'—'}</div>
+      </div>
+      <div class="section-tip" style="margin-top:10px">${s.equipped.includes(id)?'已镶嵌：被动常驻生效，主动可在战斗中催动。':'未镶嵌：请先「镶嵌」入神格盘，战斗中方可催动。'}</div>`;
+    const cb=h('button','btn btn-primary','知道了');
+    cb.onclick=()=>{ ml.innerHTML=''; };
+    box.appendChild(cb); ov.appendChild(box); ml.appendChild(ov);
+  },
+
   /* ================= 页三：神衙（营造 / 杂货铺 / 募兵 / 休整） ================= */
   renderYamen(c){
     const s=Game.s;
@@ -576,17 +619,19 @@ const UI = {
       Object.entries(ITEMS).filter(([,it])=>it.slot===slot).forEach(([id,it])=>{
         const owned=!!s.bag[id];
         const worn=s.wear[slot]===id;
+        const locked=!!(it.reqChapter && s.chapter<it.reqChapter);
         const r=h('div','shop-row item-row'+(owned?' owned':''));
         r.innerHTML=`
           ${ic(id,it.icon)}
           <div class="item-body">
             <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
-              ${worn?'<span class="tag tag-merit">佩中</span>':''}</div>
+              ${worn?'<span class="tag tag-merit">佩中</span>':''}
+              ${locked?`<span class="tag" style="color:var(--ink-faint)">第 ${it.reqChapter} 章解锁</span>`:''}</div>
             <div class="sr-d">${it.desc}</div>
           </div>
           <span class="price">${it.price} 文</span>`;
-        const b=h('button','btn btn-sm', owned?'已购入':'请购');
-        b.disabled=owned;
+        const b=h('button','btn btn-sm', owned?'已购入':(locked?'机缘未至':'请购'));
+        b.disabled=owned||locked;
         b.onclick=()=>Game.buyItem(id);
         r.appendChild(b);
         p.appendChild(r);
@@ -1112,6 +1157,8 @@ const UI = {
 
       /* 恩典增量 */
       const gifts=[];
+      if(Game._promoBounty) gifts.push(['升官赏钱',`${Game._promoBounty} 文`]);
+      if(newR.grow) gifts.push(['神躯凝实',`体魄+${newR.grow.hp} · 攻伐+${newR.grow.atk} · 护身+${newR.grow.def}`]);
       if(newR.slots>oldR.slots) gifts.push(['神格盘槽位',`${oldR.slots} → ${newR.slots}`]);
       if(newR.shelf>oldR.shelf) gifts.push(['法宝货架',`${oldR.shelf} → ${newR.shelf}`]);
       if(newR.soldiers>oldR.soldiers) gifts.push(['阴兵编制',`${oldR.soldiers} → ${newR.soldiers}`]);
@@ -1570,6 +1617,13 @@ const UI = {
     await sleep(300);
     if(res==='win'){
       this.view='mission'; this.renderTop();
+      /* 怪物掉落：妖邪身上散落的香火钱（按品阶概率） */
+      const loot=Game.dropLoot(node.enemy, node.scale||1);
+      if(loot>0){
+        Game.save();
+        this.toast(`「${node.name||ENEMIES[node.enemy].name}」身上散落香火钱 ${loot} 文，你顺手收了`);
+        this.renderTop();
+      }
       /* 战斗结束后直接进入下一节点（玩家点继续） */
       this.rt.node++;
       if(this.rt.node>=this.curNodes().length){ this.settle(); return; }
@@ -2228,7 +2282,7 @@ const UI = {
     if(typeof ASSET!=='undefined') ASSET.scan(ml);
     if(typeof FX!=='undefined') FX.scanAvatars && FX.scanAvatars(ml);
   },
-  showReview({grade,target,bonus,fine,strikes,gameOver}){
+  showReview({grade,target,bonus,fine,stipend,strikes,gameOver}){
     if(typeof Guide!=='undefined') Guide.act('review');
     const ml=$('modalLayer'); ml.innerHTML='';
     const ov=h('div','overlay'), box=h('div','paper review-card');
@@ -2254,6 +2308,7 @@ const UI = {
       <h2>考核 · ${gradeName}</h2>
       <div class="review-list">
         <div>本月功过目标：${target} 点 ｜ 实得 ${Game.s.merit} 点</div>
+        ${stipend?`<div>官身月俸照发：香火钱 <b style="color:var(--gold)">${stipend} 文</b>。</div>`:''}
         ${bonus?`<div>阎王爷朱批：<b>尚堪驱驰</b>，赏香火钱 ${bonus} 文。</div>`:''}
         ${fine?`<div>阎王爷朱批：<b>着实废物</b>，罚没香火钱 ${fine} 文，记大过一次（${strikes}/2）。</div>`:''}
         ${grade==='xia'?`<div>阎王爷朱批：<b>勉强够看</b>，无赏无罚。</div>`:''}
@@ -2589,7 +2644,7 @@ function facEff(n){
   return n.wakeBonus?`觉醒率 +${n.wakeBonus*100}%`:n.shelf?'工单架 +1':n.mana?'神力上限 +'+n.mana:n.cap?'阴兵编制 +1':'';
 }
 function itemGradeCls(g){
-  return g==='宝品'?'bao':g==='灵品'?'ling':'fan';
+  return g==='仙品'?'xian':g==='宝品'?'bao':g==='灵品'?'ling':'fan';
 }
 /** 法宝当前生效词条简表（用于战册特效一览） */
 function itemFxText(it){
@@ -2599,12 +2654,16 @@ function itemFxText(it){
   if(st.atk) a.push(`攻击+${st.atk}`);
   if(st.def) a.push(`防御+${st.def}`);
   if(st.crit) a.push(`暴击+${Math.round(st.crit*100)}%`);
+  if(st.critDmg) a.push(`暴伤+${Math.round(st.critDmg*100)}%`);
   if(st.lifesteal) a.push(`吸血${Math.round(st.lifesteal*100)}%`);
+  if(st.maxMp) a.push(`神力+${st.maxMp}`);
+  if(st.trueDmg) a.push(`真伤+${Math.round(st.trueDmg*100)}%`);
   const pr=it.proc||{};
   if(pr.stun) a.push(`命中${Math.round(pr.stun*100)}%震慑`);
   if(pr.healStart) a.push(`开战回血${Math.round(pr.healStart*100)}%`);
   if(pr.dmgReduce) a.push(`受伤-${Math.round(pr.dmgReduce*100)}%`);
   if(pr.burnOnHit) a.push(`命中${Math.round(pr.burnOnHit*100)}%点燃`);
+  if(pr.firstSave) a.push('濒死庇护一次');
   return a.join('，');
 }
 function bloss2txt(p){ return p?` <span style="color:var(--cinnabar)">感应${p}%</span>`:''; }

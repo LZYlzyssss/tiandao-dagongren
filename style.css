@@ -910,6 +910,7 @@ body::before{
 .g-fan{color:#6f7a63;border-color:#b7c0aa;background:rgba(120,140,100,.08)}
 .g-ling{color:#2e5f8e;border-color:#9fbcd6;background:rgba(46,95,142,.08)}
 .g-bao{color:#a86418;border-color:#d9a94f;background:rgba(217,169,79,.14)}
+.g-xian{color:#8e5ab8;border-color:#c9a7e8;background:rgba(142,90,184,.13)}
 
 /* 装备页三栏位 */
 .wear-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
