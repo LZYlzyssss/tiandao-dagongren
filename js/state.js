@@ -529,9 +529,11 @@ const Game = {
   promoteRank(){
     if(this.s.rank>=RANKS.length-1) return false;
     this.s.rank++;
+    const g=RANKS[this.s.rank].grow;
     Stats.recalc();
+    if(g) this.s.hp+=g.hp;   /* 神躯凝实：体魄成长同步回血 */
     if(this.s.hp>Stats.cur().maxHp) this.s.hp=Stats.cur().maxHp;
-    this.toast(`敕封：${RANKS[this.s.rank].name}！`);
+    this.toast(`敕封：${RANKS[this.s.rank].name}！${g?`神躯凝实——体魄+${g.hp}、攻伐+${g.atk}、护身+${g.def}。`:''}`);
     this.save();
     return true;
   },
@@ -605,6 +607,12 @@ const Stats = {
     v.atk+=Math.floor(s.cult/5);
     v.def+=Math.floor(s.cult/15);
     v.maxMp+=Math.floor(s.cult/4);
+
+    /* 品阶神躯成长：每升一阶永久凝实一次（按当前品阶累加，老档自动补发） */
+    for(let i=1;i<=s.rank && i<RANKS.length;i++){
+      const g=RANKS[i].grow;
+      if(g){ v.maxHp+=g.hp||0; v.atk+=g.atk||0; v.def+=g.def||0; }
+    }
 
     /* 香炉 */
     if(s.fac.incense>0) v.maxMp+=FACILITIES.incense.levels.slice(0,s.fac.incense).reduce((a,l)=>a+l.mana,0);

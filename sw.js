@@ -11,8 +11,8 @@
    2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档）
    图片桶 IMG 固定名跨版本存活：发版只清代码桶，已缓存图片不再被清——
    教训：v33 抬号删旧桶把用户已缓存图片全清了，慢网络等于每次发版全量重拉（v34 修正） */
-const VERSION='xw-v34';
-const ASSET_VER='20260921d';
+const VERSION='xw-v35';
+const ASSET_VER='20261011a';
 const RT='xw-runtime-'+VERSION;
 const IMG='xw-img';
 /* 判定"图片类"URL：本站 img/ 与 CDN 字体/引擎——进 IMG 桶；代码进 RT 桶 */

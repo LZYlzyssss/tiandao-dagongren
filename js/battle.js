@@ -91,10 +91,14 @@ const Battle = {
     const hasGuardsFirst = s.soldiers.includes('xiaojiang');
     const hasBlock = s.soldiers.includes('duwei');
 
+    /* 呼神次数：按当前工单神明好感档预置（相熟1/信重2/莫逆2/生死3；无工单神明则本场无呼神） */
+    let _aidG0=null;
+    try{ const _gm=(typeof UI!=='undefined'&&UI.mission)?UI.mission():null; _aidG0=_gm?_gm.god:null; }catch(_){}
     const B = {
       p,e, round:0, log:[], momentsUsed:0,
       finished:false, fled:false, playerDown:false,
-      aidUsed:false, aidGod:null,
+      aidLeft: _aidG0 ? (AID_CHARGES[Game.aidLevelOf(_aidG0)]||0) : 0,
+      aidGod:null, comboUsed:false, guardAidUsed:false,
     };
 
     const addLog = (html, cls)=>{
@@ -341,24 +345,40 @@ const Battle = {
       await sleep(300);
     };
 
-    /* ---------- 神明援助（好感档位缩放，每场一次） ---------- */
-    const castAid = async (gkey)=>{
+    /* ---------- 神明援助（好感档位缩放 · 呼神次数制 · 敌血≤35%可合击×1.5） ---------- */
+    const castAid = async (gkey, combo=false)=>{
       const gd=GODS[gkey], a=gd.aid;
       if(!gd) return;
       const lv=Game.aidLevelOf(gkey), factor=Game.aidFactor(gkey);
       if(lv<=0 || factor<=0){ UI.toast('交情尚浅，无法呼神'); return; }
-      B.aidUsed=true; B.aidGod=gkey;
+      if(B.aidLeft<=0){ UI.toast('神明已应过此番呼唤，本场不再降临'); return; }
+      B.aidLeft--; B.aidGod=gkey;
+      if(combo) B.comboUsed=true;
       if(UI.showAidGod) UI.showAidGod(gkey);   /* 画质批2：支援神立绘降临 */
       if(typeof SFX!=='undefined') SFX.play('aid');
       UI.flash('player','cast');
       const lvName=FAVOR_LEVELS[lv].name;
-      addLog(`危难之际，你遥唤「${gd.name}」——${lvName}降临，<b>${a.name}</b>！`,'lg-sys');
+      addLog(combo
+        ? `你与「${gd.name}」心意相通——<b>神人合击·${a.name}</b>！（威力×1.5）`
+        : `危难之际，你遥唤「${gd.name}」——${lvName}降临，<b>${a.name}</b>！`,'lg-sys');
+      if(combo) UI.flash('foe','cast');
       await sleep(250);
-      const scaleParam = (v)=> (typeof v==='number' ? v*factor : v);
+      /* 神明出手基数：不随玩家攻击走低（保底=敌人体量12%），弱者呼神亦有神威 */
+      const aidBase = Math.max(p.atk, Math.round(e.maxHp*0.12));
+      const cm = combo?1.5:1;
+      const scaleParam = (v)=> (typeof v==='number' ? v*factor*cm : v);
       const canStun = !a.stunAt || lv>=a.stunAt;
+      /* 破式：控场类神明出手打断敌方蓄力，并反震真伤 */
+      if((a.type==='control'||a.type==='percentStun'||a.type==='nukeStun') && e.charging && e.hp>0){
+        e.charging=false;
+        const ex=Math.round(e.maxHp*0.08);
+        e.hp=Math.max(0,e.hp-ex);
+        UI.floatFoe(`-${ex}`,'#7a5a8c');
+        addLog(`神威如雷，<b>打断了「${e.name}」的蓄势</b>，反震 ${ex} 点真伤！`,'lg-good');
+      }
       switch(a.type){
         case 'nuke':{
-          const dmg=Math.max(1,Math.round(p.atk*scaleParam(a.mult)*rnd(0.95,1.05)-e.def*0.45)*shellMul(false));
+          const dmg=Math.max(1,Math.round(aidBase*scaleParam(a.mult)*rnd(0.95,1.05)-e.def*0.45)*shellMul(false));
           e.hp=Math.max(0,e.hp-dmg); UI.floatFoe(`-${dmg}`,'#c03c2e');
           addLog(`${gd.name}远程压阵，造成 <b>${dmg}</b> 点伤害。`,'lg-good'); break;
         }
@@ -387,11 +407,11 @@ const Battle = {
           addLog(`圣光垂照，回复 <b>${hp}</b> 点生命并获得 <b>${sh}</b> 点护盾。`,'lg-good'); break;
         }
         case 'burn':{
-          e.burn=(a.rounds||3)+p.burnRound; e.burnDmg=Math.round(p.atk*scaleParam(a.pct||a.burnPct)*(1+p.burnDot));
+          e.burn=(a.rounds||3)+p.burnRound; e.burnDmg=Math.round(aidBase*scaleParam(a.pct||a.burnPct)*(1+p.burnDot));
           addLog(`神焰焚身，「${e.name}」被点燃（每回合 ${e.burnDmg}，${e.burn} 回合）！`,'lg-good'); break;
         }
         case 'vuln':{
-          const dmg=Math.max(1,Math.round(p.atk*scaleParam(a.mult)-e.def*0.45)*shellMul(false));
+          const dmg=Math.max(1,Math.round(aidBase*scaleParam(a.mult)-e.def*0.45)*shellMul(false));
           e.hp=Math.max(0,e.hp-dmg); e.vulnTurns=a.vuln||2;
           UI.floatFoe(`-${dmg}`,'#c9962f');
           addLog(`一道破绽被点破，造成 ${dmg} 点伤害，敌承伤+50%。`,'lg-good'); break;
@@ -436,7 +456,7 @@ const Battle = {
           if(choice.act==='burn'){ await burnGodhood(choice.id); }
           if(choice.act==='aid'){
             const m=UI.mission?UI.mission():null;
-            await castAid(m?m.god:(B.aidGod||'yan_luo'));
+            await castAid(m?m.god:(B.aidGod||'yan_luo'), !!choice.combo);
           }
           /* 凝神接战：据敌意图做守势，减伤或反制 */
           if(choice.act==='wait'){
@@ -498,6 +518,20 @@ const Battle = {
       await enemyAct();
       /* 守势减伤 */
       /* (已在 enemyAct 内按意图处理；p._guard 用于关键时刻的额外减伤) */
+      /* 神明护主：首次濒危（≤40%），工单神明自动挡下一击（好感≥相熟，每场一次） */
+      if(!B.guardAidUsed && p.hp>0 && p.hp/p.maxHp<=0.4){
+        B.guardAidUsed=true;
+        let _gk=null;
+        try{ const _gm=(typeof UI!=='undefined'&&UI.mission)?UI.mission():null; _gk=_gm?_gm.god:null; }catch(_){}
+        if(_gk && Game.aidLevelOf(_gk)>=1){
+          const sh=Math.round(p.maxHp*0.25);
+          p.shield+=sh;
+          if(UI.showAidGod) UI.showAidGod(_gk);
+          addLog(`危急关头，「${GODS[_gk].name}」一道法旨落在你身前——<b>护主</b>，护盾 +${sh}！`,'lg-sys');
+          UI.floatPlayer(`护盾+${sh}`,'#2e6f8e');
+          await sleep(300);
+        }
+      }
       if(p.hp<=0){
         /* 免死被动：首次致命伤回血 */
         const sv = p.saves.find(x=>!x.used);

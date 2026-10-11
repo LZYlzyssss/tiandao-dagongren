@@ -2409,16 +2409,19 @@ const UI = {
       this._momentResolve=resolve;
       const slot=$('momentSlot'); if(!slot){ resolve({act:'flee'}); return; }
       const m=h('div','moment');
-      /* 神明援助：好感 Lv1+（相熟），AID_POWER > 0 即可，每场一次 */
+      /* 神明援助：好感 Lv1+（相熟），呼神次数制（相熟1/信重2/莫逆2/生死之交3） */
       const gm=this.mission?this.mission():null;
       const gkey=gm?gm.god:null;
-      const canAid=gkey && !B.aidUsed && Game.aidFactor(gkey)>0;
+      const canAid=gkey && B.aidLeft>0 && Game.aidFactor(gkey)>0;
       const aidPct = gkey ? Math.round(Game.aidFactor(gkey)*100) : 0;
       const aidLvName = gkey ? FAVOR_LEVELS[Game.aidLevelOf(gkey)].name : '';
+      /* 神人合击：敌血≤35%、本场未用且尚有呼神次数（威力×1.5，同样耗 1 次） */
+      const canCombo = canAid && !B.comboUsed && B.e && B.e.hp>0 && B.e.hp/B.e.maxHp<=0.35;
       m.innerHTML=`<h3>关键时刻 · 你当如何？</h3>
         <div class="m-actions">
           <button class="btn btn-indigo" id="mCast">祭法宝（催动神格神通）</button>
-          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name} · ${aidLvName}${aidPct}%威力）</button>`:''}
+          ${canAid?`<button class="btn btn-primary" id="mAid">呼神援助（${GODS[gkey].name}·${GODS[gkey].aid.name} · ${aidLvName}${aidPct}% · 剩${B.aidLeft}次）</button>`:''}
+          ${canCombo?`<button class="btn btn-primary" id="mCombo">神人合击（${GODS[gkey].aid.name}·威力×1.5 · 耗1次）</button>`:''}
           <button class="btn" id="mBurn">拼命（透支神格，沉睡三日）</button>
           <button class="btn" id="mWait">凝神接战（见招拆招）</button>
           <button class="btn btn-ghost" id="mFlee">遁走（保命，委托失败）</button>
@@ -2445,6 +2448,7 @@ const UI = {
         gdone({act:'flee'});
       };
       if($('mAid')) $('mAid').onclick=()=>gdone({act:'aid'});
+      if($('mCombo')) $('mCombo').onclick=()=>gdone({act:'aid',combo:true});
       $('mCast').onclick=()=>{
         const sub=$('mSub'); sub.innerHTML='<div class="skill-list"></div>';
         const list=sub.firstChild;
