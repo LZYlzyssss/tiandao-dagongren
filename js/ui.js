@@ -459,35 +459,50 @@ const UI = {
     }
     c.appendChild(pp);
 
-    /* ---- 融合（按章节/配方过滤） ---- */
+    /* ---- 融合（按章节/配方过滤 · 默认收拢，点头部展开） ---- */
     const fp=h('div','panel');
     fp.innerHTML=`<h2>神格融合 <span class="sub">两枚觉醒神格合而为一</span></h2>`;
-    FUSIONS.forEach(f=>{
-      if(!Game.hasRecipe(f)) return;   /* 仅显示已解锁配方 */
-      const out=GODHOODS[f.out], ins=f.in.map(x=>GODHOODS[x].name).join(' + ');
-      const allAwake=f.in.every(x=>Game.awakened(x));
-      const anyEquipped=f.in.some(x=>s.equipped.includes(x));
-      const ready=Game.canFuse(f);
-      const bless=Math.round((s.fusionBless[f.out]||0)*100);
-      /* 材料缺口提示：未拥有的标明「去哪拿」 */
-      const missing=f.in.filter(x=>!Game.hasGh(x)).map(x=>{
-        const g=GODHOODS[x];
-        const god=Object.entries(GODS).find(([k,v])=>v.gh===x);
-        return god?`${g.name}（与${god[1].name}结交至相熟可得）`:`${g.name}（妖丹炼化偶得）`;
-      });
-      const label = missing.length ? `（缺材料：${missing.join('、')}）${ins} → ${out.name}`
-                  : !allAwake ? `（须将两枚材料神格觉醒：神龛参悟）${ins} → ${out.name}`
-                  : anyEquipped ? `（融合前请先取下两枚神格）${ins} → ${out.name}`
-                  : `融合：${ins} → ${out.name} · ${f.cost}文${bloss2txt(bless)}`;
-      const b=h('button','btn btn-sm fuse-btn',label);
-      b.disabled=!ready;
-      b.onclick=()=>Game.fuse(f);
-      fp.appendChild(b);
-    });
-    if(!FUSIONS.some(f=>Game.hasRecipe(f))){
+    const avail=FUSIONS.filter(f=>Game.hasRecipe(f));
+    const readyN=avail.filter(f=>Game.canFuse(f)).length;
+    /* 收拢头部：一行摘要 + 红点（有可融合时）+ 箭头 */
+    if(!avail.length){
       fp.appendChild(h('div','section-tip','尚未习得任何融合配方。推进主线、完成支线可获配方；商铺配方随章节解锁。'));
     }else{
-      fp.appendChild(h('div','section-tip','材料神格获取：主线支线任务直给 ｜ 与对应神明交情升档相赠（神衙送礼/接单）｜ 妖丹·凶丹入炉炼化随机出宝/仙品格。'));
+      const open=!!this.fuseOpen;
+      const head=h('button','fuse-fold-head');
+      head.type='button';
+      head.innerHTML=`<span class="ff-arrow">${open?'▾':'▸'}</span>
+        <span>已解锁配方 <b>${avail.length}/${FUSIONS.length}</b> · 可融合 <b>${readyN}</b></span>
+        ${readyN>0?'<i class="ff-dot"></i>':''}
+        <span class="ff-hint">${open?'收起':'展开'}</span>`;
+      head.onclick=()=>{ this.fuseOpen=!this.fuseOpen; this.render(); };
+      fp.appendChild(head);
+      const list=h('div','fuse-list'+(open?'':' folded'));
+      avail.forEach(f=>{
+        const out=GODHOODS[f.out], ins=f.in.map(x=>GODHOODS[x].name).join(' + ');
+        const allAwake=f.in.every(x=>Game.awakened(x));
+        const anyEquipped=f.in.some(x=>s.equipped.includes(x));
+        const ready=Game.canFuse(f);
+        const bless=Math.round((s.fusionBless[f.out]||0)*100);
+        /* 状态副行：缺材料指路 / 未觉醒 / 镶嵌中 / 就绪 */
+        const missing=f.in.filter(x=>!Game.hasGh(x)).map(x=>{
+          const g=GODHOODS[x];
+          const god=Object.entries(GODS).find(([k,v])=>v.gh===x);
+          return god?`${g.name}·与${god[1].name}升交情可得`:`${g.name}·妖丹炼化偶得`;
+        });
+        const state = missing.length ? `缺材料：${missing.join('；')}`
+                    : !allAwake ? '材料未觉醒——神龛参悟'
+                    : anyEquipped ? '融合前请先取下两枚神格'
+                    : ready ? `就绪${bless?` · 气息加成 +${bless}%`:''}` : '';
+        const b=h('button','btn btn-sm fuse-btn');
+        b.innerHTML=`<span class="fb-main">${ins} → ${out.name} <em>${f.cost}文</em></span>
+          ${state?`<span class="fb-state${ready&&!missing.length&&!anyEquipped&&allAwake?' ok':''}">${state}</span>`:''}`;
+        b.disabled=!ready;
+        b.onclick=()=>Game.fuse(f);
+        list.appendChild(b);
+      });
+      list.appendChild(h('div','section-tip','材料神格获取：主线支线任务直给 ｜ 与对应神明交情升档相赠（神衙送礼/接单）｜ 妖丹·凶丹入炉炼化随机出宝/仙品格。'));
+      fp.appendChild(list);
     }
     c.appendChild(fp);
   },

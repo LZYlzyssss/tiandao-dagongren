@@ -810,7 +810,20 @@ body::before{
 .gh-item .gh-wake{color:var(--purple)}
 .gh-item .gh-dorm{color:var(--ink-faint)}
 .gh-item fusion-badge{float:right}
-.fuse-btn{width:100%;margin-top:8px}
+/* 融合面板：收拢式模块 */
+.fuse-fold-head{display:flex;align-items:center;gap:8px;width:100%;margin-top:4px;padding:10px 12px;
+  background:rgba(60,52,40,.06);border:1px solid var(--line,#d8cfba);border-radius:8px;
+  font-size:14px;color:var(--ink,#3a332a);cursor:pointer;text-align:left}
+.fuse-fold-head:active{background:rgba(60,52,40,.12)}
+.ff-arrow{font-size:11px;color:var(--ink-faint,#a49a86);width:12px}
+.ff-hint{margin-left:auto;font-size:12px;color:var(--ink-faint,#a49a86)}
+.ff-dot{width:8px;height:8px;border-radius:50%;background:#c03c2e;flex:none}
+.fuse-list.folded{display:none}
+.fuse-btn{width:100%;margin-top:8px;display:flex;flex-direction:column;gap:2px;align-items:stretch;padding:8px 10px}
+.fuse-btn .fb-main{font-size:14px}
+.fuse-btn .fb-main em{font-style:normal;font-size:12px;color:var(--gold,#b08a3e);margin-left:4px}
+.fuse-btn .fb-state{font-size:12px;color:var(--ink-faint,#a49a86);font-weight:normal}
+.fuse-btn .fb-state.ok{color:var(--jade,#477a5a)}
 .path-战{color:#c03c2e}.path-佛{color:#c9962f}.path-天启{color:#2e6f8e}.path-幽冥{color:#7a5a8c}.path-火德{color:#d2571c}
 .dot-战{background:#c03c2e}.dot-佛{background:#c9962f}.dot-天启{background:#2e6f8e}.dot-幽冥{background:#7a5a8c}.dot-火德{background:#d2571c}
 .clash-warn{font-size:12px;color:var(--cinnabar);background:rgba(192,60,46,.08);border:1px solid var(--cinnabar);border-radius:4px;padding:5px 8px;margin-bottom:8px;line-height:1.6}
