@@ -233,6 +233,17 @@ const Battle = {
         addLog(`—— 读招克制！「${INTENT_INFO[e.intentNext]?.name||e.intent}」被你一招破去 ——`,'lg-good');
       }
 
+      /* 神通专属特效：按类型分派墨爆/震屏/暴闪（先炸开，伤害数字随出）
+         攻伐=紫墨重震  点破=金墨  灼烧=橙焰  勾魂真伤=紫黑+暴闪  雷控=青雷+暴闪  回生/护体=松绿/靛蓝 */
+      if(typeof FX!=='undefined'){
+        const _heal=/^(shield|heal|cleanse)$/.test(a.type);
+        const _c={nuke:'#7a2d8c',nukeStun:'#7a2d8c',vuln:'#c9962f',nukeHeal:'#2e6f8e',shield:'#2e6f8e',heal:'#477a5a',burn:'#d2571c',percentStun:'#6b4a8c',percentHeal:'#6b4a8c',control:'#2e6f9e',cleanse:'#477a5a'}[a.type];
+        if(_c) FX.splash(_heal?'player':'foe',_c);
+        if(/^(nukeHeal|percentHeal)$/.test(a.type)) FX.splash('player','#477a5a');
+        if(/^(nuke|nukeStun|burn|control|percentStun)$/.test(a.type)){ FX.shake(); UI.flash('foe','cast'); }
+        if(/^(nukeStun|percentStun|control)$/.test(a.type)) FX.critFlash();
+      }
+
       switch(a.type){
         case 'nuke':{
           let dmg=Math.max(1,Math.round((p.atk*a.mult*rnd(0.95,1.05)-e.def*0.45)*vulnMul*el*counter*shellMul(false)));
@@ -333,6 +344,7 @@ const Battle = {
       const g = GODHOODS[id];
       if(typeof SFX!=='undefined') SFX.play('burn');
       UI.flash('player','cast');
+      if(typeof FX!=='undefined'){ FX.shake(); FX.critFlash(); FX.splash('foe','#c03c2e'); }
       const dmg=Math.max(1,Math.round(p.atk*3.2*rnd(1.0,1.15)*shellMul(false)));
       e.hp=Math.max(0,e.hp-dmg);
       if(typeof SFX!=='undefined') SFX.play('crit');
@@ -375,6 +387,14 @@ const Battle = {
         e.hp=Math.max(0,e.hp-ex);
         UI.floatFoe(`-${ex}`,'#7a5a8c');
         addLog(`神威如雷，<b>打断了「${e.name}」的蓄势</b>，反震 ${ex} 点真伤！`,'lg-good');
+      }
+      /* 神明出手特效：立绘降临之外，按神通类型补墨爆/震屏/暴闪 */
+      if(typeof FX!=='undefined'){
+        const _c={nuke:'#c03c2e',percent:'#7a5a8c',percentStun:'#7a5a8c',percentHeal:'#7a5a8c',heal:'#477a5a',shield:'#2e6f8e',healShield:'#477a5a',burn:'#d2571c',vuln:'#c9962f',control:'#2e6f9e',cleanse:'#477a5a',buff:'#c9962f',debuff:'#6b4a8c'}[a.type];
+        if(_c) FX.splash(/^(heal|shield|healShield|cleanse|buff)$/.test(a.type)?'player':'foe',_c);
+        if(/^(heal|healShield|percentHeal)$/.test(a.type)) FX.splash('player','#477a5a');
+        if(/^(nuke|percent|percentStun|burn|control)$/.test(a.type)){ FX.shake(); UI.flash('foe','cast'); }
+        if(/^(percent|percentStun|control)$/.test(a.type)) FX.critFlash();
       }
       switch(a.type){
         case 'nuke':{
