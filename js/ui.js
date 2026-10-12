@@ -469,7 +469,14 @@ const UI = {
       const anyEquipped=f.in.some(x=>s.equipped.includes(x));
       const ready=Game.canFuse(f);
       const bless=Math.round((s.fusionBless[f.out]||0)*100);
-      const label = !allAwake ? `（两枚神格皆觉醒后方可融合）${ins} → ${out.name}`
+      /* 材料缺口提示：未拥有的标明「去哪拿」 */
+      const missing=f.in.filter(x=>!Game.hasGh(x)).map(x=>{
+        const g=GODHOODS[x];
+        const god=Object.entries(GODS).find(([k,v])=>v.gh===x);
+        return god?`${g.name}（与${god[1].name}结交至相熟可得）`:`${g.name}（妖丹炼化偶得）`;
+      });
+      const label = missing.length ? `（缺材料：${missing.join('、')}）${ins} → ${out.name}`
+                  : !allAwake ? `（须将两枚材料神格觉醒：神龛参悟）${ins} → ${out.name}`
                   : anyEquipped ? `（融合前请先取下两枚神格）${ins} → ${out.name}`
                   : `融合：${ins} → ${out.name} · ${f.cost}文${bloss2txt(bless)}`;
       const b=h('button','btn btn-sm fuse-btn',label);
@@ -479,6 +486,8 @@ const UI = {
     });
     if(!FUSIONS.some(f=>Game.hasRecipe(f))){
       fp.appendChild(h('div','section-tip','尚未习得任何融合配方。推进主线、完成支线可获配方；商铺配方随章节解锁。'));
+    }else{
+      fp.appendChild(h('div','section-tip','材料神格获取：主线支线任务直给 ｜ 与对应神明交情升档相赠（神衙送礼/接单）｜ 妖丹·凶丹入炉炼化随机出宝/仙品格。'));
     }
     c.appendChild(fp);
   },

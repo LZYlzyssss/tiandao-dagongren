@@ -201,7 +201,15 @@ const Game = {
     const oldLv=this.favorLevel(r.favor);
     r.favor=Math.max(0, Math.min(FAVOR_LEVELS[FAVOR_LEVELS.length-1].v, r.favor+n));
     const newLv=this.favorLevel(r.favor);
-    if(newLv>oldLv) this.toast(`「${GODS[g].name}」与你的交情升至【${FAVOR_LEVELS[newLv].name}】！`);
+    if(newLv>oldLv){
+      this.toast(`「${GODS[g].name}」与你的交情升至【${FAVOR_LEVELS[newLv].name}】！`);
+      /* 升档赠礼：好感每升一档，若其专属神格未曾获得，则相赠整格（融合材料的定向通路） */
+      const gid=GODS[g].gh;
+      if(gid && GODHOODS[gid] && !this.s.gh[gid]){
+        const res=this.gainGodhood(gid);
+        this.toast(`「${GODS[g].name}」感你诚意，赠下随身神格：<b>${GODHOODS[gid].name}</b>${res.awakened?'，灵光乍现当场觉醒！':'（可在神龛参悟觉醒）'}`);
+      }
+    }
     /* 非接单途径（剧情抉择/关卡/结案赏）首次结识：排入待登场队列，由 UI 在结算后补播「仙驾初临」 */
     if(first && typeof GODS!=='undefined' && GODS[g]){
       this.s.pendingDebut=this.s.pendingDebut||[];
@@ -369,8 +377,9 @@ const Game = {
 
   /* ---------------- 融合配方（材料不毁；失败只损香火钱） ---------------- */
   hasRecipe(f){
-    if(f.src==='shop') return this.s.chapter >= (f.ch||1);
-    return !!this.s.recipes[f.out];
+    /* shop/quest 一律按章节解锁可见；quest 的支线奖励（grantRecipe）可提前拿到 */
+    if(this.s.recipes[f.out]) return true;
+    return this.s.chapter >= (f.ch||1);
   },
   grantRecipe(out){ this.s.recipes[out]=true; this.save(); },
   canFuse(f){
