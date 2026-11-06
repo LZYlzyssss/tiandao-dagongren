@@ -85,7 +85,7 @@ quote:'喝吧喝吧，忘了好；记着的那些，老身替你们记着呢。'
   story:'孟婆本是孟姜女，丈夫范喜良被秦始皇征去修长城累死。孟姜女哭倒长城八百里，天帝感其痴情，让她在地府奈何桥头熬汤——喝了就忘前世。孟婆汤里有忘忧草、绝情丹和三千年的眼泪。',
 img:'Chinese ink wash painting of old Lady Meng beside a soup cart on the forgetfulness terrace, kind eyes and slow smile, sumi-e style with muted grey and tea tones, portrait',
 aid:{name:'忘尘一呷',type:'dispel',desc:'相熟驱散增益，信重回血混乱，莫逆群混乱，本体清增益群混乱并治疗解负。'},
-gifts:{loved:['wugu'],liked:['xiangzhu'],disliked:['puti']}},
+gifts:{loved:['wugu'],liked:['xiangzhu'],disliked:['puti']},set:'mengpo'},
 ri_youshen:{name:'日游神',title:'昼巡之神',icon:'日',tier:'D',camp:'地府',path:'you',unlock:{ch:2},gh:'y_riyou',
 intro:'昼行阳间巡行监察，记人小过，牌票日报察查司，绛衣皂带腰牌悬胸，鸡零狗碎皆录在册，只忠于记录本身的体制末梢。',
   sources:'《月令广义》；《集说诠真》；《西游记》（游弈灵官）',
@@ -121,7 +121,7 @@ intro:'掌罚恶司擒天下邪祟虚耗，专吃恶鬼与恶吏，刚烈粗犷�
   story:'钟馗本是穷秀才，才华横溢却奇丑无比。考状元时皇帝因他丑不录取，钟馗一怒撞柱而死。天帝封他罚恶司判官专捉鬼。他有个习惯——每天画自己的像送街坊：「贴在门上鬼就不敢进」。',
 img:'Chinese ink wash painting of Zhong Kui demon-queller with fierce ugly face in blue robe holding a sword, bold and boisterous, sumi-e style with strong ink strokes, portrait',
 aid:{name:'啖鬼一口',type:'percent',pct:0.30,desc:'相熟真伤吸血，信重群震骇，莫逆大真伤灼烧斩杀，本体群真伤对鬼处决。'},
-gifts:{loved:['hulu'],liked:['taomu'],disliked:['panta']}},
+gifts:{loved:['hulu'],liked:['taomu'],disliked:['panta']},set:'zhongkui'},
 lu_zhidao:{name:'陆之道',title:'察查判官',icon:'陆',tier:'C',camp:'地府',path:'you',unlock:{ch:3},gh:'y_lupan',
 intro:'掌察查司核查案情真伪卷宗虚实，阴间法医兼御史，貌狞心热痴气学术狂，剖开看假的真不了，验状能上阎罗殿只替证据说话。',
   sources:'清·蒲松龄《聊斋志异·陆判》',
@@ -205,7 +205,7 @@ intro:'武圣主忠义伏魔武运与江湖商贾信义，三教共尊，傲上�
   story:'关羽三国名将，死后被佛教、道教、民间同时供奉。佛教尊他伽蓝菩萨，道教尊关圣帝君，民间尊武圣。核心精神是「义」——千里走单骑护嫂嫂、华容道义释曹操。黑白两道都拜他。',
 img:'Chinese ink wash painting of Guan Yu the martial saint with red face and long beard holding the Green Dragon Crescent Blade, proud and righteous, sumi-e style with cinnabar accents, portrait',
 aid:{name:'偃月一刀',type:'nuke',mult:2.7,desc:'相熟强攻重击，信重暴击增益，莫逆群伤减速，本体核弹群震骇并处决低血。'},
-gifts:{loved:['hulu'],liked:['mozhen'],disliked:['panta']}},
+gifts:{loved:['hulu'],liked:['mozhen'],disliked:['panta']},set:'guanyu'},
 wang_lingguan:{name:'王灵官',title:'三五火车',icon:'灵',tier:'B',camp:'天庭',path:'fa',unlock:{ch:3},gh:'f_lingguan',
 intro:'道教五百灵官之首，镇天下名山山门第一进，主纠劾天上地下一切邪伪，刚正暴烈疾恶如仇，天庭纪律化身，相爷一切绕开他。',
 quote:'本王这三只眼里，神仙和妖邪，走的是同一道闸。',
@@ -1245,6 +1245,25 @@ const ITEMS = {
   hu:     { name:'聚魂葫芦', slot:'trinket', grade:'灵品', price:560, icon:'葫', desc:'攻击附带 8% 吸血。', stat:{lifesteal:0.08} },
   yin:    { name:'神火印', slot:'trinket', grade:'宝品', price:900, icon:'印', desc:'命中时 30% 概率以火星点燃敌人，2 回合内每回合受你攻击 30% 的灼烧伤害。', proc:{burnOnHit:0.3} },
   kunlun: { name:'昆仑镜', slot:'trinket', grade:'仙品', price:1350, icon:'镜', desc:'神躯上限 +40；每场战斗首次濒死时，镜中仙影替你挡下致命一击并回复 30% 神躯。（主线第四章后开售）', stat:{hp:40}, proc:{firstSave:{heal:0.3}}, reqChapter:4 },
+  /* 神明专属套装（非卖品：两件走剧情工单、一件走好感升档相赠；集齐两/三件触发套装特效） */
+  gy_dao: { name:'青龙偃月', slot:'weapon', grade:'宝品', price:0, icon:'偃', set:'guanyu', noShop:true, noSell:true,
+    desc:'攻击 +20，暴击率 +6%。关帝祠失窃的佩刀模型，刀背錾着一行小字：刀是义气打出来的，钱买不走。' , stat:{atk:20,crit:0.06} },
+  gy_pao: { name:'绿锦战袍', slot:'armor', grade:'宝品', price:0, icon:'袍', set:'guanyu', noShop:true, noSell:true,
+    desc:'防御 +14，神躯上限 +50。旧年某位将军赠庙的锦袍拆改而成，针脚里还留着一句「替我看着人间」。', stat:{def:14,hp:50} },
+  gy_yin: { name:'汉寿亭侯印', slot:'trinket', grade:'宝品', price:0, icon:'印', set:'guanyu', noShop:true, noSell:true,
+    desc:'暴击率 +5%，暴击伤害 +15%。印是死的，义是活的——佩它的人，得配得上这两个字。', stat:{crit:0.05,critDmg:0.15} },
+  mp_shao:{ name:'忘川汤杓', slot:'weapon', grade:'灵品', price:0, icon:'杓', set:'mengpo', noShop:true, noSell:true,
+    desc:'攻击 +13，神力上限 +25。孟婆舀了三千年汤的老杓，柄上包浆比奈何桥的石栏还滑。', stat:{atk:13,maxMp:25} },
+  mp_sha: { name:'雾縠汤衣', slot:'armor', grade:'灵品', price:0, icon:'纱', set:'mengpo', noShop:true, noSell:true,
+    desc:'神躯上限 +60，防御 +6。驱忘台上的雾气织的，穿上它，别人的闲话记不住，恩情忘不了。', stat:{hp:60,def:6} },
+  mp_ling:{ name:'奈桥铃', slot:'trinket', grade:'灵品', price:0, icon:'铃', set:'mengpo', noShop:true, noSell:true,
+    desc:'神力上限 +30；每场战斗开始时恢复 20% 生命。桥头挂了三千年的引魂铃，摇一摇，魂就认得回家的路。', stat:{maxMp:30}, proc:{healStart:0.20} },
+  zk_jian:{ name:'罚恶剑', slot:'weapon', grade:'宝品', price:0, icon:'罚', set:'zhongkui', noShop:true, noSell:true,
+    desc:'攻击 +19，攻击附带 6% 吸血。剑格上刻着半行咬痕——钟判官着急的时候，是真用牙开路的。', stat:{atk:19,lifesteal:0.06} },
+  zk_mao:{ name:'罚恶袍', slot:'armor', grade:'灵品', price:0, icon:'皂', set:'zhongkui', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +40。罚恶司的皂色官袍改的，袖口还沾着洗不掉的鬼油——钟馗说那是勋章。', stat:{def:12,hp:40} },
+  zk_deng:{ name:'噬鬼灯', slot:'trinket', grade:'灵品', price:0, icon:'灯', set:'zhongkui', noShop:true, noSell:true,
+    desc:'攻击 +6，暴击率 +4%。灯罩里那只老魂打了三千年的饱嗝，见着恶鬼，比你还先亮。', stat:{atk:6,crit:0.04} },
   /* 礼物（七样白名单，诸神偏好见 GODS[g].gifts；loved+18 / liked+8 / 忌讳+1 / 其余+4） */
   taomu:   { name:'桃木如意', slot:'gift', grade:'凡品', price:150, icon:'桃', desc:'老桃木雕的小如意，平实讨喜，各路神明都不至于嫌弃。' },
   wugu:    { name:'五谷福袋', slot:'gift', grade:'凡品', price:200, icon:'谷', desc:'新粟新稻缝成的福袋，盛满人间烟火气。' },
@@ -1252,7 +1271,20 @@ const ITEMS = {
   mozhen:  { name:'徽墨「铁斋」', slot:'gift', grade:'灵品', price:300, icon:'墨', desc:'一两徽墨一两银。判官们案头最缺的就是这个。' },
   panta:   { name:'蟠桃（次品）', slot:'gift', grade:'灵品', price:320, icon:'果', desc:'瑶池挑剩的次品，但猴子才不管品相。' },
   hulu:    { name:'杏仁酒葫芦', slot:'gift', grade:'灵品', price:340, icon:'酒', desc:'装着杏花酿的小葫芦，严肃的神明多半摇头，爱酒的神仙两眼放光。' },
-  puti:    { name:'金菩提', slot:'gift', grade:'宝品', price:600, icon:'菩', desc:'菩提树顶摘的金果，佛门至宝。' },
+  puti:   { name:'金菩提', slot:'gift', grade:'宝品', price:600, icon:'菩', desc:'菩提树顶摘的金果，佛门至宝。' },
+};
+
+/* ================= 神明套装特效（≥2件两档 / 3件三档；stat/proc 在 Stats.recalc 结算，hook 在战斗引擎结算） ================= */
+const SET_BONUS = {
+  guanyu: { name:'武圣行头', god:'guan_yu', quest:'s35', gift:'gy_yin',
+    two: { label:'温酒', desc:'两件套「温酒」：暴击伤害 +30%', stat:{critDmg:0.30} },
+    three:{ label:'拖刀计', desc:'三件套「拖刀计」：暴击后 40% 概率追加一记 60% 攻击的追斩', hook:'guanyuCritFollow' } },
+  mengpo: { name:'忘川三味', god:'meng_po', quest:'s36', gift:'mp_ling',
+    two: { label:'忘忧', desc:'两件套「忘忧」：神力上限 +50，神通神力消耗 −10%', stat:{maxMp:50}, proc:{mpCost:0.90} },
+    three:{ label:'回魂', desc:'三件套「回魂」：每回合开始时回复 10% 神力', hook:'mengpoMpRegen' } },
+  zhongkui:{ name:'啖鬼行头', god:'zhong_kui', quest:'s37', gift:'zk_deng',
+    two: { label:'辨鬼', desc:'两件套「辨鬼」：对鬼类敌人攻击 +15%', hook:'zkGui15' },
+    three:{ label:'啖鬼', desc:'三件套「啖鬼」：对鬼类敌人攻击 +30%（覆盖两件套）', hook:'zkGui30' } },
 };
 
 /* ================= 阴兵 ================= */
@@ -2589,6 +2621,86 @@ const MISSIONS = [
     {t:'请村妇们按下手印，联名陈情求留一池',r:{favor:{he_xiangu:8},flags:{flag_know_truth:1,flag_stance:1},log:'几百个红手印按在状纸上，最上头那个手印旁，还歪歪扭扭印了个小脚丫。天曹的水车，破天荒停了半日。'}},
     {t:'收下「迁池补偿款」，签字让池改田',r:{money:120,erode:6,flags:{flag_ruthless:1},favor:{he_xiangu:-12},log:'仙姑没有争辩，只把最后一片干荷瓣收进袖中。从那以后，那一带妇人生产时，再也没人梦见过荷花。'}}
    ]}
+ ]},
+
+{id:'s35',name:'武圣祠·香火断供案',god:'guan_yu',chapter:4,side:'s35',danger:4,money:120,merit:28,
+ scroll:'城南老关帝祠香火断供三月，隔壁「新武圣祈福中心」日进斗金。关平托梦：祠里那口刀，夜里在哭。',
+ reward:{items:['gy_dao','gy_pao']},
+ nodes:[
+  {type:'event',text:'城南老关帝祠的门槛被磨得发亮，如今却结了蛛网。神案上那柄供了百年的青龙偃月木样，刀身裂了一道细缝。夜风穿堂，你听见极轻的一声——像刀在叹气。一位赤面长髯的身影立在殿角阴影里，声如闷雷：某家祠堂穷，养不起刀了。隔壁那座金碧辉煌的「新武圣祈福中心」，某去看看是谁在替某家收香火。',
+   choices:[
+    {t:'问关帝：香火断供，为何不显圣自证',r:{flags:{flag_know_truth:1},log:'关羽冷笑：显圣？若显灵能断案，要你这道外包的差做什么。某家只管义不义——敛财的账，归你们阴司管。'}},
+    {t:'先去「新武圣祈福中心」踩点',r:{log:'隔着三条街就望见鎏金大牌楼，香客排到巷口。门口横幅：开光武圣刀坠，限量九百九十九柄，扫码开光。'}},
+    {t:'问他：办这案，有什么好处',r:{money:0,flags:{flag_ruthless:1},log:'关羽丹凤眼微睁，看你的眼神像看一根没长直的枪杆：好处。你若也讲这个，这案让某自己来——顺便把你也办了。'}}
+   ]},
+  {type:'quiz',who:'关羽',text:'关羽横刀立在祠门前，月色把他的影子拉成一道刀痕：「替某家办事，先得懂某家的规矩。义字怎么写，答上来再进门。」',
+   qs:[
+    {q:'「某家这口『汉寿亭侯』的印，」他以刀背轻叩神案，「你可知道，是谁给某封的侯？」',
+     opts:['曹操表奏汉献帝所封——白马阵前斩颜良、解白马之围的军功侯','汉献帝私下笼络所封','刘备自立汉中王后追封','孙权为修好荆州所赠'],a:0,
+     why:'《三国志·蜀书·关羽传》：建安五年，关羽策马刺颜良于万众之中，解白马之围，曹操表封其为汉寿亭侯。军功是真的，俸禄某收了——人，某是要走的。'},
+    {q:'「金某收了，印某挂了。」刀背又是一叩，「某挂印封金之后，走的是哪条路？」',
+     opts:['挂汉寿亭侯印于堂梁，封曹操所赠金银于库，护二位嫂嫂千里寻兄，过五关斩六将','带着金银连夜投奔东吴','留在曹营官拜先锋，官渡立功后再归刘备','假意南下，实则屯兵荆州'],a:0,
+     why:'《三国演义》第二十六、二十七回：关羽封金挂印、留书辞曹，千里走单骑护嫂寻兄，过五关斩六将。「义」字，就是这么一步一步走成神位的。'}
+   ],
+   pass:{shield:0.25,enemyVuln:true,merit:8,favor:{guan_yu:5},log:'关羽抚髯，殿角那柄木刀的裂缝竟合拢了半分：讲义的人，某家的刀认得。去罢——那伙假武圣，某随你身后。'}},
+  {type:'battle',enemy:'chizhengxuhao',name:'假圣香会执事',scale:1.1},
+  {type:'event',text:'「新武圣祈福中心」的鎏金牌楼塌了半边。假执事的「开光刀坠」滚了一地——全是锡皮灌铅。关羽的刀尖挑着那面「武圣授权」的锦旗，回头看你，等你收尾。',
+   choices:[
+    {t:'把锡坠充公、账册封存，香火七成还愿老祠',r:{favor:{guan_yu:15},merit:10,flags:{flag_refuse_count:1},log:'关羽难得笑了一声，把青龙偃月木样从神案上取下，连同案头那件旧锦袍一并推给你：祠穷，刀不能穷。这两件替某家带着——替某家看着人间。'}},
+    {t:'只拆牌楼不追账，给香会小卒留条活路',r:{favor:{guan_yu:8},flags:{flag_mercy_cut:1},log:'关羽收刀入鞘：冤有头。那几个扫地的杂役确实不知情——你比某家年轻时，多三分饶人的雅量。锦袍你还是得收下，刀也是。'}},
+    {t:'悄悄收下香会孝敬的一箱「香火分成」',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{guan_yu:-15},log:'箱盖合上的瞬间，你听见身后一声刀鸣，冷得像二月的河水。关羽没有回头，只留下一句话：义字倒着写，也认得出来。'}}
+   ]}
+ ]},
+
+{id:'s36',name:'忘川·渡资滞纳案',god:'meng_po',chapter:4,side:'s36',danger:3,money:100,merit:24,
+ scroll:'奈何桥头渡资凭空涨了三倍，穷魂攒不齐钱，桥头积压万人。孟婆搅着汤锅轻声说：涨价的令牌，是老身看着长大的一个孩子递出去的。',
+ reward:{items:['mp_shao','mp_sha']},
+ nodes:[
+  {type:'event',text:'奈何桥头，长队从桥这头排到望乡台。汤锅腾起的雾气里，孟婆慢慢搅着勺，火光映着她眉间的皱纹：以前渡资三文，如今九文，还是「活动价」。递牌子收钱的那位，生前是老身看着长大的娃——如今官袍加身，管着「忘川渡务提举司」。老身这双手，熬汤行，掰手腕，不行了。',
+   choices:[
+    {t:'问她：渡资涨了，钱进了谁的口袋',r:{flags:{flag_know_truth:1},log:'孟婆舀起一勺汤又缓缓倒回：三文入公账，六文入私囊。桥头那杆秤，早就不称魂，只称钱了。'}},
+    {t:'先替排队的穷魂垫一轮渡资',r:{money:-30,flags:{flag_mercy_cut:1},favor:{meng_po:6},log:'三十文换九个魂过了桥。第九个回头看你，还没喝汤，先把你的名字记住了——孟婆说，这就是她送你的利钱。'}},
+    {t:'劝她：明哲保身，少管闲事',r:{erode:3,log:'孟婆搅汤的手没停：老身熬了三千年，把「记着」熬成了「忘了」。就这一桩，老身忘不掉。'}}
+   ]},
+  {type:'game',game:'lights',difficulty:2,
+   text:'渡务司在桥面布了「引魂灯阵」：九盏渡灯被差役拨乱大半，灯灭处魂不认路，长队便永远排不到汤锅。孟婆把汤杓往你手里一塞：踏亮一盏，相邻四盏明暗齐翻——九灯尽明，魂自己认得桥；灯阵不开，你连提举司的门都摸不着。',
+   pass:{enemyVuln:true,merit:6,favor:{meng_po:5},log:'九盏渡灯次第亮起，长队缓缓向前挪动。守灯差丁摸黑扑来——却一头撞进灯影里，魂看得见他，他看不见魂。'}},
+  {type:'battle',enemy:'zhengshuichaiding',name:'囤渡资鬼吏',scale:1.0},
+  {type:'event',text:'鬼吏被按在桥板上，怀里滚出一摞「渡资滞纳金催缴单」——落款盖着提举司大印。孟婆拖着老步子走近，汤勺在手里转了半圈，像一柄提了三千年的刀。她看看你，又看看那个她看着长大的孩子。',
+   choices:[
+    {t:'依律办：私囊六文一体追缴，牌子缴销',r:{favor:{meng_po:15},merit:8,flags:{flag_refuse_count:1},log:'孟婆把汤勺轻轻搁回锅沿，解下腰间那柄用了三千年的老杓，又从雾里抽出一件雾縠织的衣：账清了，心就轻了。这两件老身用惯的家什，你带着——汤凉了记得热，人凉了记得捞。'}},
+    {t:'只追公账三文，私账当众烧了，留他一条改过的路',r:{favor:{meng_po:10},flags:{flag_mercy_cut:1},log:'催缴单在桥头烧成一蓬纸灰，混进汤锅的雾气。孟婆长长叹了口气，像卸下三千年里最重的一勺：老身替桥头十万个魂，谢你这一烧。家什你还是拿着——念想，得有人替老身带下去。'}},
+    {t:'收下鬼吏塞的「渡务干股」，催缴单烧个干净',r:{money:130,erode:7,flags:{flag_ruthless:1},favor:{meng_po:-12},log:'纸灰飘进汤锅的那一刻，整锅汤泛起一层浑浊的油花。孟婆盯着那层油花看了很久，缓缓把汤杓收了回去：这锅汤，今天不舀了。'}}
+   ]}
+ ]},
+
+{id:'s37',name:'罚恶司·空饷鬼吏案',god:'zhong_kui',chapter:4,side:'s37',danger:4,money:120,merit:28,
+ scroll:'罚恶司「捉鬼业绩册」月月满额，人间恶鬼却越捉越多。钟馗嚼着一根鬼骨：册上三百个鬼差，俺点了名——二百七十个是空的。',
+ reward:{items:['zk_jian','zk_mao']},
+ nodes:[
+  {type:'event',text:'罚恶司大堂，业绩册堆得比房梁高，页页「满额」「嘉奖」「先进司局」。钟馗一屁股坐在案上，把一册摔到你脚边：你自己看。三百个在编鬼差，俸禄月月领足；俺昨夜吹灯点名，到的只有三十个——剩下二百七十个名字底下，连个鬼影都没有。空饷吃到俺罚恶司头上来了，俺这口牙，都气痒了。',
+   choices:[
+    {t:'问他：空饷的名额，钱流去了哪里',r:{flags:{flag_know_truth:1},log:'钟馗咬碎那根鬼骨：每个空名额月俸四十文，二百七十个名额，一年十三万文——够俺给终南山老家的娃们，修十座桥。'}},
+    {t:'翻册验对：空名额的笔迹出自谁手',r:{log:'三百个名字，二百七十个的墨色一模一样——同一支笔、同一夜写就。落笔的那只手，连装都懒得装。'}},
+    {t:'劝他：空饷是衙门积弊，睁只眼闭只眼',r:{erode:4,log:'钟馗眼一瞪，环眼圆睁如两口铜钟：俺生前撞柱，撞的就是这个「睁只眼闭只眼」。你要劝俺这个，趁早走，别脏了俺的门槛。'}}
+   ]},
+  {type:'quiz',who:'钟馗',text:'钟馗从案上跳下来，鬼骨往掌心一敲：「跟俺办案，先考你两问。俺的事你知道得越真，俺心里越踏实——鬼容易认，人难认，你先让俺认认你。」',
+   qs:[
+    {q:'「后人说俺『钟馗嫁妹』。」他咧嘴一笑，难得有些腼腆，「你可知道，俺嫁的是谁？」',
+     opts:['生前以小妹许配同乡好友杜平；俺死后为践前诺，率鬼众连夜还乡，风风光光把妹妹嫁给了他','阎罗之女下嫁罚恶司','俺闺女嫁给了判官崔珏','玉帝赐婚，嫁与二郎神'],a:0,
+     why:'民间「钟馗嫁妹」传说：书生杜平昔年助葬含冤触阶而死的钟馗（一说掩其遗骨）。钟馗感其恩，践生前婚约，率小鬼笙箫灯烛、连夜还乡送妹完婚——鬼嫁妹，嫁的是一个「信」字。'},
+    {q:'「画像上的俺，前头总有个小东西开路。」他用鬼骨点了点自己的画像，「是什么？」',
+     opts:['一只蝙蝠——专嗅鬼气所在，「蝠」谐「福」，名为先行官','一只白泽——通万物之情','黑无常的锁链','一盏引魂幡'],a:0,
+     why:'传统钟馗画中，前方常绘蝙蝠引路：蝠替钟馗嗅出藏鬼之处，「蝠」又谐「福」——福到之前，鬼先现形。俺的先行官，翅膀比官印好使。'}
+   ],
+   pass:{shield:0.25,enemyVuln:true,merit:8,favor:{zhong_kui:5},log:'钟馗仰头大笑，笑声震得房梁上的业绩册簌簌落灰：中！这两问答得地道，俺这案子，你就不是外人。走——陪俺去会会那支一夜写出二百七十个名字的笔。'}},
+  {type:'battle',enemy:'renzhengkeli',name:'空饷鬼吏',scale:0.95},
+  {type:'event',text:'空饷鬼吏瘫坐在账册堆里，怀里还死死抱着那枚「业绩审核司」的铜印。钟馗的剑尖抵着他的官帽，回头看你——这案子怎么收尾，他让你说。',
+   choices:[
+    {t:'空饷全数追缴，名录直报酆都，一查到底',r:{favor:{zhong_kui:15},merit:10,flags:{flag_refuse_count:1},log:'钟馗把剑往地上一杵，从腰后解下佩剑、又扯下自己那件皂色官袍，一并拍在你怀里：痛快！这两件俺用惯的家伙什给你——剑替俺多斩几个恶的，袍替俺多挡几阵阴的。查到底这三个字，俺记下了。'}},
+    {t:'追缴空饷，但给三十个真当差的鬼差补足欠俸',r:{favor:{zhong_kui:10},flags:{flag_mercy_cut:1},log:'钟馗盯着你看了半晌，忽然咧嘴：查恶还惦记着善的——中，比俺年轻时想得周全。剑和袍你拿着。俺去给那三十个真干活的，一人补一碗热汤。'}},
+    {t:'收下鬼吏的「封口香火」，名录就地烧了',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{zhong_kui:-15},log:'火光映在钟馗脸上，那双环眼里第一次没有怒，只有冷：俺吃鬼三千，今日算开了眼——鬼里头，还数你最像人。他收剑入鞘，转身走进了罚恶司的浓雾里。'}}
+   ]}
  ]}
 
 ];
@@ -2813,7 +2925,19 @@ s33:[
 s34:[
 '何仙姑是八仙里唯一的女仙，零陵姑娘，十三岁溪边遇仙食桃得道，从此手持荷花行世，主清净疗愈，专司女子采桑纺织、生产病痛之愿。她的荷花池在零陵山坳里，池水是一脉活泉，多少难产的妇人靠半盏荷露母子平安。',
 '这年天曹一纸《人间水域统一调配》，水车架进荷塘，日夜不停把活水抽往云深处——说是瑶池设宴，要补三日「景观水」。半池枯了，粉荷卷边，池边求子求药的妇人排的队却更长了。',
-'仙姑不与人争，也不与官争。她只把一片荷瓣放进你掌心，软声软气：硬堵水车要惊胎气。水的事，咱们软着来。']
+'仙姑不与人争，也不与官争。她只把一片荷瓣放进你掌心，软声软气：硬堵水车要惊胎气。水的事，咱们软着来。'],
+s35:[
+'关帝祠在城南立了一百四十年。求义的、求财的、拜把子的，门槛磨得发亮。祠祝说，夜里有刀鸣，声不大，但一夜一夜，没停过。',
+'祠穷了三个月。香火钱断供，祠祝跑光，只剩神案上那柄青龙偃月的木样和一件旧锦袍，还守着满殿蛛网。而三条街外，新开的「武圣祈福中心」金碧辉煌，香客排到巷口——扫码开光，童叟无欺。',
+'夜风穿堂，你在殿角看见一道赤面长髯的影子。他没有看你，只看着神案上的刀：某家的刀，替人间斩了一百四十年的邪。如今斩不动一张收款码。'],
+s36:[
+'奈何桥这头到望乡台，长队排出去十里。以前渡资三文，童叟无欺；如今涨到九文，还分「普通魂」「加急魂」「VIP魂」三档——收钱的牌子，盖着新成立的「忘川渡务提举司」大印。',
+'孟婆在桥头熬了三千年的汤。她记得每一个过桥的魂：哪个亏欠过谁，哪个惦记着谁，全在她那口锅里。她说递牌子的那位鬼吏，生前是她看着长大的娃，穷魂出身，饿死在灾年。',
+'如今那娃官袍加身，穷魂的渡资，是他涨的。孟婆搅着汤，火光照着皱纹：老身这双手，熬汤行。掰手腕——不行了。'],
+s37:[
+'罚恶司的业绩册，一年比一年厚：页页「满额」，月月「先进」，墙上的锦旗多到没地方挂。可人间恶鬼越捉越多，钟馗的剑，一年比一年钝。',
+'钟馗昨夜吹灯点名：三百个在编鬼差，应到的只有三十个。剩下二百七十个名字，俸禄月月领足，名字底下一个鬼影都没有——空饷，吃到了罚恶司自己头上。',
+'他一屁股坐在案上，把业绩册摔到你脚边：俺生前撞柱，撞的是不公。俺死后吃鬼，吃的是邪恶。可这册子上的二百七十个名字——俺的牙，都不知道先啃哪个。']
 
 };
 

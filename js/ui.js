@@ -644,6 +644,26 @@ const UI = {
         const owned=!!s.bag[id];
         const worn=s.wear[slot]===id;
         const locked=!!(it.reqChapter && s.chapter<it.reqChapter);
+        /* 神明套装：非卖品，展示获取途径 */
+        if(it.noShop){
+          const sb=SET_BONUS[it.set];
+          const r=h('div','shop-row item-row'+(owned?' owned':''));
+          r.innerHTML=`
+            ${ic(id,it.icon)}
+            <div class="item-body">
+              <div class="sr-t">${it.name} <span class="grade g-${itemGradeCls(it.grade)}">${it.grade}</span>
+                ${sb?`<span class="tag tag-merit">神明套装·${sb.name}</span>`:''}
+                ${worn?'<span class="tag tag-merit">佩中</span>':''}
+                ${owned?'':'<span class="tag" style="color:var(--ink-faint)">支线剧情 / 交情升档获取</span>'}</div>
+              <div class="sr-d">${it.desc}</div>
+            </div>
+            <span class="price" style="color:var(--ink-faint)">非卖品</span>`;
+          const b=h('button','btn btn-sm', owned?'已拥有':'机缘之物');
+          b.disabled=true;
+          r.appendChild(b);
+          p.appendChild(r);
+          return;
+        }
         const r=h('div','shop-row item-row'+(owned?' owned':''));
         r.innerHTML=`
           ${ic(id,it.icon)}
@@ -666,7 +686,7 @@ const UI = {
     /* ---- 旧货回收（只列背包中未穿戴的闲置法宝） ---- */
     const rp=h('div','panel');
     rp.innerHTML=`<h2>旧货回收 <span class="sub">半价收旧，概不赎回</span></h2>`;
-    const spare=Object.keys(s.bag).filter(id=>s.wear[ITEMS[id].slot]!==id);
+    const spare=Object.keys(s.bag).filter(id=>ITEMS[id] && !ITEMS[id].noSell && s.wear[ITEMS[id].slot]!==id);
     if(!spare.length){
       rp.appendChild(h('div','shelf-empty','老道在铺子里打着哈欠——你行囊里没有闲置法宝。<br>佩中的法宝须先到「装备」页取下，才能出手。'));
     }else{
@@ -726,6 +746,35 @@ const UI = {
     });
     wp.appendChild(slots);
     c.appendChild(wp);
+
+    /* ---- 神明套装（集齐两件/三件触发套装特效） ---- */
+    const sp=h('div','panel');
+    sp.innerHTML=`<h2>神明套装 <span class="sub">两件成特效，三件臻化境</span></h2>`;
+    const stC=Stats.cur();
+    Object.entries(SET_BONUS).forEach(([sid,sb])=>{
+      const ids=['weapon','armor','trinket'].map(sl=>Object.keys(ITEMS).find(id=>ITEMS[id].set===sid&&ITEMS[id].slot===sl)).filter(Boolean);
+      const n=(stC.sets&&stC.sets[sid])||0;
+      const q=MISSIONS.find(m=>m.id===sb.quest);
+      const pieces=ids.map(id=>{
+        const it=ITEMS[id];
+        const own=!!s.bag[id], wear=s.wear[it.slot]===id;
+        const style=wear?'border-color:var(--cinnabar);color:var(--cinnabar)':(own?'':'color:var(--ink-faint)');
+        return `<span class="tag" style="margin:2px 4px;${style}">${it.name}${wear?'·佩中':(own?'·在囊':'·未得')}</span>`;
+      }).join('');
+      const row=h('div','shop-row item-row');
+      row.innerHTML=`
+        <div class="item-body">
+          <div class="sr-t">${GODS[sb.god].name}·${sb.name} <span class="tag tag-merit" style="margin-left:4px">集齐 ${n}/3</span></div>
+          <div style="margin:4px 0">${pieces}</div>
+          <div class="sr-d">
+            <span style="${n>=2?'':'color:var(--ink-faint)'}">${sb.two.desc}${n>=2?'（生效中）':''}</span><br>
+            <span style="${n>=3?'':'color:var(--ink-faint)'}">${sb.three.desc}${n>=3?'（生效中）':''}</span>
+          </div>
+          ${q?`<div class="sr-d" style="color:var(--ink-faint)">获取：支线「${q.name}」两件 · 与${GODS[sb.god].name}交情升档赠「${ITEMS[sb.gift].name}」</div>`:''}
+        </div>`;
+      sp.appendChild(row);
+    });
+    c.appendChild(sp);
 
     /* 背包（未穿戴；礼物不出现在行囊，送礼走神明档案） */
     const bp=h('div','panel');
@@ -1756,6 +1805,7 @@ const UI = {
     if(out.shards && out.shards.length) out.shards.forEach(([p,n])=>{ rwdHtml+=`<br>碎末 <b>${PATHS[p].name}系 +${n}</b>`; });
     if(out.dshards && out.dshards.length) out.dshards.forEach(([g,n])=>{ rwdHtml+=`<br>同名碎片 <b>${GODS[g].name} +${n}</b>`; });
     if(out.pill) rwdHtml+=`<br>妖丹 <b>${PILLS[out.pill].name}</b>`;
+    if(out.items&&out.items.length) out.items.forEach(id=>{ rwdHtml+=`<br>套装件 <b>${ITEMS[id].name}</b>（${SET_BONUS[ITEMS[id].set]?SET_BONUS[ITEMS[id].set].name:''}）`; });
     wrap.innerHTML=`<h3>${m.long?'长单完结 · 回衙复命':'差使办妥 · 回衙复命'}</h3>
       <div style="width:80px;height:80px;margin:6px auto 4px">${godAvatar(m.god,80)}</div>
       <div style="font-size:13px;color:var(--ink-faint);margin-bottom:6px">${GODS[m.god].name} 一揖到地</div>
@@ -2223,6 +2273,28 @@ const UI = {
   },
 
   /* ================= 神明档案（好感 / 送礼） ================= */
+  /* 神明档案 · 专属套装块（有套装的神显示；三件状态 + 特效 + 获取途径） */
+  setBlockHtml(g){
+    const s=Game.s, gd=GODS[g];
+    const sb=gd.set && SET_BONUS[gd.set];
+    if(!sb) return '';
+    const ids=['weapon','armor','trinket'].map(sl=>Object.keys(ITEMS).find(id=>ITEMS[id].set===gd.set&&ITEMS[id].slot===sl)).filter(Boolean);
+    const q=MISSIONS.find(m=>m.id===sb.quest);
+    const pieces=ids.map(id=>{
+      const it=ITEMS[id], own=!!s.bag[id], wear=s.wear[it.slot]===id;
+      const style=wear?'border-color:var(--cinnabar);color:var(--cinnabar)':(own?'':'color:var(--ink-faint)');
+      const tag=wear?'·佩中':(own?'·在囊':(id===sb.gift?'·交情升档赠':'·支线剧情'));
+      return `<span class="tag" style="margin:2px 4px;${style}">${it.name}${tag}</span>`;
+    }).join('');
+    const n=((Stats.cur().sets)||{})[gd.set]||0;
+    return `<div class="gm-block" style="margin-top:8px">
+      <div class="gm-label">专属套装 · ${sb.name}（集齐 ${ids.filter(id=>s.bag[id]).length}/3）</div>
+      <div style="margin:4px 0">${pieces}</div>
+      <div style="font-size:12px;color:var(--ink-faint)">${sb.two.desc} ｜ ${sb.three.desc}${n?`（已佩 ${n} 件）`:''}</div>
+      ${q?`<div style="font-size:12px;color:var(--ink-faint);margin-top:2px">两件走支线「${q.name}」，一件随交情升档相赠</div>`:''}
+    </div>`;
+  },
+
   openGodModal(g){
     const gd=GODS[g]; if(!gd) return;
     const s=Game.s, rel=s.godsRel[g]||{met:0,favor:0};
@@ -2279,6 +2351,7 @@ const UI = {
            </div>
            ${aidOk?`<div class="aid-hint">◆ 援助档位【${FAVOR_LEVELS[aidLv].name}】· 威力 ${aidPct}%：战斗关键时刻可呼叫「<b>${gd.aid.name}</b>」——${gd.aid.desc}</div>`
                   :`<div class="aid-hint" style="color:var(--ink-faint)">◆ 交情至「相熟」（好感 20），战斗关键时刻可呼叫其援助（五档：神念25%/分身45%/完整75%/本体100%）</div>`}
+           ${this.setBlockHtml(g)}
            <div class="gm-gifts"><b>行囊中的礼物</b>${giftToday?'<span style="color:var(--ink-faint);font-size:12px"> · 今日已送过，明日再来</span>':''}</div>
            <div class="gift-list"></div>
            ${gifts.length?'':'<div class="section-tip">行囊中没有礼物。去「商铺 · 礼单」购些心意。</div>'}`

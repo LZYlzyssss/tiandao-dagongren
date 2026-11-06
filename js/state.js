@@ -209,6 +209,12 @@ const Game = {
         const res=this.gainGodhood(gid);
         this.toast(`「${GODS[g].name}」感你诚意，赠下随身神格：<b>${GODHOODS[gid].name}</b>${res.awakened?'，灵光乍现当场觉醒！':'（可在神龛参悟觉醒）'}`);
       }
+      /* 升档赠套装：若有专属套装且赠件（饰品）未拥有，则一并相赠（bag 去重，天然只赠一次） */
+      const sb=GODS[g].set && SET_BONUS[GODS[g].set];
+      if(sb && sb.gift && ITEMS[sb.gift] && !this.s.bag[sb.gift]){
+        this.s.bag[sb.gift]=true;
+        this.toast(`「${GODS[g].name}」解下随身之物相赠：<b>${ITEMS[sb.gift].name}</b>（${sb.name}·${SLOT_INFO[ITEMS[sb.gift].slot].name}，集齐三件可成套装特效）`);
+      }
     }
     /* 非接单途径（剧情抉择/关卡/结案赏）首次结识：排入待登场队列，由 UI 在结算后补播「仙驾初临」 */
     if(first && typeof GODS!=='undefined' && GODS[g]){
@@ -290,14 +296,15 @@ const Game = {
     if(!m || !m.gh) return {noGh:true};
     return this.gainGodhood(m.gh);
   },
-  /** 统一发奖：gh整格 / shards碎末 / dshards同名碎片 / pill妖丹 / merit / money / favor / erode / flags */
+  /** 统一发奖：gh整格 / shards碎末 / dshards同名碎片 / pill妖丹 / items套装件 / merit / money / favor / erode / flags */
   grantReward(rew){
     if(!rew) return {};
-    const out={gh:null,shards:[],dshards:[],pill:null};
+    const out={gh:null,shards:[],dshards:[],pill:null,items:[]};
     if(rew.gh){ const r=this.gainGodhood(rew.gh); out.gh=r; }
     if(rew.shards) Object.entries(rew.shards).forEach(([p,n])=>{ this.s.shards[p]=(this.s.shards[p]||0)+n; out.shards.push([p,n]); });
     if(rew.dshards) Object.entries(rew.dshards).forEach(([g,n])=>{ this.s.dshards[g]=(this.s.dshards[g]||0)+n; out.dshards.push([g,n]); });
     if(rew.pill){ this.addPill(rew.pill,1); out.pill=rew.pill; }
+    if(rew.items) rew.items.forEach(id=>{ if(ITEMS[id] && !this.s.bag[id]){ this.s.bag[id]=true; out.items.push(id); } });
     if(rew.merit){ this.s.merit+=rew.merit; }
     if(rew.money){ this.s.money+=rew.money; }
     if(rew.favor) Object.entries(rew.favor).forEach(([g,n])=>this.addFavor(g,n));
@@ -494,6 +501,7 @@ const Game = {
     const s=this.s;
     if(!s.bag[id]) return;
     const it=ITEMS[id];
+    if(it.noSell){ this.toast('神明所赠之物，不可转卖'); return; }
     if(s.wear[it.slot]===id){ this.toast('佩中的法宝不能出手，请先取下'); return; }
     const gain=Math.floor(it.price*SELL_RATE);
     delete s.bag[id]; s.money+=gain;
@@ -709,6 +717,27 @@ const Stats = {
         if(it.proc.burnOnHit) v.burnOnHit=it.proc.burnOnHit;
         /* 昆仑镜类：法宝自带的一次免死（战斗引擎读 st.saves） */
         if(it.proc.firstSave) v.saves.push({gh:id, ...it.proc.firstSave});
+      }
+    });
+
+    /* 神明套装：≥2件两档、=3件三档（stat/proc 此处结算；hook 型特效由战斗引擎读 v.sets 自行结算） */
+    v.sets={};
+    const setCnt={};
+    Object.values(s.wear||{}).forEach(id=>{ if(id && ITEMS[id] && ITEMS[id].set) setCnt[ITEMS[id].set]=(setCnt[ITEMS[id].set]||0)+1; });
+    Object.entries(setCnt).forEach(([sid,n])=>{
+      const sb=SET_BONUS[sid]; if(!sb) return;
+      v.sets[sid]=n;
+      const b=n>=3?sb.three:(n>=2?sb.two:null);
+      if(b && b.stat){
+        v.maxHp+=b.stat.hp||0; v.atk+=b.stat.atk||0; v.def+=b.stat.def||0;
+        v.crit+=b.stat.crit||0; v.critDmg+=(b.stat.critDmg||0);
+        v.maxMp+=b.stat.maxMp||0; v.lifesteal+=b.stat.lifesteal||0;
+      }
+      if(b && b.proc){
+        v.stunProc=Math.max(v.stunProc,b.proc.stun||0);
+        v.healStart=Math.max(v.healStart,b.proc.healStart||0);
+        v.dmgReduce=Math.max(v.dmgReduce,b.proc.dmgReduce||0);
+        if(b.proc.mpCost) v.mpCost*=b.proc.mpCost;
       }
     });
 

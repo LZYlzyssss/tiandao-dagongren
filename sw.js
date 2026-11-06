@@ -1,4 +1,4 @@
-/* ================= 天道打工人 · Service Worker =================
+﻿/* ================= 天道打工人 · Service Worker =================
    策略：
    - 图片(img/)：缓存优先 + 永久落盘（同名不改动），二次访问本地秒开，绕过 Pages 的 10 分钟缓存限制
    - 同源 JS/CSS：Stale-While-Revalidate（先秒开旧档，后台拉新版，下次生效）
@@ -11,8 +11,8 @@
    2) 同步抬 index.html 里 css/js/manifest 的 ?v= 与下方 ASSET_VER（换 URL 让赖着不更新的旧 SW 也强制走网络拿新档）
    图片桶 IMG 固定名跨版本存活：发版只清代码桶，已缓存图片不再被清——
    教训：v33 抬号删旧桶把用户已缓存图片全清了，慢网络等于每次发版全量重拉（v34 修正） */
-const VERSION='xw-v39';
-const ASSET_VER='20261012b';
+const VERSION='xw-v40';
+const ASSET_VER='20261012c';
 const RT='xw-runtime-'+VERSION;
 const IMG='xw-img';
 /* 判定"图片类"URL：本站 img/ 与 CDN 字体/引擎——进 IMG 桶；代码进 RT 桶 */

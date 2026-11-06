@@ -43,6 +43,7 @@ const Battle = {
       stunProc: st.stunProc, healStart: st.healStart,
       burnOnHit: st.burnOnHit||0,
       zhanshen: !!st.zhanshen,
+      sets: st.sets||{},
       saves: (st.saves||[]).map(sv=>({...sv, used:false})),
     };
     /* 可催动的觉醒神格（含融合） */
@@ -107,6 +108,16 @@ const Battle = {
     };
     const isHalluc = ()=> st.halluc>0 && Math.random()<st.halluc;
 
+    /* 钟馗套装「辨鬼/啖鬼」：对鬼类敌人攻击系数提升（覆盖普攻与攻系神通） */
+    {
+      const zk=(p.sets&&p.sets.zhongkui)||0;
+      if(zk>=2 && e.kind==='gui'){
+        const mul=zk>=3?0.30:0.15;
+        p.atk=Math.round(p.atk*(1+mul));
+        addLog(`噬鬼灯青焰大盛——「啖鬼行头」对鬼类之敌，攻击提升 ${Math.round(mul*100)}%！`,'lg-sys');
+      }
+    }
+
     /* ---------- 四系克制系数（敌方 kind vs 行动系别） ---------- */
     const elemMul = (path)=>{
       if(!path) return 1;
@@ -148,6 +159,15 @@ const Battle = {
       if(p.burnOnHit && e.hp>0 && e.burn<=0 && Math.random()<p.burnOnHit){
         e.burn = 2 + p.burnRound; e.burnDmg = Math.round(p.atk*0.3*(1+p.burnDot));
         addLog(`神火印火星溅出，点燃了「${e.name}」（每回合 ${e.burnDmg}，${e.burn} 回合）！`,'lg-sys');
+      }
+      /* 关羽套装「拖刀计」：三件套暴击后 40% 概率回锋追斩（60% 攻击，吃同次易伤/克制/守势系数） */
+      if(p.sets&&p.sets.guanyu>=3 && isCrit && e.hp>0 && Math.random()<0.4){
+        const fd=Math.max(1, Math.round(p.atk*0.6*rnd(0.9,1.1)*vulnMul*el*sh));
+        e.hp=Math.max(0, e.hp-fd);
+        addLog(`青龙偃月回锋——「武圣行头·拖刀计」追斩 <b>${fd}</b> 点伤害！`,'lg-good');
+        UI.floatFoe(`-${fd}`,'#c03c2e');
+        if(typeof SFX!=='undefined') SFX.play('crit');
+        await sleep(150);
       }
     };
 
@@ -502,6 +522,12 @@ const Battle = {
       B.round++;
       /* 玩家每回合回蓝（含共鸣耗神减免） */
       p.mp = Math.min(p.maxMp, p.mp + Math.round(p.maxMp*0.15));
+      /* 孟婆套装「回魂」：三件套每回合开始额外回复 10% 神力 */
+      if(p.sets&&p.sets.mengpo>=3 && p.mp<p.maxMp){
+        const mr=Math.round(p.maxMp*0.10);
+        p.mp=Math.min(p.maxMp,p.mp+mr);
+        addLog(`奈桥铃轻响，「忘川三味·回魂」——神力回复 ${mr} 点。`,'lg-sys');
+      }
       /* 冷却递减 */
       Object.keys(p.cooldowns).forEach(k=>{ if(p.cooldowns[k]>0) p.cooldowns[k]--; });
 

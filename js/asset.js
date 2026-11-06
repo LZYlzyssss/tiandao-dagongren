@@ -1355,7 +1355,9 @@ const INKSVG=(()=>{
     s21:'fire',s22:'water',s23:'temple',s24:'night',
     /* s25-s34 天曹外包化系列 */
     s25:'mountain',s26:'temple',s27:'night',s28:'mountain',s29:'night',
-    s30:'indoor',s31:'indoor',s32:'night',s33:'mountain',s34:'water'
+    s30:'indoor',s31:'indoor',s32:'night',s33:'mountain',s34:'water',
+    /* s35-s37 神明套装系列 */
+    s35:'temple',s36:'water',s37:'indoor'
   };
   function task(k){
     const id=k.slice(5);
