@@ -738,6 +738,8 @@ const Stats = {
         v.healStart=Math.max(v.healStart,b.proc.healStart||0);
         v.dmgReduce=Math.max(v.dmgReduce,b.proc.dmgReduce||0);
         if(b.proc.mpCost) v.mpCost*=b.proc.mpCost;
+        /* 哪吒「莲花化身」类：套装自带的一次免死（战斗引擎读 st.saves） */
+        if(b.proc.firstSave) v.saves.push({gh:'set_'+sid, ...b.proc.firstSave});
       }
     });
 

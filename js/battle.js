@@ -116,6 +116,12 @@ const Battle = {
         p.atk=Math.round(p.atk*(1+mul));
         addLog(`噬鬼灯青焰大盛——「啖鬼行头」对鬼类之敌，攻击提升 ${Math.round(mul*100)}%！`,'lg-sys');
       }
+      /* 二郎神套装「细犬搜山」：三件套对妖类敌人攻击系数提升 */
+      const el=(p.sets&&p.sets.erlang)||0;
+      if(el>=3 && e.kind==='yao'){
+        p.atk=Math.round(p.atk*1.30);
+        addLog('天眼符竖瞳睁开——「清源天眼·细犬搜山」对妖类之敌，攻击提升 30%！','lg-sys');
+      }
     }
 
     /* ---------- 四系克制系数（敌方 kind vs 行动系别） ---------- */
@@ -137,9 +143,11 @@ const Battle = {
       if(e.stun>0){ /* 敌人震骇不影响玩家 */ }
       const isCrit = Math.random() < p.crit;
       const vulnMul = (e.vulnTurns>0 || e.vulnFixed>1) ? 1.5 : 1;
+      /* 二郎神套装「天眼」：两件套对易伤中的敌人攻击 +18% */
+      const elVuln = (p.sets&&p.sets.erlang>=2 && (e.vulnTurns>0||e.vulnFixed>1)) ? 1.18 : 1;
       const el = elemMul(path);
       const sh = e.shielding ? 0.5 : 1;
-      let dmg = Math.max(1, Math.round((p.atk*mult*rnd(0.9,1.1) - e.def*0.45) * vulnMul * el * sh * (isCrit?p.critDmg:1)));
+      let dmg = Math.max(1, Math.round((p.atk*mult*rnd(0.9,1.1) - e.def*0.45) * vulnMul * elVuln * el * sh * (isCrit?p.critDmg:1)));
       if(isHalluc()){ dmg = Math.round(dmg*0.85); }
       e.hp = Math.max(0, e.hp-dmg);
       const life = p.lifesteal;
@@ -162,12 +170,24 @@ const Battle = {
       }
       /* 关羽套装「拖刀计」：三件套暴击后 40% 概率回锋追斩（60% 攻击，吃同次易伤/克制/守势系数） */
       if(p.sets&&p.sets.guanyu>=3 && isCrit && e.hp>0 && Math.random()<0.4){
-        const fd=Math.max(1, Math.round(p.atk*0.6*rnd(0.9,1.1)*vulnMul*el*sh));
+        const fd=Math.max(1, Math.round(p.atk*0.6*rnd(0.9,1.1)*vulnMul*elVuln*el*sh));
         e.hp=Math.max(0, e.hp-fd);
         addLog(`青龙偃月回锋——「武圣行头·拖刀计」追斩 <b>${fd}</b> 点伤害！`,'lg-good');
         UI.floatFoe(`-${fd}`,'#c03c2e');
         if(typeof SFX!=='undefined') SFX.play('crit');
         await sleep(150);
+      }
+      /* 孙悟空套装「法天象地」：三件套普攻后 30% 概率追加两连击（各 45% 攻击，吃同次系数） */
+      if(p.sets&&p.sets.sunwukong>=3 && e.hp>0 && Math.random()<0.3){
+        for(let i=0;i<2;i++){
+          if(e.hp<=0) break;
+          const sd=Math.max(1, Math.round(p.atk*0.45*rnd(0.9,1.1)*vulnMul*elVuln*el*sh));
+          e.hp=Math.max(0, e.hp-sd);
+          addLog(`身外身法拔毫毛——「齐天行头·法天象地」第 ${['一','二'][i]} 棒追击 <b>${sd}</b> 点伤害！`,'lg-good');
+          UI.floatFoe(`-${sd}`,'#c03c2e');
+          if(typeof SFX!=='undefined') SFX.play('hit');
+          await sleep(130);
+        }
       }
     };
 
