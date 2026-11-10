@@ -107,14 +107,14 @@ quote:'簿上添一笔的事——你没见过本判，本判，也没见过你�
   story:'崔珏是阴律司崔判官，唐太宗时的大臣，死后因铁面无私被阎王重用。《西游记》里唐太宗游地府，崔珏偷偷把他阳寿从十三年改三十三年——就是这位。他是帮玩家出头的关键人物。',
 img:'Chinese ink wash painting of judge Cui Jue in dark official robes holding a vermilion brush and the book of life and death, dignified and inscrutable, sumi-e style, portrait',
 aid:{name:'簿上一点',type:'percent',pct:0.30,desc:'相熟单体真伤，信重大疗免死，莫逆大真伤加易伤，本体累计真伤并复活一人。'},
-gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']}},
+gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']},set:'cui_jue'},
 wei_zheng:{name:'魏征',title:'赏善判官',icon:'魏',tier:'C',camp:'地府',path:'you',unlock:{ch:3},gh:'y_weizheng',
 intro:'掌赏善司核查生前行善之魂定人天福报，方正冷峻不苟言笑，人曹官梦斩泾河老龙的凌烟名臣，认法不认人也认证据。',
   sources:'《旧唐书·魏征传》；《贞观政要》；《西游记》第九、十回',
   story:'魏征是赏善司判官，和崔珏是同朝旧识。活着时就是李世民的谏臣，敢当面骂皇帝。做了判官更不认人——哪怕是天庭下来的神犯了错，他一样按律发落。体制内「规则派」代表。',
 img:'Chinese ink wash painting of Wei Zheng as underworld reward-goodness judge in scholar robes holding a memorial tablet, stern and upright, sumi-e style with ink black accents, portrait',
 aid:{name:'赏善录',type:'heal',heal:0.32,desc:'相熟治疗加护，信重真伤破盾，莫逆龙妖巨伤，本体破伪群易伤并反伤盾。'},
-gifts:{loved:['mozhen'],liked:['puti'],disliked:['hulu']}},
+gifts:{loved:['mozhen'],liked:['puti'],disliked:['hulu']},set:'wei_zheng'},
 zhong_kui:{name:'钟馗',title:'罚恶判官',icon:'钟',tier:'C',camp:'地府',path:'you',unlock:{ch:2},gh:'y_zhongkui',
 intro:'掌罚恶司擒天下邪祟虚耗，专吃恶鬼与恶吏，刚烈粗犷嫉恶如仇的终南山进士，恨恶吏如仇，十个恶里九个穿着官衣。',
   sources:'北宋《梦溪笔谈》（唐明皇梦）；《唐逸史》；《钟馗斩鬼传》《钟馗全传》',
@@ -128,7 +128,7 @@ intro:'掌察查司核查案情真伪卷宗虚实，阴间法医兼御史，貌�
   story:'陆之道是察查司判官，专查冤案错案。传说他有本「善恶簿」，记着每个人前世今生所有善恶。有人说他就是《聊斋志异》里帮朱尔旦换心的「陆判」。只认案情不认天条。',
 img:'Chinese ink wash painting of Lu Pan the inspector judge with green face and red beard holding an autopsy knife, coldly scholarly, sumi-e style with dark green and cinnabar, portrait',
 aid:{name:'勘验',type:'vuln',mult:1.8,vuln:0.5,rounds:2,desc:'相熟真伤加易伤，信重暴击回能增益，莫逆明牌加群破防，本体已损血比例核弹。'},
-gifts:{loved:['mozhen'],liked:['hulu'],disliked:['puti']}},
+gifts:{loved:['mozhen'],liked:['hulu'],disliked:['puti']},set:'lu_zhidao'},
 bi_gan:{name:'比干',title:'文财神',icon:'干',tier:'C',camp:'民间',path:'sheng',unlock:{ch:3},gh:'s_bigan',
 intro:'文财神之一，无心故无私，主公正之财与科甲文衡，商少师强谏三日被纣剖七窍玲珑心，清癯温和，最懂被挖空的滋味。',
 quote:'人无心，便无偏私；这秤上的财，才配叫公道。',
@@ -136,7 +136,7 @@ quote:'人无心，便无偏私；这秤上的财，才配叫公道。',
   story:'比干是商朝王叔，劝纣王不要宠妲己被挖心。他走出宫门碰见卖空心菜的老妇人，问「人无心能活吗」，老妇人说「菜无心能活，人为何不能」——比干顿悟倒地，被封文财神。游戏里他最懂「空心」滋味。',
 img:'Chinese ink wash painting of Bi Gan the civil wealth god with hollow chest in court robes, serene and sorrowful, sumi-e style with jade green and gold accents, portrait',
 aid:{name:'无心秤',type:'shield',shield:0.35,desc:'相熟公正护盾，信重命中暴击增益，莫逆持续回血，本体清增益转全队大护盾反弹。'},
-gifts:{loved:['mozhen'],liked:['puti'],disliked:['hulu']}},
+gifts:{loved:['mozhen'],liked:['puti'],disliked:['hulu']},set:'bi_gan'},
 sun_simiao:{name:'孙思邈',title:'药王爷',icon:'药',tier:'C',camp:'民间',path:'sheng',unlock:{ch:2},gh:'s_yaowang',
 intro:'药王爷主医药疗疾走方施诊，兼治神的空心之症，著千金方的仁厚医者，唯一敢给神看病的人，诊出空心化不可逆。',
 quote:'人间的病要治；神仙的病，也总得有人敢号这个脉。',
@@ -144,14 +144,14 @@ quote:'人间的病要治；神仙的病，也总得有人敢号这个脉。',
   story:'药王孙思邈活了一百四十二岁，写了《千金方》。传说隐居时曾给老虎治伤——老虎叼金钗谢他，后来出门总带这只钗。民间药王庙会的主神，医者祖师爷。',
 img:'Chinese ink wash painting of Sun Simiao the medicine king with white beard holding a gourd and tiger-ring, kindly and composed, sumi-e style with sage green accents, portrait',
 aid:{name:'千金方',type:'heal',heal:0.38,desc:'相熟中等治疗，信重净化回血，莫逆濒死复活，本体大疗全净化持续回血。'},
-gifts:{loved:['puti'],liked:['wugu'],disliked:['xiangzhu']}},
+gifts:{loved:['puti'],liked:['wugu'],disliked:['xiangzhu']},set:'sun_simiao'},
 lu_ban:{name:'鲁班',title:'巧圣先师',icon:'班',tier:'C',camp:'民间',path:'bing',unlock:{ch:3},gh:'b_luban',
 intro:'工匠祖师主营造机巧绳墨尺寸，护天下手艺人，公输般削竹木为鹊三日不下，认尺寸不认神佛，一眼看出神瓤不吃劲了。',
   sources:'《孟子·离娄》；《墨子·公输》《鲁问》；《礼记·檀弓》；《事物绀珠》',
   story:'鲁班本名公输班，春秋鲁国人。造过攻城云梯、木鸢飞车，被墨子怼过。民间说他发明了锯（被草割手灵感来的）、刨子、墨斗、榫卯。他有本《鲁班书》分上下卷，上卷盖房子，下卷「整人」——学下卷要绝后。',
 img:'Chinese ink wash painting of Lu Ban the master carpenter holding a ink marker and try square, focused artisan, sumi-e style with wood brown ink, portrait',
 aid:{name:'墨斗放线',type:'vuln',mult:1.9,vuln:0.5,rounds:2,desc:'相熟易伤2回合，信重大伤破甲，莫逆机关群伤，本体破防核弹眩晕并全队减伤。'},
-gifts:{loved:['taomu'],liked:['mozhen'],disliked:['panta']}},
+gifts:{loved:['taomu'],liked:['mozhen'],disliked:['panta']},set:'lu_ban'},
 lv_dongbin:{name:'吕洞宾',title:'纯阳帝君',icon:'吕',tier:'C',camp:'天庭',path:'bing',unlock:{ch:3},gh:'b_lvchunyang',
 intro:'全真北五祖之一，酒仙剑胆度人无数的游方散仙，黄粱一梦大悟，编外散仙烦工单，江淮斩蛟岳阳弄鹤，只度人不度天。',
 quote:'天庭的工单催不进酒壶里——来，先干了这碗再说。',
@@ -1289,6 +1289,43 @@ const ITEMS = {
     desc:'防御 +12，神躯上限 +60。慈悲不是软——这袭袈裟挡过的刀，比甲胄多。', stat:{def:12,hp:60} },
   gw_liu: { name:'杨柳枝', slot:'trinket', grade:'宝品', price:0, icon:'柳', set:'guanyin', noShop:true, noSell:true,
     desc:'神力上限 +35；每场战斗开始时恢复 15% 生命。蘸一瓶甘露，点在哪儿，哪儿就活。', stat:{maxMp:35}, proc:{healStart:0.15} },
+  /* 第三批神明套装：地府判官与民间诸神（C级） */
+  cj_bi:  { name:'朱勾判笔', slot:'weapon', grade:'宝品', price:0, icon:'勾', set:'cui_jue', noShop:true, noSell:true,
+    desc:'攻击 +20，暴击率 +5%。笔尖的朱砂掺过忘川水，勾下去的名字，抹不掉。', stat:{atk:20,crit:0.05} },
+  cj_pao: { name:'阴律皂袍', slot:'armor', grade:'灵品', price:0, icon:'皂', set:'cui_jue', noShop:true, noSell:true,
+    desc:'防御 +14，神躯上限 +45。阴律司值夜的老袍，袖口磨薄了，规矩没磨薄。', stat:{def:14,hp:45} },
+  cj_ye:  { name:'生死簿页', slot:'trinket', grade:'宝品', price:0, icon:'页', set:'cui_jue', noShop:true, noSell:true,
+    desc:'神力上限 +20，暴击伤害 +12%。从簿上揭下的一页空白——留着，比写着值钱。', stat:{maxMp:20,critDmg:0.12} },
+  wz_jian:{ name:'梦斩剑', slot:'weapon', grade:'宝品', price:0, icon:'斩', set:'wei_zheng', noShop:true, noSell:true,
+    desc:'攻击 +19，暴击率 +6%。梦里斩过泾河老龙的那一柄，醒来还在响。', stat:{atk:19,crit:0.06} },
+  wz_fu:  { name:'谏臣朝服', slot:'armor', grade:'灵品', price:0, icon:'谏', set:'wei_zheng', noShop:true, noSell:true,
+    desc:'防御 +13，神躯上限 +50。补子上的獬豸被摸得发亮，摸它的人，先摸着自己的良心。', stat:{def:13,hp:50} },
+  wz_bu:  { name:'赏善簿', slot:'trinket', grade:'宝品', price:0, icon:'簿', set:'wei_zheng', noShop:true, noSell:true,
+    desc:'神力上限 +25，暴击伤害 +10%。簿上一笔善，抵人间一炉香；笔锋向下，从不含糊。', stat:{maxMp:25,critDmg:0.10} },
+  lz_dao: { name:'剖心薄刃', slot:'weapon', grade:'宝品', price:0, icon:'刃', set:'lu_zhidao', noShop:true, noSell:true,
+    desc:'攻击 +18，暴击率 +7%。薄得能照见骨头——陆判说，心若没病，刀就割不着。', stat:{atk:18,crit:0.07} },
+  lz_pao: { name:'验状皂衣', slot:'armor', grade:'灵品', price:0, icon:'验', set:'lu_zhidao', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +55。衣襟上洗不掉的墨点，每一处都验过一个人。', stat:{def:12,hp:55} },
+  lz_jing:{ name:'勘验镜', slot:'trinket', grade:'宝品', price:0, icon:'鉴', set:'lu_zhidao', noShop:true, noSell:true,
+    desc:'暴击率 +5%，暴击伤害 +12%。照卷宗照不出真伪，照人心一照一个准。', stat:{crit:0.05,critDmg:0.12} },
+  bg_cheng:{ name:'无心秤', slot:'weapon', grade:'宝品', price:0, icon:'秤', set:'bi_gan', noShop:true, noSell:true,
+    desc:'攻击 +17，神力上限 +20。秤杆上没有准星——不称人心，只称良心。', stat:{atk:17,maxMp:20} },
+  bg_pao: { name:'文财锦袍', slot:'armor', grade:'灵品', price:0, icon:'财', set:'bi_gan', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +55。面子绣的是铜钱纹，里子是粗布：钱穿在外，命垫在里。', stat:{def:12,hp:55} },
+  bg_xin: { name:'七窍玲珑心佩', slot:'trinket', grade:'宝品', price:0, icon:'窍', set:'bi_gan', noShop:true, noSell:true,
+    desc:'神力上限 +35，暴击率 +4%。七窍都通，偏不通人情——所以他算得清账。', stat:{maxMp:35,crit:0.04} },
+  ssm_chu:{ name:'千金药杵', slot:'weapon', grade:'宝品', price:0, icon:'杵', set:'sun_simiao', noShop:true, noSell:true,
+    desc:'攻击 +16，神力上限 +20。捣过三千张方子，杵底那层药垢，比金子沉。', stat:{atk:16,maxMp:20} },
+  ssm_pao:{ name:'药王布袍', slot:'armor', grade:'灵品', price:0, icon:'药', set:'sun_simiao', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +60。洗得发白的旧布袍，病人家属抓着它哭过太多回。', stat:{def:12,hp:60} },
+  ssm_fang:{ name:'龙宫药方', slot:'trinket', grade:'宝品', price:0, icon:'方', set:'sun_simiao', noShop:true, noSell:true,
+    desc:'神力上限 +20；每场战斗开始时恢复 15% 生命。龙宫抄来的方子，字是湿的，药性是真的。', stat:{maxMp:20}, proc:{healStart:0.15} },
+  lb_mo:  { name:'公输墨斗', slot:'weapon', grade:'宝品', price:0, icon:'墨', set:'lu_ban', noShop:true, noSell:true,
+    desc:'攻击 +18，防御 +4。一根墨线弹下去，歪一寸都赖不过去。', stat:{atk:18,def:4} },
+  lb_he:  { name:'公输短褐', slot:'armor', grade:'灵品', price:0, icon:'褐', set:'lu_ban', noShop:true, noSell:true,
+    desc:'防御 +15，神躯上限 +45。袖口卷到肘上——干活的人穿的衣服，从不讲究。', stat:{def:15,hp:45} },
+  lb_chi: { name:'鲁班曲尺', slot:'trinket', grade:'灵品', price:0, icon:'尺', set:'lu_ban', noShop:true, noSell:true,
+    desc:'防御 +8，神躯上限 +30。量过天庭的梁，也量过人家的门；尺子是直的，人是弯的。', stat:{def:8,hp:30} },
   /* 礼物（七样白名单，诸神偏好见 GODS[g].gifts；loved+18 / liked+8 / 忌讳+1 / 其余+4） */
   taomu:   { name:'桃木如意', slot:'gift', grade:'凡品', price:150, icon:'桃', desc:'老桃木雕的小如意，平实讨喜，各路神明都不至于嫌弃。' },
   wugu:    { name:'五谷福袋', slot:'gift', grade:'凡品', price:200, icon:'谷', desc:'新粟新稻缝成的福袋，盛满人间烟火气。' },
@@ -1322,6 +1359,24 @@ const SET_BONUS = {
   guanyin:{ name:'莲台甘露', god:'guan_yin', quest:'s41', gift:'gw_liu',
     two: { label:'杨枝甘露', desc:'两件套「杨枝甘露」：每场战斗开始时恢复 25% 生命', proc:{healStart:0.25} },
     three:{ label:'慈航普度', desc:'三件套「慈航普度」：受到的伤害减少 15%', proc:{dmgReduce:0.15} } },
+  cui_jue:{ name:'阴律朱笔', god:'cui_jue', quest:'s42', gift:'cj_ye',
+    two: { label:'一线生机', desc:'两件套「一线生机」：每场战斗开始时恢复 20% 生命', proc:{healStart:0.20} },
+    three:{ label:'朱笔勾魂', desc:'三件套「朱笔勾魂」：对魂类敌人攻击 +30%', hook:'vsHun30' } },
+  wei_zheng:{ name:'赏善铁面', god:'wei_zheng', quest:'s43', gift:'wz_bu',
+    two: { label:'铁面', desc:'两件套「铁面」：受到的伤害减少 10%', proc:{dmgReduce:0.10} },
+    three:{ label:'梦斩泾河', desc:'三件套「梦斩泾河」：对妖类敌人攻击 +30%', hook:'vsYao30' } },
+  lu_zhidao:{ name:'察查明镜', god:'lu_zhidao', quest:'s44', gift:'lz_jing',
+    two: { label:'明镜', desc:'两件套「明镜」：暴击率 +8%', stat:{crit:0.08} },
+    three:{ label:'照胆', desc:'三件套「照胆」：暴击后 40% 概率追加一记 60% 攻击的追斩', hook:'critFollow' } },
+  bi_gan: { name:'七窍文心', god:'bi_gan', quest:'s45', gift:'bg_xin',
+    two: { label:'玲珑', desc:'两件套「玲珑」：神力上限 +50', stat:{maxMp:50} },
+    three:{ label:'无心', desc:'三件套「无心」：每回合开始时回复 10% 神力', hook:'mpRegen' } },
+  sun_simiao:{ name:'千金药王', god:'sun_simiao', quest:'s46', gift:'ssm_fang',
+    two: { label:'悬丝', desc:'两件套「悬丝」：每场战斗开始时恢复 20% 生命', proc:{healStart:0.20} },
+    three:{ label:'续命', desc:'三件套「续命」：每场战斗首次濒死时免死并回复 30% 生命', proc:{firstSave:{heal:0.30}} } },
+  lu_ban: { name:'公输规矩', god:'lu_ban', quest:'s47', gift:'lb_chi',
+    two: { label:'规矩', desc:'两件套「规矩」：防御 +14，神躯上限 +40', stat:{def:14,hp:40} },
+    three:{ label:'机关百出', desc:'三件套「机关百出」：普攻后 30% 概率追加两连击（各 45% 攻击）', hook:'combo' } },
 };
 
 /* ================= 阴兵 ================= */
@@ -2854,8 +2909,142 @@ const MISSIONS = [
     {t:'先冻结账户保本金，渠道费既往暂免追，保粥棚不断炊为第一',r:{favor:{guan_yin:10},flags:{flag_mercy_cut:1},log:'菩萨望着你，眼中有几乎看不见的笑意：先保粥，再算账——你懂了慈悲的次序。瓶与袈裟你带着。账我记着，一笔不会少，但一口粥，也不会晚。'}},
     {t:'收下「渠道总代理」的干股，账册代为「妥善保管」',r:{money:160,erode:8,flags:{flag_ruthless:1},favor:{guan_yin:-16},log:'菩萨没有看你，只是把那本账册从你手边轻轻抽回，抱进臂弯，转身面向大海。潮声很大，她的声音很小，你却字字听得清：苦海无边。回头，是岸——我在岸上，等你自己走回来。'}}
    ]}
- ]}
+ ]},
 
+{id:'s42',name:'阴律司·借寿回执案',god:'cui_jue',chapter:4,side:'s42',danger:4,money:120,merit:28,
+ scroll:'阴律司一夜少了三千张「借寿回执」。凡间有富户拿它提前支取阳寿，被支取的，全是些没人替他们说话的穷魂。',
+ reward:{items:['cj_bi','cj_pao']},
+ nodes:[
+  {type:'event',text:'阴律司的库房没有门，只有一道朱砂封条——封条完好，回执却少了三千张。崔珏把朱笔搁在砚上，笔尖悬着一滴不肯落的朱砂：本判昨日核对，簿上死了的还活着，活着的已经死了。有人在替本判勾人，勾得比本判还熟。',
+   choices:[
+    {t:'问他：回执上的印，是谁盖的',r:{flags:{flag_know_truth:1},log:'崔珏从袖里取出一张回执，印色鲜红，边角却洇了水：印是真的，纸也是真的。只是这印，三年前就该缴销——如今盖它的人，在人间开着「延寿代办」的铺子。'}},
+    {t:'先去人间，看看被「借寿」的都是些什么人家',r:{favor:{cui_jue:6},flags:{flag_mercy_cut:1},log:'三户人家：一户是替人抬棺的挑夫，一户是守寡的绣娘，一户是还不识字的孩子。他们都「自愿」签了字——画押的红泥，是别人按着他们的手按下去的。'}},
+    {t:'劝他：生死簿上的事，不必查得太细',r:{erode:3,log:'崔珏把笔搁回去，朱砂终于落下，在案上洇成一个极小的红点：簿上少一撇，人间多一座坟。本判若也嫌细，那三千张回执，就该有三千个冤魂替你记着。'}}
+   ]},
+  {type:'quiz',who:'崔珏',text:'崔珏把生死簿推到案角，朱笔横在簿上：要替本判去人间勾这一笔，先答本判两问。答不上，这案本判自己跑一趟。',
+   qs:[
+    {q:'「本判替唐太宗在生死簿上添过寿。」崔珏道，「添了多少年？」',opts:['二十年——把「贞观一十三年」改成了「三十三年」','十年','三十年','五十年'],a:0,why:'《西游记》第十、十一回：崔珏私改生死簿，将「贞观一十三年」改为「三十三年」，即添寿二十年。他敢改一次，也只敢改这一次——改的是皇帝的寿，赔的是自己的名。'},
+    {q:'「那你说，」崔珏抬眼，「本判掌的阴律司，管的是哪一桩？」',opts:['天下生死簿与阴律刑名——勾注寿夭，按律定罚','人间赏善记功','恶鬼缉拿刑罚','六道投胎轮转'],a:0,why:'地府四判官分司：赏善司魏征、罚恶司钟馗、察查司陆之道、阴律司崔珏。阴律司掌生死簿与刑律勾注——所以「借寿」这种事，动的正是他的笔。'}
+   ],
+   pass:{shield:0.25,enemyVuln:true,merit:8,favor:{cui_jue:5},log:'崔珏点头，把朱笔在砚边磕了两下，笔尖那滴朱砂终于落回墨海：懂簿的人，才配动笔。去罢——那间「延寿代办」的铺子，本判替你封了门，剩下的路，你自己走。'}},
+  {type:'battle',enemy:'maopaijiachai',name:'私刻回执·代办掌柜',scale:1.1},
+  {type:'event',text:'铺子后堂挂满「延寿成功」的锦旗，旗下一排玻璃罐，罐里泡着从回执上剥下来的名字。掌柜跪在地上，还在算这笔账能赔多少。',
+   choices:[
+    {t:'依律办：回执尽数缴销，名字逐个还魂，私印当堂熔了',r:{favor:{cui_jue:15},merit:10,flags:{flag_refuse_count:1},log:'崔珏从袖中取出那支朱笔，又解下身上皂袍，一并放进你手里：笔给你，勾得准；袍给你，站得住。私印熔了之后，那三千个名字自己走回簿上——没有一个回头看这间铺子。'}},
+    {t:'只追回已支取的阳寿，未用的回执留个自首台阶',r:{favor:{cui_jue:10},flags:{flag_mercy_cut:1},log:'崔珏沉默半晌，把笔收了回去，只把袍子递给你：律是死的，人是活的。本判替你担这一笔——但你要替本判记住，宽一次是仁，宽两次就是账。'}},
+    {t:'收下「延寿代办」三成干股，回执改成「已核销」',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{cui_jue:-15},log:'崔珏看着你，眼里那点温度一点点退干净：本判见过太多这样的手。朱笔在簿上一划，你的名字后面，从此多了一个墨点。'}}
+   ]}
+ ]},
+
+{id:'s43',name:'赏善司·龙鳞抵押案',god:'wei_zheng',chapter:4,side:'s43',danger:4,money:120,merit:28,
+ scroll:'泾河龙王的旧案卷宗被人从赏善司借走，一借不还；市面上的钱庄，开始拿「龙王旧案一页」作抵押放贷。',
+ reward:{items:['wz_jian','wz_fu']},
+ nodes:[
+  {type:'event',text:'赏善司的灯点到后半夜。魏征立在长案后，衣冠一丝不乱：泾河龙王那一案，本官生前梦中所斩，卷宗封了三百年。如今它被人一页一页借出去，做成了钱庄的抵押品。借据上盖的，是本司的章。',
+   choices:[
+    {t:'查借阅簿：卷宗是从哪个「合规流程」出去的',r:{flags:{flag_know_truth:1},log:'借阅簿上只有一行字：「业务需要，长期借用」。签字的名字是一团墨，像被人反复涂过。魏征盯着那团墨看了很久：本官认字，认了三十年，涂了的也认得出。'}},
+    {t:'先去钱庄，看那些拿旧案抵押的穷户',r:{favor:{wei_zheng:6},flags:{flag_mercy_cut:1},log:'钱庄后堂压着一叠借据，抵押物全是「一页旧案」。借钱的有渔户、有船工、有丢了儿子的老妇。他们不知道那页纸上写着什么，只知道押上去，才借得到救命钱。'}},
+    {t:'劝他：旧案既已封存，借出去也无妨',r:{erode:3,log:'魏征把卷宗合上，声音不高：本官斩龙那夜，也是在梦里。梦里的刀落下去，河就干了。这案若借出去，落下去的就不是刀了。'}}
+   ]},
+  {type:'game',game:'memory',difficulty:2,
+   text:'钱庄的抵押库里堆着三百页散卷，页页字迹相似。魏征把赏善簿摊在案上：翻开的页，看一遍就得记住；三百年旧案，一页都不能错配。配错的，就是让钱庄把「斩龙」二字，写成了「保龙」。',
+   pass:{enemyVuln:true,merit:7,favor:{wei_zheng:5},log:'三百页旧案一页页归位，最后压在案底的，是泾河龙王亲笔的诉状。魏征用朱笔在边角点了一点：这一页，本官记得。它写的不是冤，是一句「龙王行雨，误了时辰，该斩」。'}},
+  {type:'battle',enemy:'chidietaohun',name:'持牒借卷·钱庄判官',scale:1.1},
+  {type:'event',text:'钱庄判官倒下时，怀里掉出一叠借据，最上面那张押的是「一页旧案」，落款是个渔户的名字。',
+   choices:[
+    {t:'依律办：借据尽焚，卷宗归还，私章当众销去',r:{favor:{wei_zheng:15},merit:10,flags:{flag_refuse_count:1},log:'魏征解下腰间的梦斩剑，又脱下朝服，一并递给你：剑无锋，斩的是心里的偏；服很旧，站的是该站的地方。借据一页页烧起来，火光映着他半边冷脸，像极了当年梦里那一刀。'}},
+    {t:'先销穷户的借据，钱庄的账留待秋后算',r:{favor:{wei_zheng:10},flags:{flag_mercy_cut:1},log:'魏征点头：先救人，再算账——这是本官做谏臣时才学会的次序。剑与服你带去。钱庄的账，本官一笔一笔，慢慢同他们算。'}},
+    {t:'收下钱庄的「顾问」聘书，把借阅簿改成「内部存档」',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{wei_zheng:-16},log:'魏征没有发怒，只是把那本借阅簿合上，压回案角：本官生前骂过皇帝，死后还骂得动判官。你这样的，本官见得多——簿上不缺你一个名字。'}}
+   ]}
+ ]},
+
+{id:'s44',name:'察查司·代死替身案',god:'lu_zhidao',chapter:4,side:'s44',danger:4,money:120,merit:28,
+ scroll:'察查司的验状上，一年里死了三回同一个人。三具尸首，三张脸，验状上的名字，却只有那一个。',
+ reward:{items:['lz_dao','lz_pao']},
+ nodes:[
+  {type:'event',text:'察查司的停尸房比别处冷。陆之道蹲在第三具尸首旁，薄刃挑开验状：这具是溺死的，上一具是病死的，最早那具是摔死的。三具尸首，指纹不同，牙口不同，可验状上写的是同一个名字。他抬眼：有一种生意，能让该死的人不死。叫「替死」。',
+   choices:[
+    {t:'查那三具尸首的来处，是谁把他们「送」来的',r:{flags:{flag_know_truth:1},log:'三具尸首来处不同，收尸的却是同一个「善堂」。善堂账上写着「无主孤魂，代为安葬」，安葬费一笔一笔，全由一个姓钱的富户出。陆之道把验状折起来：出钱的人，命最金贵。'}},
+    {t:'先去看看那个本该死了三回的人，如今怎样',r:{favor:{lu_zhidao:6},flags:{flag_mercy_cut:1},log:'那人躺在锦被里，气色好得很，只是不敢照镜子。他说每换一个替身，梦里就多一个人站在床前，不说话，只看着他。陆之道听完，只说了一句：验状能换，梦换不了。'}},
+    {t:'劝他：验状既已签押，翻案恐伤察查司颜面',r:{erode:3,log:'陆之道把薄刃在袖上擦了擦：本判验尸，验的是尸，不是颜面。颜面能盖棺，尸首盖不住。'}}
+   ]},
+  {type:'game',game:'spot',difficulty:2,
+   text:'停尸房的长案上摊开九张验状，印色、纸色、墨色几乎一样。陆之道把勘验镜推到你手边：真验状的朱印压在「致命伤」三个字上，假的那几张，印压的是名字。找出来——找错一张，就多一个人白死。',
+   pass:{enemyVuln:true,merit:7,favor:{lu_zhidao:5},log:'九张验状，四张是假的。假状上的朱印都压着名字，压得端端正正——像是生怕别人看不见那个人是谁。陆之道用刀尖挑了挑：真验状从不急着认人，它先认伤。'}},
+  {type:'battle',enemy:'maopaijiachai',name:'善堂收尸·代死掮客',scale:1.1},
+  {type:'event',text:'掮客的包袱里滚出一叠「替死协议」，每张都按着血手印，最底下压着一块刻好的新验状印。',
+   choices:[
+    {t:'依律办：三案并查，替死链一挖到底，假印当堂销毁',r:{favor:{lu_zhidao:15},merit:10,flags:{flag_refuse_count:1},log:'陆之道把剖心薄刃横在掌心，又解下皂衣，一起交到你手上：刀薄，割得开谎；衣旧，遮得住冷。三具尸首各自归了名，最后那一个躺在锦被里的人，第一次敢照镜子——镜子里只有他自己。'}},
+    {t:'只把三具尸首归名安葬，替死钱庄的事报上去慢慢查',r:{favor:{lu_zhidao:10},flags:{flag_mercy_cut:1},log:'陆之道点头：先让死人有个名字，再让活人有个说法。刀与衣你带着。剩下的账，本判一页一页翻，翻到翻不动为止。'}},
+    {t:'收下富户的「善堂捐输」，把三份验状并作一份「意外」',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{lu_zhidao:-16},log:'陆之道把三张验状一张张铺平，压上镇纸，没有看你：本判验过三千具尸，最难看的一具，是活人。你走罢，这间屋子，你不必再来了。'}}
+   ]}
+ ]},
+
+{id:'s45',name:'财帛司·香火期货案',god:'bi_gan',chapter:4,side:'s45',danger:4,money:130,merit:28,
+ scroll:'财帛司的香火账上，多了一批「未到账的香火」——有人把明年、后年的香火提前卖了，一层层加价，卖到了第三手。',
+ reward:{items:['bg_cheng','bg_pao']},
+ nodes:[
+  {type:'event',text:'财帛司的算盘声一夜没停。比干坐在案后，衣襟敞着——胸口那里空着，什么也没有。他把账册推过来：本官没有心，所以不看人，只看数。这批香火，今年一文没进，账上却记了三年。三年之后若进不来呢？进不来，那些买了「期货」的人，就得拿自己的香火填。',
+   choices:[
+    {t:'查这批「期货」是谁发的，凭证又是什么',r:{flags:{flag_know_truth:1},log:'凭证是一张黄纸，印着「财帛司预收」，底下盖的是个「代」字章。比干用指甲刮了刮那个字：本官的印，从来不刻「代」字。代谁？代天？天没让他代。'}},
+    {t:'先去人间，看买了期货的都是些什么人',r:{favor:{bi_gan:6},flags:{flag_mercy_cut:1},log:'买主多是些小庙的庙祝、卖香烛的摊贩，还有把养老钱换成黄纸的老人。他们不识字，只听人说「财神爷的香火，稳赚不赔」。比干听完，胸口那处空荡荡的衣襟，忽然像被风吹了一下。'}},
+    {t:'劝他：香火账上的虚数，来年补上就行',r:{erode:3,log:'比干把算盘一推，珠子撞出一串冷响：账可以补，香火补不了。香火是人家跪着烧的，不是算盘上拨出来的。'}}
+   ]},
+  {type:'game',game:'pairs',difficulty:2,
+   text:'财帛司的库房里堆着两摞凭证：一摞是「已入库」的香火单，一摞是「预收」的黄纸。比干把无心秤往案上一搁：单子配单子，数量对得上才是真香火；配不上的，就是拿明年的纸，烧今年的账。',
+   pass:{enemyVuln:true,merit:7,favor:{bi_gan:5},log:'满案凭证配到最后，剩下一叠黄纸，怎么配都配不出对应的入库单。比干用秤杆轻轻一挑，黄纸飞起来，底下压着一行小字：「本券最终解释权归财帛司所有」。他笑了一下，没有心的人笑起来，比哭还冷。'}},
+  {type:'battle',enemy:'moguigui',name:'平账墨柜鬼',scale:1.1},
+  {type:'event',text:'墨柜鬼化成一摊墨，墨里浮出一枚私刻的「代」字章。比干把它捞起来，在指间掂了掂。',
+   choices:[
+    {t:'依律办：期货尽废，预收凭证全额清退，私章入炉',r:{favor:{bi_gan:15},merit:10,flags:{flag_refuse_count:1},log:'比干把无心秤与锦袍一并给你：秤没有准星，因为良心不该有准星；袍子面子是钱、里子是布，因为命总在里层。清退那日，小庙的庙祝抱着黄纸哭，比干站在殿角，胸口空着，却像比谁都有心。'}},
+    {t:'先清退小户的凭证，大户的按年折价慢慢还',r:{favor:{bi_gan:10},flags:{flag_mercy_cut:1},log:'比干点头：先让烧得起香的人有香烧，再让卖香的人有账算。秤与袍你拿去。这笔虚数本官认下——反正本官没有心，赔得起。'}},
+    {t:'收下「财帛司顾问」的干股，把黄纸改成「合规理财」',r:{money:160,erode:8,flags:{flag_ruthless:1},favor:{bi_gan:-16},log:'比干把算盘归零，抬眼看你：本官被挖心那日，才知道没有心也能活。今日看你，才知道没有心，也能做神。你走罢——这算盘，本官要重打一遍。'}}
+   ]}
+ ]},
+
+{id:'s46',name:'药王庙·延命订阅案',god:'sun_simiao',chapter:4,side:'s46',danger:3,money:110,merit:26,
+ scroll:'凡间新起一门生意：「按月订阅，续命不断」。断供一日，病即复发；断供一月，人就没了。',
+ reward:{items:['ssm_chu','ssm_pao']},
+ nodes:[
+  {type:'event',text:'药王庙后院的药圃荒了半边。孙思邈蹲在畦边，捻起一撮土：这土三年没换过，种什么死什么。前殿的「延命订阅」，药是从这儿出去的——本王的方子被人改了三味，添了一味。添的那味，叫「断不得」。',
+   choices:[
+    {t:'查订阅契书：药里到底添了什么',r:{flags:{flag_know_truth:1},log:'契书上一行小字：「本方含依赖性佐药，停药需遵医嘱」。可这城里，没有第二个大夫敢签这个医嘱。孙思邈把契书翻过来，背面印着药铺的号——正是他当年施药的那间铺子。'}},
+    {t:'先去病家，看断供的人是什么下场',r:{favor:{sun_simiao:6},flags:{flag_mercy_cut:1},log:'一户人家把房契、田契、女儿的嫁妆全换成了药。最后一剂药喝完，男人坐在门槛上喘，女人抱着空药包哭。孙思邈站在门外看了很久，才低声说了一句：医者治病，不治穷。可这病，是穷治出来的。'}},
+    {t:'劝他：药既有效，何必管人怎么买',r:{erode:3,log:'孙思邈把药锄插回土里：有效？虎狼之药也有效。本王行医一生，只开过治病的方，没开过拴人的绳。'}}
+   ]},
+  {type:'game',game:'memory',difficulty:2,
+   text:'药王庙的丹房里摆着十二味药，孙思邈把药方一张张摊开又收起：看一遍，记住哪几味被换过。换过的药，颜色差一线，气味差一分——差这一线，就是一条命。',
+   pass:{enemyVuln:true,merit:7,favor:{sun_simiao:5},log:'十二味药归位，三味被换过的露了出来：一味减了效，一味添了瘾，还有一味，是拿陈年药渣充的。孙思邈把药渣捻在指间，搓了搓：这味药，本王年轻时也用过——用来喂牲口。'}},
+  {type:'battle',enemy:'yigui',name:'断供化形·药疫鬼',scale:1.05},
+  {type:'event',text:'药疫鬼散成一团苦雾，雾里落下厚厚一叠订阅契书，每一张末尾都按着病家的手印。',
+   choices:[
+    {t:'依律办：契书尽废，停药改方，药铺收回公办',r:{favor:{sun_simiao:15},merit:10,flags:{flag_refuse_count:1},log:'孙思邈把千金药杵与布袍交到你手上：杵捣的是药，不是价；袍洗得再白，也白不过病人眼里那点盼头。改方那日，他亲自守了三天三夜，断药的人一个一个缓过来——没有一个再回去买那副「断不得」。'}},
+    {t:'先免费施药三个月，让病家缓过来再谈契书',r:{favor:{sun_simiao:10},flags:{flag_mercy_cut:1},log:'孙思邈点头，把药杵递给你：治病如救火，先泼水，再查是谁点的火。杵与袍你带着。三个月后，本王亲自去收那些契书——一页都不留。'}},
+    {t:'收下药铺三成干股，把「依赖佐药」写成「调理辅药」',r:{money:140,erode:8,flags:{flag_ruthless:1},favor:{sun_simiao:-16},log:'孙思邈没有骂你，只是把药圃里最后一株活着的药苗连根拔了，扔在你脚边：药王庙里，从此不供本王。你走罢，别带着这身药气回去。'}}
+   ]}
+ ]},
+
+{id:'s47',name:'匠作监·傀儡替工案',god:'lu_ban',chapter:4,side:'s47',danger:3,money:110,merit:26,
+ scroll:'匠作监的工匠名册上有一千二百人，工地上却只见三百张脸。其余九百人的工钱，月月照发，活儿也照干——只是干活的东西，不是人。',
+ reward:{items:['lb_mo','lb_he']},
+ nodes:[
+  {type:'event',text:'匠作监的工棚里堆着刨花，香得很。鲁班把曲尺往梁上一卡，又俯身听了听地底：底下有响动，不是人走路的声音。他直起身：一千二百个工匠，三百张脸。剩下的九百个，是机关傀儡——照着匠人的手刻的，刻得比人还齐整。工钱呢？工钱进的是活人的口袋。',
+   choices:[
+    {t:'查名册：九百个「工匠」是谁替他们签的到',r:{flags:{flag_know_truth:1},log:'名册上九百个名字，笔迹全一样。签到用的是朱笔，一天一天，签得工工整整。鲁班摸了摸那笔迹：刻板。跟傀儡一个模子。'}},
+    {t:'先去工棚，看那三百个真工匠过得如何',r:{favor:{lu_ban:6},flags:{flag_mercy_cut:1},log:'三百个真工匠挤在一间通铺上，工钱被扣了「工具磨损费」「傀儡维护费」。他们不敢说话——说了，就得换成傀儡。鲁班蹲在通铺边，半天没起来，只说了一句：俺这行，最忌讳拿假手替真手。'}},
+    {t:'劝他：傀儡干活比人快，也算替天庭省了钱',r:{erode:3,log:'鲁班把曲尺往地上一插，尺影笔直：省的是钱，赔的是手艺。手艺一断，往后天庭塌了梁，谁来修？傀儡自己会修自己么？'}}
+   ]},
+  {type:'game',game:'pairs',difficulty:2,
+   text:'工地上的构件摆了一地，鲁班把墨斗线一弹：真匠人打的榫卯，松紧差半丝，能咬得住；傀儡打的，尺寸分毫不差，却咬不住。两两配对，把傀儡件挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{lu_ban:5},log:'配到最后，九百件「完美」的构件孤零零剩在一边，尺寸齐整得像用尺子画出来的。鲁班拿起一件，用拇指一按，咔的一声裂了：太齐整，反而没咬合。人做的东西，总得有点不齐整，才咬得住。'}},
+  {type:'battle',enemy:'heguimoshou',name:'九百替工·傀儡总匠',scale:1.05},
+  {type:'event',text:'傀儡总匠散成一地木屑，木屑里滚出一枚刻着「代工」的铜牌，牌后刻着一个名字——正是那位总监工。',
+   choices:[
+    {t:'依律办：傀儡尽毁，九百个名字销籍，工钱退赔工匠',r:{favor:{lu_ban:15},merit:10,flags:{flag_refuse_count:1},log:'鲁班把墨斗与短褐一并塞给你：墨线弹下去，歪的直的都在明面上；短褐卷着袖口，是干活的人才穿的。九百个名字销籍那日，三百个真工匠自己动手，把傀儡一件件拆了——拆到最后一件，谁也没舍得烧，留在了工棚门口，当个教训。'}},
+    {t:'傀儡留着修堤坝，工钱折半补给真工匠',r:{favor:{lu_ban:10},flags:{flag_mercy_cut:1},log:'鲁班想了想，点头：东西是好东西，用歪了。留着干粗活，让活人干细活。墨斗与短褐你带去——记得，尺量得出长短，量不出良心。'}},
+    {t:'收下总监工的「技术顾问」俸，把名册改成「人机协作」',r:{money:140,erode:8,flags:{flag_ruthless:1},favor:{lu_ban:-16},log:'鲁班把曲尺折成两截，扔在铜牌上，转身就走，走了两步又回头：俺祖师爷的规矩，只传手，不传印。你这印，俺不认。'}}
+   ]}
+ ]}
 ];
 
 /* ================= 下凡过场·任务故事背景 =================
@@ -3106,7 +3295,31 @@ s40:[
 s41:[
 '普陀山的功德箱换了新的——鎏金镶嵌，正面一块小牌：「功德金融·善款增值计划：您的每一文功德都在生息」。箱侧一行小字：「救助申请审批周期 45-180 天」。',
 '山下疫病的人等不了四十五天，饿的人连四五天都等不了。善款在账上滚动生息，粥棚的火却越来越小。',
-'观音菩萨立在紫竹林边，净瓶抱在臂弯，声音像退潮后的沙滩：善款是哭声换来的。哭声——不能生利息。']
+'观音菩萨立在紫竹林边，净瓶抱在臂弯，声音像退潮后的沙滩：善款是哭声换来的。哭声——不能生利息。'],
+s42:[
+'阴律司的库房没有门，只有一道朱砂封条。封条完好，三千张「借寿回执」却不翼而飞——簿上死了的活着，活着的已经死了。',
+'人间的「延寿代办」开着三家分号，门口排队的人捧着银锭子，出来时捧着一张盖了阴律司大印的黄纸。被支取阳寿的，都是些没人替他们说话的穷魂。',
+'崔珏把朱笔搁在砚上，笔尖悬着一滴不肯落的朱砂：本判掌簿三百年，头一回遇着有人替本判勾人，勾得比本判还熟。'],
+s43:[
+'泾河龙王那一案，封在赏善司三百年。卷宗上写的是「行雨误时，按律当斩」，盖的是魏征的私印——他生前梦里斩的龙，死后还要替这条龙守案卷。',
+'可这半年，卷宗被人一页一页借了出去。借据上只有一行字：「业务需要，长期借用。」市面上的钱庄，开始拿「龙王旧案一页」作抵押，放贷给渔户、船工、丢了儿子的老妇。',
+'魏征立在长案后，衣冠一丝不乱：本官认字认了三十年。涂了的，也认得出。'],
+s44:[
+'察查司的验状上，一年里死了三回同一个人。三具尸首，三张不同的脸，指纹不同，牙口不同，验状上的名字，却只有一个。',
+'京城有门叫「替死」的生意：该死的人出钱，善堂替他找一具无主尸首，换一张验状。死的是别人，活着的是他——只是他从此不敢照镜子。',
+'陆之道蹲在第三具尸首旁，薄刃挑开验状：本判验尸三十年，验过溺死的、病死的、摔死的。头一回验到「替死」的。'],
+s45:[
+'财帛司的香火账上，多了一批「未到账的香火」。有人把明年、后年的香火提前卖了，一层层加价，卖到了第三手——买主是些小庙庙祝、香烛摊贩，还有把养老钱换成黄纸的老人。',
+'凭证是一张黄纸，印着「财帛司预收」，底下盖一个「代」字章。比干的印，从来不刻「代」字。',
+'比干坐在案后，衣服敞着，胸口那里空着：本官没有心，所以不看人，只看数。这数，三年一模一样，一文不差——太干净了。'],
+s46:[
+'凡间新起一门生意：「按月订阅，续命不断」。断供一日，病即复发；断供一月，人就没了。契书背面印着药铺的号——正是药王当年施药的那一间。',
+'药王庙后院的药圃荒了半边，土三年没换过，种什么死什么。前殿的「延命订阅」，药就是从这里出去的。',
+'孙思邈蹲在畦边，捻起一撮土：本王的方子被改了三味，添了一味。添的那味，叫「断不得」。'],
+s47:[
+'匠作监的工匠名册上一千二百人，工地上却只见三百张脸。其余九百人的工钱，月月照发，活儿也照干——只是干活的东西，不是人。',
+'九百个「工匠」是机关傀儡，照着匠人的手刻的，刻得比人还齐整，签到用朱笔，一天一天，字迹全一样。',
+'鲁班把曲尺往梁上一卡，又俯身听了听地底：底下有响动，不是人走路的声音。俺这行，最忌讳拿假手替真手。']
 
 
 };

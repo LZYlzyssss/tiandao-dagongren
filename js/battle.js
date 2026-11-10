@@ -124,6 +124,22 @@ const Battle = {
       }
     }
 
+    /* ---- 神明套装通用特效层（后续批次套装统一走此处；hook 白名单见 SET_BONUS） ---- */
+    const setHook = {};
+    Object.entries(p.sets||{}).forEach(([sid,n])=>{
+      const sb=SET_BONUS[sid]; if(!sb) return;
+      const b = n>=3 ? sb.three : (n>=2 ? sb.two : null);
+      if(b && b.hook) setHook[b.hook]=true;
+    });
+    {
+      const km = (h15,h30,kind)=> (setHook[h30]&&e.kind===kind)?0.30 : (setHook[h15]&&e.kind===kind)?0.15 : 0;
+      const mul = km('vsHun15','vsHun30','hun') || km('vsGui15','vsGui30','gui') || km('vsYao15','vsYao30','yao');
+      if(mul>0){
+        p.atk=Math.round(p.atk*(1+mul));
+        addLog(`套装特效感应敌形——对${e.kind==='hun'?'魂':e.kind==='gui'?'鬼':'妖'}类之敌，攻击提升 ${Math.round(mul*100)}%！`,'lg-sys');
+      }
+    }
+
     /* ---------- 四系克制系数（敌方 kind vs 行动系别） ---------- */
     const elemMul = (path)=>{
       if(!path) return 1;
@@ -187,6 +203,27 @@ const Battle = {
           UI.floatFoe(`-${sd}`,'#c03c2e');
           if(typeof SFX!=='undefined') SFX.play('hit');
           await sleep(130);
+        }
+      }
+      /* 通用套装层：critFollow（暴击后 40% 概率追击 60% 攻击） */
+      if(setHook['critFollow'] && isCrit && e.hp>0 && Math.random()<0.4){
+        const fd=Math.max(1, Math.round(p.atk*0.6*rnd(0.9,1.1)*vulnMul*elVuln*el*sh));
+        e.hp=Math.max(0, e.hp-fd);
+        addLog(`套装特效迸发——回锋追击 <b>${fd}</b> 点伤害！`,'lg-good');
+        UI.floatFoe(`-${fd}`,'#c03c2e');
+        if(typeof SFX!=='undefined') SFX.play('crit');
+        await sleep(140);
+      }
+      /* 通用套装层：combo（普攻后 30% 概率追加两连击，各 45% 攻击） */
+      if(setHook['combo'] && e.hp>0 && Math.random()<0.3){
+        for(let i=0;i<2;i++){
+          if(e.hp<=0) break;
+          const sd=Math.max(1, Math.round(p.atk*0.45*rnd(0.9,1.1)*vulnMul*elVuln*el*sh));
+          e.hp=Math.max(0, e.hp-sd);
+          addLog(`套装特效连绵——第 ${['一','二'][i]} 段追击 <b>${sd}</b> 点伤害！`,'lg-good');
+          UI.floatFoe(`-${sd}`,'#c03c2e');
+          if(typeof SFX!=='undefined') SFX.play('hit');
+          await sleep(120);
         }
       }
     };
@@ -547,6 +584,12 @@ const Battle = {
         const mr=Math.round(p.maxMp*0.10);
         p.mp=Math.min(p.maxMp,p.mp+mr);
         addLog(`奈桥铃轻响，「忘川三味·回魂」——神力回复 ${mr} 点。`,'lg-sys');
+      }
+      /* 通用套装层：mpRegen（每回合开始回复 10% 神力） */
+      if(setHook['mpRegen'] && p.mp<p.maxMp){
+        const mr=Math.round(p.maxMp*0.10);
+        p.mp=Math.min(p.maxMp,p.mp+mr);
+        addLog(`套装灵光流转——神力回复 ${mr} 点。`,'lg-sys');
       }
       /* 冷却递减 */
       Object.keys(p.cooldowns).forEach(k=>{ if(p.cooldowns[k]>0) p.cooldowns[k]--; });
