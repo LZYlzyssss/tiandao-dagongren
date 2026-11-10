@@ -159,14 +159,14 @@ quote:'天庭的工单催不进酒壶里——来，先干了这碗再说。',
   story:'吕洞宾是八仙之一，有「狗咬吕洞宾」的故事。传说他有个朋友叫苟杳，被人欺负吕洞宾帮他出头。后来苟杳发达了，吕洞宾装穷去试探，苟杳不收留，吕洞宾叹「苟杳狗咬吕洞宾」——后来传成「狗咬吕洞宾」。',
 img:'Chinese ink wash painting of Lyu Dongbin the immortal swordsman with wine gourd and sword, free-spirited and witty, sumi-e style with flowing brush lines, portrait',
 aid:{name:'天遁剑诀',type:'nuke',mult:2.5,desc:'相熟两连击，信重沉睡控制加伤害，莫逆大伤灼烧，本体多段核弹灼烧震骇。'},
-gifts:{loved:['hulu'],liked:['taomu'],disliked:['xiangzhu']}},
+gifts:{loved:['hulu'],liked:['taomu'],disliked:['xiangzhu']},set:'lv_dongbin'},
 he_xiangu:{name:'何仙姑',title:'荷仙姑',icon:'荷',tier:'C',camp:'民间',path:'sheng',unlock:{ch:3},gh:'s_hexiang',
 intro:'八仙中唯一女仙，持荷行世，主清净疗愈与女子采桑织之愿，清净温软偶带机锋，以竹罩投水渡海，荷花池近年被天庭征水。',
   sources:'宋《集仙传》（已佚，见《续通考》转引）；《太平广记》引《广异记》；明《东游记》',
   story:'何仙姑是八仙里唯一的女性。传说本是湖南零陵姑娘，十三岁在溪边碰见道士给她桃吃，吃了就成仙。常提装有蟠桃的花篮在人间行善，专治难产和妇女病。民间有「何仙姑送子」的说法。',
 img:'Chinese ink wash painting of He Xiangu the lotus immortal holding a lotus petal, pure and gentle, sumi-e style with pink lotus and ink wash, portrait',
 aid:{name:'荷露',type:'heal',heal:0.35,desc:'相熟治疗，信重净化持续回血，莫逆全队盾加闪避，本体大疗大盾反弹护罩。'},
-gifts:{loved:['puti'],liked:['panta'],disliked:['hulu']}},
+gifts:{loved:['puti'],liked:['panta'],disliked:['hulu']},set:'he_xiangu'},
 dian_mu:{name:'电母',title:'秀天君',icon:'电',tier:'C',camp:'天庭',path:'fa',unlock:{ch:3},gh:'f_dianmu',
 intro:'雷部掌电之神，双镜放光为雷公雷祖司掌前引，端方利落精确到刻板，镜不留情也不撒谎，照见一座座被切空的庙。',
 quote:'先照，后劈——这是规矩。镜中照见什么，本君不替谁遮掩。',
@@ -174,7 +174,7 @@ quote:'先照，后劈——这是规矩。镜中照见什么，本君不替谁�
   story:'电母是雷公老婆，负责打闪电。传说本是瞎子的女儿，雷公打雷时不小心劈了她爹，后来上天做电母专门提醒——「先闪电再打雷，免得劈错好人」。所以现在都是先闪电后打雷。',
 img:'Chinese ink wash painting of the Lightning Goddess holding two mirrors radiating light, poised and precise, sumi-e style with electric blue and silver accents, portrait',
 aid:{name:'镜光一闪',type:'vuln',mult:1.8,vuln:0.5,rounds:2,desc:'相熟雷伤加易伤，信重震骇打断加雷伤，莫逆群雷伤眩晕，本体群雷核弹眩晕灼烧。'},
-gifts:{loved:['xiangzhu'],liked:['panta'],disliked:['hulu']}},
+gifts:{loved:['xiangzhu'],liked:['panta'],disliked:['hulu']},set:'dian_mu'},
 zhao_gongming:{name:'赵公明',title:'武财神',icon:'赵',tier:'B',camp:'天庭',path:'bing',unlock:{ch:3},gh:'b_zhaogong',
 intro:'武财神玄坛元帅，率招宝纳珍招财利市四神主公平之财与驱雷驭役，旧瘟神出身，最懂被天庭定义再被香火改写的价码。',
 quote:'钱财的事好说——本帅早年管的，可是要命的买卖。',
@@ -182,7 +182,7 @@ quote:'钱财的事好说——本帅早年管的，可是要命的买卖。',
   story:'赵公明本是瘟神，后来被道教收编变成武财神。他手拿黑鞭，骑黑虎。有四个手下：招宝、纳珍、招财、利市——合起来叫「五路财神」。过年贴的财神画，武财神是他，文财神是比干。',
 img:'Chinese ink wash painting of Zhao Gongming the military wealth god on a black tiger with iron whip, opulent and shrewd, sumi-e style with gold and black accents, portrait',
 aid:{name:'铁鞭扫',type:'nuke',mult:2.6,desc:'相熟重击破甲，信重流血连击，莫逆群伤群易伤，本体核弹缴械并战后掉宝提升。'},
-gifts:{loved:['puti'],liked:['panta'],disliked:['taomu']}},
+gifts:{loved:['puti'],liked:['panta'],disliked:['taomu']},set:'zhao_gongming'},
 wen_chang:{name:'文昌帝君',title:'文昌帝君',icon:'昌',tier:'B',camp:'天庭',path:'fa',unlock:{ch:3},gh:'f_wenchang',
 intro:'掌天下文运功名禄籍桂籍榜册，读书人的头顶上司，梓潼神与文昌六星合流，骑白特侍天聋地哑，天庭亲信掌禄籍。',
 quote:'禄籍榜册都在本君案头；只是身边这两位，一个听不见，一个说不出。',
@@ -190,7 +190,7 @@ quote:'禄籍榜册都在本君案头；只是身边这两位，一个听不见�
   story:'文昌帝君本是文昌星，后来人格化成张亚子。传说东晋时四川人，战死沙场后被封为文昌帝君，专管科举。旁边总跟着「天聋」「地哑」两个童子——天机不可泄露，所以一个聋一个哑。',
 img:'Chinese ink wash painting of Wenchang the literature god riding a white mule with brush and scroll, elegant and scholarly, sumi-e style with indigo and gold, portrait',
 aid:{name:'朱笔点斗',type:'vuln',mult:1.9,vuln:0.5,rounds:2,desc:'相熟易伤加命中，信重群沉默，莫逆全队暴击回能，本体群易伤并禁用援助法术。'},
-gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['hulu']}},
+gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['hulu']},set:'wen_chang'},
 ma_zu:{name:'妈祖',title:'天上圣母',icon:'妈',tier:'B',camp:'民间',path:'sheng',unlock:{ch:3},gh:'s_mazu',
 intro:'海神主海上救难护航济溺，闽海舟船与漕运的命，林默娘乘席渡海专济海难，民命海难为上，削藩动她先动民心。',
 quote:'海上风再大，灯亮着，人，便要回来。',
@@ -198,7 +198,7 @@ quote:'海上风再大，灯亮着，人，便要回来。',
   story:'妈祖本名林默娘，福建莆田人。她能「神游」海上预知风暴。有次听说父亲出海遇风暴，神游去救，可惜救不了父亲自己也去了。死后湄洲岛建庙祭祀，从宋朝一路封到「天妃」「天后」「天上圣母」。',
 img:'Chinese ink wash painting of Mazu the sea goddess in flowing robes by a lantern tower over stormy waves, compassionate and calm, sumi-e style with sea blue accents, portrait',
 aid:{name:'神灯引',type:'heal',heal:0.40,desc:'相熟治疗夜间加成，信重全队护盾减伤，莫逆群显形易伤，本体大盾免死持续回血。'},
-gifts:{loved:['wugu'],liked:['xiangzhu'],disliked:['panta']}},
+gifts:{loved:['wugu'],liked:['xiangzhu'],disliked:['panta']},set:'ma_zu'},
 guan_yu:{name:'关羽',title:'关圣帝君',icon:'关',tier:'B',camp:'民间',path:'bing',unlock:{ch:3},gh:'b_wusheng',
 intro:'武圣主忠义伏魔武运与江湖商贾信义，三教共尊，傲上而不忍下，青龙偃月水淹七军威震华夏，头枕洛阳身卧当阳唯义是从。',
   sources:'《三国志·蜀书·关羽传》；《佛祖统纪》（智者大师玉泉显圣）；《三国演义》；历朝封号',
@@ -213,54 +213,54 @@ quote:'本王这三只眼里，神仙和妖邪，走的是同一道闸。',
   story:'王灵官本名王恶，北宋长沙人。死后被道教收编成天庭「纠察御史」——专管众神有没有犯错。手拿金鞭脚踏风火轮，额头有第三只眼。送他「桃木如意」他会很高兴——他最讨厌邪祟。',
 img:'Chinese ink wash painting of Marshal Wang Lingguan with red face and third eye holding a golden whip, fierce and just, sumi-e style with fire red and gold, portrait',
 aid:{name:'金鞭一指',type:'nuke',mult:2.6,desc:'相熟雷伤打断，信重群灼冲锋震骇，莫逆群打断加反伤盾，本体群雷核弹定身反伤。'},
-gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']}},
+gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']},set:'wang_lingguan'},
 zeng_zhang:{name:'增长天王',title:'增长天王',icon:'增',tier:'B',camp:'释门',path:'fa',unlock:{ch:3},gh:'f_tianwang',
 intro:'四大天王之一护南赡部洲令善根增长掌风，魔礼青执青云剑剑锋无鞘，令行禁止的天庭受调护法，忠于合同与排班。',
   sources:'《长阿含经》《金光明经》；《陀罗尼集经》；《封神演义》第四十、九十九回',
   story:'增长天王是四大天王之一，佛教护法神也被道教收编。名字叫「毗楼勒叉」，汉译「增长」——令众生增长善根。手拿宝剑守护南方。四大天王寓意「风调雨顺」，持剑增长代表「风」。',
 img:'Chinese ink wash painting of the Growth Heavenly King Virudhaka with blue body holding a sword, majestic and martial, sumi-e style with azure and gold armor, portrait',
 aid:{name:'青云剑·风',type:'vuln',mult:1.8,vuln:0.5,rounds:2,desc:'相熟群伤加易伤，信重全队攻防增益，莫逆群灼风刃，本体风火群核弹击退震骇。'},
-gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']}},
+gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']},set:'zeng_zhang'},
 duo_wen:{name:'多闻天王',title:'多闻天王',icon:'闻',tier:'B',camp:'释门',path:'fa',unlock:{ch:3},gh:'f_tianwang',
 intro:'四大天王之一护北俱芦洲以福德名闻四方，掌雨伞财施，魔礼红持混元珠伞，四天王里最懂代价的护法，管过边塞见过弃子。',
   sources:'《长阿含经》《毗沙门天王经》；《大唐西域记》（于阗护国）；《封神演义》',
   story:'多闻天王是四大天王之首，佛教叫「毗沙门」。手拿伞（或幢幡），怀里抱着「吐宝鼠」能吐金银。本是印度神，传到中国成财神之一，又演变成托塔李天王。',
 img:'Chinese ink wash painting of the Vaishravana Heavenly King with green body holding a precious umbrella and jewel-spitting mongoose, composed and worldly, sumi-e style, portrait',
 aid:{name:'伞盖轻旋',type:'shield',shield:0.38,desc:'相熟全队小盾，信重驱散增益缴械，莫逆群伤致盲，本体群控2回合并吸增益转大盾。'},
-gifts:{loved:['puti'],liked:['mozhen'],disliked:['hulu']}},
+gifts:{loved:['puti'],liked:['mozhen'],disliked:['hulu']},set:'duo_wen'},
 qin_guang:{name:'秦广王',title:'一殿秦广',icon:'秦',tier:'B',camp:'地府',path:'you',unlock:{ch:3},gh:'y_qinguang',
 intro:'十殿第一殿接引亡魂初判善恶，善人超升恶者照孽镜后分发诸狱，精明客气程式化疲劳的幽冥前台，批送十殿的笔很快。',
 quote:'初到是吧？善恶单在那边填，笔自取——莫急，都得排。',
   sources:'《玉历宝钞》（清传本）；《集说诠真》；《阎王经》系统',
 img:'Chinese ink wash painting of King Qin Guang first hall of the underworld holding a brush and ledger, shrewd and tired, sumi-e style with dark robes, portrait',
 aid:{name:'销牒朱笔',type:'percent',pct:0.32,desc:'相熟单体真伤，信重显形加易伤，莫逆群定身，本体群显形群易伤加大真伤。'},
-gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']}},
+gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']},set:'qin_guang'},
 yan_luo:{name:'阎罗王',title:'五殿阎罗',icon:'阎',tier:'B',camp:'地府',path:'you',unlock:{ch:3},gh:'y_yanluo',
 intro:'五殿阎罗王掌叫唤大地狱与十六诛心小狱审喊冤之鬼，因哀怜屈死屡放亡魂还阳被降调，玩家顶头上司，自身难保。',
 quote:'喊冤的先领号——本王自己，也还在队里排着呢。',
   sources:'《洛阳伽蓝记》；《隋书·韩擒虎传》；《玉历宝钞》；元杂剧、《三侠五义》（包拯）',
 img:'Chinese ink wash painting of King Yama fifth hall with black face and crescent mark holding a scepter,威严 and weary, sumi-e style with deep purple and black, portrait',
 aid:{name:'狱火惊堂',type:'percent',pct:0.33,desc:'相熟真伤，信重大真伤禁疗，莫逆群震骇加真伤，本体核弹真伤加禁疗场域2回合。'},
-gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']}},
+gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']},set:'yan_luo'},
 zhuan_lun:{name:'转轮王',title:'十殿转轮',icon:'轮',tier:'B',camp:'地府',path:'you',unlock:{ch:3},gh:'y_zhuanlun',
 intro:'十殿之末核定胎卵湿化男女贵贱发六道投生，给每个灵魂留最后一程体面的送站老人，十万游魂堵在轮回门前不是他的错。',
   sources:'《玉历宝钞》；《集说诠真》；敦煌写本《十王经》',
 img:'Chinese ink wash painting of the Wheel-Turning King tenth hall turning the six-realm wheel, gentle and patient, sumi-e style with muted gold and grey, portrait',
 aid:{name:'轮回簿翻',type:'debuff',atk:-0.2,def:-0.2,rounds:2,desc:'相熟降攻防2回合，信重治疗净化，莫逆随机控制，本体清增益清CD并复活一人。'},
-gifts:{loved:['puti'],liked:['wugu'],disliked:['taomu']}},
+gifts:{loved:['puti'],liked:['wugu'],disliked:['taomu']},set:'zhuan_lun'},
 ao_guang:{name:'敖广',title:'东海龙王',icon:'敖',tier:'B',camp:'天庭',path:'fa',unlock:{ch:3},gh:'f_aoguang',
 intro:'四海水族之长领巡海夜叉虾兵蟹将司兴云布雨，招安派老狐狸，想给东海洋下一场不必请旨的雨，三太子被哪吒抽了筋。',
 quote:'下雨，得请旨；你这桩小事嘛——寡王先「研究研究」。',
   sources:'《西游记》第三、十、四十一回等；《封神演义》（敖光）；《酉阳杂俎》；唐《祠令》封四海龙王',
 img:'Chinese ink wash painting of the Dragon King Ao Guang in dragon robes with coral crown, aged and diplomatic, sumi-e style with sea blue and jade green, portrait',
 aid:{name:'雨簿一点',type:'burn',mult:1.3,burnPct:0.5,burnRounds:3,desc:'相熟群水伤减速，信重缠绕控制加水伤，莫逆重击加群水伤，本体水雷群核弹缠绕破防。'},
-gifts:{loved:['puti'],liked:['panta'],disliked:['taomu']}},
+gifts:{loved:['puti'],liked:['panta'],disliked:['taomu']},set:'ao_guang'},
 zhong_yue:{name:'中岳大帝',title:'中天崇圣',icon:'嵩',tier:'B',camp:'天庭',path:'sheng',unlock:{ch:3},gh:'s_zhongyue',
 intro:'中岳嵩山之神居天下之中主土地山川陵台与地脉消长，五岳分权削藩受害者，地脉空心化被动中枢，教井神假装自己还满着。',
   sources:'《礼记·王制》五岳祀；《山海经·中次七经》；《旧唐书·礼仪志》；《宋史·礼志》；《五岳真形图》',
 img:'Chinese ink wash painting of the Central Sacred Mountain Emperor on Mount Song with flowing robes, heavy and ancient, sumi-e style with earthy green and stone grey, portrait',
 aid:{name:'岳影为屏',type:'shield',shield:0.40,desc:'相熟减伤护盾，信重群真伤减速，莫逆大减伤反伤，本体群真伤眩晕加地脉回血。'},
-gifts:{loved:['xiangzhu'],liked:['wugu'],disliked:['hulu']}},
+gifts:{loved:['xiangzhu'],liked:['wugu'],disliked:['hulu']},set:'zhong_yue'},
 er_lang:{name:'二郎神',title:'清源真君',icon:'戬',tier:'A',camp:'天庭',path:'bing',unlock:{ch:3},gh:'b_qingyuan',
 intro:'昭惠灵显王领梅山七圣一千二百草头神，听调不听宣的灌江口割据强神，斧劈桃山救母担山逐日，削藩首要对象。',
 quote:'调令，本君接了；宣么？灌江口的庙门，从不朝那个方向开。',
@@ -280,25 +280,25 @@ quote:'魔，本帝来荡。其余的话——龟蛇不会说，本帝也不说�
   sources:'《三教源流搜神大全》；《玄天上帝启圣录》；《明史·礼志》；宋赵彦卫《云麓漫钞》',
 img:'Chinese ink wash painting of the True Martial Emperor with loose hair and bare feet stepping on turtle and snake, holding the Big Dipper sword, silent and majestic, sumi-e style, portrait',
 aid:{name:'七星剑影',type:'nuke',mult:3.0,desc:'相熟雷水重击，信重缠绕减速2回合，莫逆群雷水震骇，本体群核弹对妖魔追加真伤。'},
-gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']}},
+gifts:{loved:['taomu'],liked:['xiangzhu'],disliked:['hulu']},set:'zhen_wu'},
 lei_zu:{name:'雷祖',title:'普化天尊',icon:'雷',tier:'A',camp:'天庭',path:'fa',unlock:{ch:3},gh:'f_leizu',
 intro:'雷部至尊统三十六雷主天之祸福物之权衡，掌物掌人司生司杀，闻仲绝龙岭封神，雷部被工单淹没，要劈的是发令的人。',
   sources:'《九天应元雷声普化天尊玉枢宝经》；《明史·礼志》；《道法会元》；《封神演义》第九十九回（闻仲）',
 img:'Chinese ink wash painting of the Thunder Ancestor Wen Zhong with third eye and twin whips riding a qilin, dignified old minister, sumi-e style with purple lightning and gold, portrait',
 aid:{name:'五雷正法',type:'nuke',mult:3.4,desc:'相熟大雷伤打断，信重群雷伤灼烧，莫逆残血处决，本体全屏雷核弹眩晕禁疗核验罪名。'},
-gifts:{loved:['xiangzhu'],liked:['taomu'],disliked:['wugu']}},
+gifts:{loved:['xiangzhu'],liked:['taomu'],disliked:['wugu']},set:'lei_zu'},
 xi_yue:{name:'西岳大帝',title:'金天顺圣',icon:'华',tier:'A',camp:'天庭',path:'sheng',unlock:{ch:3},gh:'s_xiyue',
 intro:'西岳华山之神西方属金主五金矿藏飞禽走兽陶铸坑冶之利，守着满山不能换香火自保的金子，三圣母被压华山西峰的旧账。',
   sources:'《礼记·王制》；《龙鱼河图》；《旧唐书·礼仪志》；《宋史·礼志》；《五岳真形图》；《沉香宝卷》（劈山救母附会）',
 img:'Chinese ink wash painting of the Western Sacred Mountain Emperor of Mount Hua in golden robes, aloof and noble-weary, sumi-e style with gold and stone grey, portrait',
 aid:{name:'金锋一线',type:'nuke',mult:2.9,desc:'相熟破防重击，信重全队厚盾，莫逆群伤群易伤，本体真伤核弹加易伤禁疗2回合。'},
-gifts:{loved:['puti'],liked:['xiangzhu'],disliked:['hulu']}},
+gifts:{loved:['puti'],liked:['xiangzhu'],disliked:['hulu']},set:'xi_yue'},
 xuan_nv:{name:'九天玄女',title:'九天玄女',icon:'玄',tier:'A',camp:'上古',path:'fa',unlock:{ch:3},gh:'f_xuannv',
 intro:'上古兵主与术数之祖，传奇门遁甲六壬兵符，于天命将倾时只授破局者的西王母座前传法人，授黄帝破蚩尤、宋江三卷天书。',
   sources:'《诗经·商颂·玄鸟》；《黄帝内经》（传本）；《云笈七签·九天玄女传》；《广黄帝本行记》；《水浒传》第四十二回',
 img:'Chinese ink wash painting of the Mysterious Lady of the Ninth Heaven on a phoenix holding scrolls and talismans, cold and transcendent, sumi-e style with dark teal and silver, portrait',
 aid:{name:'六壬课',type:'vuln',mult:2.0,vuln:0.5,rounds:2,desc:'相熟易伤看破意图，信重全队闪避先手，莫逆剑阵群伤，本体打断群易伤并全队CD归零。'},
-gifts:{loved:['mozhen'],liked:['puti'],disliked:['wugu']}},
+gifts:{loved:['mozhen'],liked:['puti'],disliked:['wugu']},set:'xuan_nv'},
 guan_yin:{name:'观音菩萨',title:'大慈大悲',icon:'观',tier:'A',camp:'释门',path:'sheng',unlock:{ch:3},gh:'s_guanyin',
 intro:'寻声救苦随类化现的大悲菩萨三十三身，手持净瓶杨柳，落伽山潮音洞听三界哭号，净瓶甘露能起死回生，慈悲不站队。',
 quote:'哪一处有哭声，哪一处，便是南海。',
@@ -311,13 +311,13 @@ intro:'幽冥教主地狱未空誓不成佛度尽六道罪苦众生的大愿菩�
   sources:'《地藏菩萨本愿经》；《大乘大集地藏十轮经》；唐《九华山化成寺记》（金乔觉）；《西游记》第三回、五十八回（谛听）',
 img:'Chinese ink wash painting of Ksitigarbha bodhisattva with monk staff and wish-fulfilling pearl, gentle and vow-deep, sumi-e style with gold and muted red, portrait',
 aid:{name:'谛听伏地',type:'vuln',mult:1.9,vuln:0.5,rounds:2,desc:'相熟看破群显形易伤，信重治疗对鬼真伤，莫逆全队盾阵亡反弹，本体鬼类持续真伤禁疗。'},
-gifts:{loved:['puti'],liked:['xiangzhu'],disliked:['taomu']}},
+gifts:{loved:['puti'],liked:['xiangzhu'],disliked:['taomu']},set:'di_zang'},
 wei_tuo:{name:'韦驮',title:'护法韦驮',icon:'韦',tier:'A',camp:'释门',path:'bing',unlock:{ch:3},gh:'b_weituo',
 intro:'四大天王部下三十二将之首，护持僧伽佛法守护佛舍利的护法总神，山门内最后一个动手的神，一杵一个准，只奉法旨。',
   sources:'《长阿含经》；《大藏经·护法篇》（韦驮天/Skanda）；《金光明经》；《封神演义》韦护',
 img:'Chinese ink wash painting of Skanda the protector deity in youthful armor holding a vajra pestle upright, disciplined and solemn, sumi-e style with gold and saffron, portrait',
 aid:{name:'降魔杵影',type:'nuke',mult:3.1,desc:'相熟重击对魔加成，信重全队嘲讽大盾，莫逆贯穿连击打断，本体核弹对魔处决加免控盾。'},
-gifts:{loved:['taomu'],liked:['puti'],disliked:['hulu']}},
+gifts:{loved:['taomu'],liked:['puti'],disliked:['hulu']},set:'wei_tuo'},
 sun_wukong:{name:'孙悟空',title:'斗战胜佛',icon:'猴',tier:'S',camp:'妖仙',path:'bing',unlock:{ch:3},gh:'b_douzhan',
 intro:'花果山美猴王齐天大圣斗战胜佛，前半生反了两次天取了一趟经的石猴，削藩受害者花果山余部线，成佛后头上金箍没人收走过。',
   sources:'《西游记》（全书，第一、四、七回为主）；《大唐三藏取经诗话》；元杂剧《二郎神锁齐天大圣》',
@@ -329,19 +329,19 @@ intro:'天下鬼神之宗治罗酆山统北阴六天宫三千年一替的幽冥�
   sources:'南朝·陶弘景《真灵位业图》第七中位；《枕中书》；《真诰》；葛洪《神仙传》（王方平、阴长生）',
 img:'Chinese ink wash painting of the Great Emperor of Fengdu in ancient dark robes before six ghost palaces, aged and tired of power, sumi-e style with black and bronze, portrait',
 aid:{name:'罗酆令',type:'percent',pct:0.40,desc:'相熟真伤对神加成，信重群减攻减速，莫逆群真伤削弱，本体全屏核弹封印援助并满复活。'},
-gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']}},
+gifts:{loved:['mozhen'],liked:['xiangzhu'],disliked:['panta']},set:'feng_du'},
 dong_yue:{name:'东岳大帝',title:'天齐仁圣',icon:'泰',tier:'S',camp:'地府',path:'you',unlock:{ch:3},gh:null,
 intro:'五岳之首天帝之孙主召人魂魄定人生死贵贱，幽冥地府十八重地狱总领，被相爷借名架空的生死总领，用朕的名收天下人的命。',
   sources:'《风俗通义》；《博物志》；《旧唐书·礼仪志》；《宋史·礼志》；《封神演义》第九十九回；《五岳真形图》',
 img:'Chinese ink wash painting of the Eastern Sacred Mountain Emperor of Mount Tai in imperial robes holding the book of life and death,沉重 and regal-weary, sumi-e style with jade and imperial gold, portrait',
 aid:{name:'天齐符',type:'percent',pct:0.38,desc:'相熟真伤加易伤，信重减伤领域，莫逆血线越低越锁定，本体全屏真伤核弹封复活治疗。'},
-gifts:{loved:['xiangzhu'],liked:['wugu'],disliked:['panta']}},
+gifts:{loved:['xiangzhu'],liked:['wugu'],disliked:['panta']},set:'dong_yue'},
 xi_wangmu:{name:'西王母',title:'瑶池金母',icon:'母',tier:'S',camp:'上古',path:'sheng',unlock:{ch:3},gh:null,
 intro:'女仙之首居昆仑玉山瑶池掌不死药与蟠桃，司天之厉及五残的上古大神，终章瑶池叙功宴立场戏的旧贵之首，见过穆天子与汉武帝。',
   sources:'《山海经·西山经·大荒西经》；《穆天子传》；《汉武帝内传》《汉武故事》；《枕中书》；《西游记》',
 img:'Chinese ink wash painting of the Queen Mother of the West in noble robes beside jade lake with peaches, poised and看透一切, sumi-e style with jade green and mother-of-pearl, portrait',
 aid:{name:'三青传信',type:'vuln',mult:2.1,vuln:0.5,rounds:2,desc:'相熟看破易伤，信重回血微盾，莫逆群沉默减速，本体复活群定身或真伤核弹禁疗。'},
-gifts:{loved:['panta'],liked:['puti'],disliked:['taomu']}}
+gifts:{loved:['panta'],liked:['puti'],disliked:['taomu']},set:'xi_wangmu'}
 };
 
 const SHARD_NEED=5;
@@ -1326,6 +1326,148 @@ const ITEMS = {
     desc:'防御 +15，神躯上限 +45。袖口卷到肘上——干活的人穿的衣服，从不讲究。', stat:{def:15,hp:45} },
   lb_chi: { name:'鲁班曲尺', slot:'trinket', grade:'灵品', price:0, icon:'尺', set:'lu_ban', noShop:true, noSell:true,
     desc:'防御 +8，神躯上限 +30。量过天庭的梁，也量过人家的门；尺子是直的，人是弯的。', stat:{def:8,hp:30} },
+  /* 第四批神明套装：八仙、雷部、财神、文昌、海神（C~B级） */
+  lv_jian:{ name:'纯阳剑', slot:'weapon', grade:'宝品', price:0, icon:'纯', set:'lv_dongbin', noShop:true, noSell:true,
+    desc:'攻击 +19，暴击率 +6%。剑鞘上没刻名字——他说名字刻上去，剑就只斩一个人了。', stat:{atk:19,crit:0.06} },
+  lv_pao: { name:'纯阳道袍', slot:'armor', grade:'灵品', price:0, icon:'袍', set:'lv_dongbin', noShop:true, noSell:true,
+    desc:'防御 +13，神躯上限 +50。袖口沾着酒渍和鹤羽，洗了三百年也洗不干净。', stat:{def:13,hp:50} },
+  lv_hu:  { name:'纯阳酒葫芦', slot:'trinket', grade:'宝品', price:0, icon:'葫', set:'lv_dongbin', noShop:true, noSell:true,
+    desc:'神力上限 +25，暴击伤害 +10%。摇了摇，里头还有半壶——他说留着，等个合适的人一起喝。', stat:{maxMp:25,critDmg:0.10} },
+  hx_zan: { name:'荷露玉簪', slot:'weapon', grade:'宝品', price:0, icon:'簪', set:'he_xiangu', noShop:true, noSell:true,
+    desc:'攻击 +16，神力上限 +18。簪头一点露水，天亮了也不干——她说这是给赶路的人留的。', stat:{atk:16,maxMp:18} },
+  hx_yi:  { name:'藕丝仙衣', slot:'armor', grade:'灵品', price:0, icon:'藕', set:'he_xiangu', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +55。藕丝抽出来织的，断了还连着，扯不断。', stat:{def:12,hp:55} },
+  hx_ye:  { name:'仙姑荷叶', slot:'trinket', grade:'宝品', price:0, icon:'荷', set:'he_xiangu', noShop:true, noSell:true,
+    desc:'神力上限 +20；每场战斗开始时恢复 12% 生命。一片荷叶能挡雨，也能挡刀子。', stat:{maxMp:20}, proc:{healStart:0.12} },
+  dm_jing:{ name:'电光镜', slot:'weapon', grade:'宝品', price:0, icon:'电', set:'dian_mu', noShop:true, noSell:true,
+    desc:'攻击 +18，暴击率 +6%。两面镜子一照，天上的云就裂开一道白。', stat:{atk:18,crit:0.06} },
+  dm_yi:  { name:'云雷衣', slot:'armor', grade:'灵品', price:0, icon:'雷', set:'dian_mu', noShop:true, noSell:true,
+    desc:'防御 +12，神躯上限 +50。雷雨夜赶工补的，针脚歪歪扭扭，雷却劈不透。', stat:{def:12,hp:50} },
+  dm_cha: { name:'分雷钗', slot:'trinket', grade:'宝品', price:0, icon:'钗', set:'dian_mu', noShop:true, noSell:true,
+    desc:'暴击率 +4%，暴击伤害 +12%。钗尖分雷，雷公劈偏的那一道，全从这儿补上。', stat:{crit:0.04,critDmg:0.12} },
+  zg_bian:{ name:'玄坛铁鞭', slot:'weapon', grade:'宝品', price:0, icon:'鞭', set:'zhao_gongming', noShop:true, noSell:true,
+    desc:'攻击 +22，暴击率 +6%。鞭身缠着一条褪色的红绳——那是黑虎的缰绳，也顺手抽人。', stat:{atk:22,crit:0.06} },
+  zg_jia: { name:'玄坛金甲', slot:'armor', grade:'宝品', price:0, icon:'坛', set:'zhao_gongming', noShop:true, noSell:true,
+    desc:'防御 +16，神躯上限 +60。甲片上刻满小字，不是符文，是一笔笔欠账的还款日。', stat:{def:16,hp:60} },
+  zg_zhu: { name:'定海珠', slot:'trinket', grade:'仙品', price:0, icon:'珠', set:'zhao_gongming', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +14%。二十四颗里丢了一颗——他说丢在人间，比搁在库房踏实。', stat:{maxMp:30,critDmg:0.14} },
+  wc_bi:  { name:'点斗朱笔', slot:'weapon', grade:'宝品', price:0, icon:'斗', set:'wen_chang', noShop:true, noSell:true,
+    desc:'攻击 +20，神力上限 +15。笔尖只点三下：一点天，二点地，三点人心里那口气。', stat:{atk:20,maxMp:15} },
+  wc_pao: { name:'文昌锦袍', slot:'armor', grade:'宝品', price:0, icon:'昌', set:'wen_chang', noShop:true, noSell:true,
+    desc:'防御 +15，神躯上限 +55。袍上暗绣星图，穿久了，连写字都带着星子气。', stat:{def:15,hp:55} },
+  wc_dou: { name:'魁星斗', slot:'trinket', grade:'宝品', price:0, icon:'魁', set:'wen_chang', noShop:true, noSell:true,
+    desc:'神力上限 +35，暴击伤害 +12%。斗里盛的不是谷，是天下读书人压在案头的灯灰。', stat:{maxMp:35,critDmg:0.12} },
+  mz_fan: { name:'顺风帆', slot:'weapon', grade:'宝品', price:0, icon:'帆', set:'ma_zu', noShop:true, noSell:true,
+    desc:'攻击 +19，神躯上限 +20。帆上补丁摞着补丁，每一块都是被救回来的船留下的。', stat:{atk:19,hp:20} },
+  mz_yi:  { name:'妈祖霞帔', slot:'armor', grade:'宝品', price:0, icon:'帔', set:'ma_zu', noShop:true, noSell:true,
+    desc:'防御 +15，神躯上限 +65。海风里披了三百年，颜色淡了，压风浪的势头一点没淡。', stat:{def:15,hp:65} },
+  mz_deng:{ name:'湄洲引航灯', slot:'trinket', grade:'宝品', price:0, icon:'灯', set:'ma_zu', noShop:true, noSell:true,
+    desc:'神力上限 +25；每场战斗开始时恢复 12% 生命。雾里最先亮起来的那一盏，从来不在岸上。', stat:{maxMp:25}, proc:{healStart:0.12} },
+  /* 第五批神明套装：天庭纠察、四大天王、十殿阎罗、岳神（B级） */
+  wl_bian:{ name:'纠察金鞭', slot:'weapon', grade:'宝品', price:0, icon:'鞭', set:'wang_lingguan', noShop:true, noSell:true,
+    desc:'攻击 +23，暴击率 +6%。鞭梢有火，抽过的地方三百年还烫手。', stat:{atk:23,crit:0.06} },
+  wl_jia: { name:'火轮甲', slot:'armor', grade:'宝品', price:0, icon:'轮', set:'wang_lingguan', noShop:true, noSell:true,
+    desc:'防御 +16，神躯上限 +60。甲下踩着两只风火轮，站岗三百年，没坐下过。', stat:{def:16,hp:60} },
+  wl_yin: { name:'纠察印', slot:'trinket', grade:'宝品', price:0, icon:'纠', set:'wang_lingguan', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。印上刻着四个字：先查自己。', stat:{maxMp:30,critDmg:0.12} },
+  zz_jian:{ name:'青云剑', slot:'weapon', grade:'宝品', price:0, icon:'青', set:'zeng_zhang', noShop:true, noSell:true,
+    desc:'攻击 +24，暴击率 +6%。剑锋无鞘——他说剑一入鞘，风就停了。', stat:{atk:24,crit:0.06} },
+  zz_kai: { name:'增长明光铠', slot:'armor', grade:'宝品', price:0, icon:'增', set:'zeng_zhang', noShop:true, noSell:true,
+    desc:'防御 +16，神躯上限 +60。铠上每一道划痕，都是替别人挡的。', stat:{def:16,hp:60} },
+  zz_ling:{ name:'善根风铃', slot:'trinket', grade:'宝品', price:0, icon:'铃', set:'zeng_zhang', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。铃响了，就是有人的善根长了一寸。', stat:{maxMp:30,critDmg:0.12} },
+  dw_san: { name:'混元珠伞', slot:'weapon', grade:'宝品', price:0, icon:'伞', set:'duo_wen', noShop:true, noSell:true,
+    desc:'攻击 +22，神力上限 +15。伞面一旋，风是风，雨是雨，账是账。', stat:{atk:22,maxMp:15} },
+  dw_jia: { name:'毗沙门甲', slot:'armor', grade:'宝品', price:0, icon:'闻', set:'duo_wen', noShop:true, noSell:true,
+    desc:'防御 +16，神躯上限 +62。甲里缝着一只小布袋，装着边塞孩子的乳牙。', stat:{def:16,hp:62} },
+  dw_shu: { name:'吐宝鼠', slot:'trinket', grade:'宝品', price:0, icon:'宝', set:'duo_wen', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。它只吐它觉得该吐的，从不听人使唤。', stat:{maxMp:30,critDmg:0.12} },
+  qg_bi:  { name:'销牒朱笔', slot:'weapon', grade:'宝品', price:0, icon:'牒', set:'qin_guang', noShop:true, noSell:true,
+    desc:'攻击 +20，神力上限 +15。笔杆磨得发亮，是三十年排号排出来的。', stat:{atk:20,maxMp:15} },
+  qg_pao: { name:'一殿皂袍', slot:'armor', grade:'宝品', price:0, icon:'殿', set:'qin_guang', noShop:true, noSell:true,
+    desc:'防御 +15，神躯上限 +55。袖口沾着墨，也沾着别人的眼泪。', stat:{def:15,hp:55} },
+  qg_jing:{ name:'孽镜', slot:'trinket', grade:'宝品', price:0, icon:'镜', set:'qin_guang', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。照人先照亮处，再照亮处背后那点暗。', stat:{maxMp:30,critDmg:0.12} },
+  yl_mu:  { name:'惊堂木', slot:'weapon', grade:'宝品', price:0, icon:'堂', set:'yan_luo', noShop:true, noSell:true,
+    desc:'攻击 +24，暴击率 +6%。一拍，堂下就静了；可他自己那桩冤，从没拍响过。', stat:{atk:24,crit:0.06} },
+  yl_pao: { name:'五殿玄袍', slot:'armor', grade:'宝品', price:0, icon:'阎', set:'yan_luo', noShop:true, noSell:true,
+    desc:'防御 +17，神躯上限 +65。袍角被地狱火烧焦过一回，补丁是黑的。', stat:{def:17,hp:65} },
+  yl_ling:{ name:'喊冤铃', slot:'trinket', grade:'宝品', price:0, icon:'冤', set:'yan_luo', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。铃有三千个，能响的不到三十个。', stat:{maxMp:30,critDmg:0.12} },
+  zl_lun: { name:'转轮盘', slot:'weapon', grade:'宝品', price:0, icon:'轮', set:'zhuan_lun', noShop:true, noSell:true,
+    desc:'攻击 +21，神力上限 +18。盘转一格，就有一个魂忘掉来路。', stat:{atk:21,maxMp:18} },
+  zl_pao: { name:'十殿素袍', slot:'armor', grade:'宝品', price:0, icon:'素', set:'zhuan_lun', noShop:true, noSell:true,
+    desc:'防御 +15，神躯上限 +58。素得像送站老人穿的，袖口磨得起了毛。', stat:{def:15,hp:58} },
+  zl_ce:  { name:'轮回簿', slot:'trinket', grade:'宝品', price:0, icon:'簿', set:'zhuan_lun', noShop:true, noSell:true,
+    desc:'神力上限 +32，暴击伤害 +12%。簿上不留名字，只留去向。', stat:{maxMp:32,critDmg:0.12} },
+  ag_jian:{ name:'龙渊剑', slot:'weapon', grade:'宝品', price:0, icon:'渊', set:'ao_guang', noShop:true, noSell:true,
+    desc:'攻击 +23，暴击率 +6%。剑沉在东海三千年，出鞘时海水跟着上来。', stat:{atk:23,crit:0.06} },
+  ag_pao: { name:'龙王衮服', slot:'armor', grade:'宝品', price:0, icon:'龙', set:'ao_guang', noShop:true, noSell:true,
+    desc:'防御 +16，神躯上限 +62。龙鳞缀的，每一片都记着一场没请旨的雨。', stat:{def:16,hp:62} },
+  ag_zhu: { name:'定雨珠', slot:'trinket', grade:'宝品', price:0, icon:'雨', set:'ao_guang', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。珠里有一场雨，下了三百年，还没落地。', stat:{maxMp:30,critDmg:0.12} },
+  zy_yin: { name:'中岳玉印', slot:'weapon', grade:'宝品', price:0, icon:'嵩', set:'zhong_yue', noShop:true, noSell:true,
+    desc:'攻击 +22，防御 +8。印压的是地脉，抬起来，山就喘一口气。', stat:{atk:22,def:8} },
+  zy_pao: { name:'嵩岳法袍', slot:'armor', grade:'宝品', price:0, icon:'岳', set:'zhong_yue', noShop:true, noSell:true,
+    desc:'防御 +17，神躯上限 +68。袍上绣的不是云，是地底下的水脉。', stat:{def:17,hp:68} },
+  zy_shu: { name:'地脉玉简', slot:'trinket', grade:'宝品', price:0, icon:'简', set:'zhong_yue', noShop:true, noSell:true,
+    desc:'神力上限 +30，暴击伤害 +12%。简上记着每一口井的深浅，也记着哪口井被抽空了。', stat:{maxMp:30,critDmg:0.12} },
+  /* 第六批神明套装：真武、雷祖、西岳、玄女、地藏、韦驮（A级） */
+  zw_jian:{ name:'七星剑', slot:'weapon', grade:'仙品', price:0, icon:'罡', set:'zhen_wu', noShop:true, noSell:true,
+    desc:'攻击 +27，暴击率 +6%。剑脊上凿着七个孔，夜里各亮一颗星。', stat:{atk:27,crit:0.06} },
+  zw_jia: { name:'玄天玄甲', slot:'armor', grade:'仙品', price:0, icon:'玄', set:'zhen_wu', noShop:true, noSell:true,
+    desc:'防御 +18，神躯上限 +75。甲片是黑的，黑得像北方的夜。', stat:{def:18,hp:75} },
+  zw_ling:{ name:'龟蛇符', slot:'trinket', grade:'仙品', price:0, icon:'龟', set:'zhen_wu', noShop:true, noSell:true,
+    desc:'神力上限 +32，暴击伤害 +12%。符上龟蛇相缠，缠了三千年没松开。', stat:{maxMp:32,critDmg:0.12} },
+  lz_bian:{ name:'雌雄双鞭', slot:'weapon', grade:'仙品', price:0, icon:'鞭', set:'lei_zu', noShop:true, noSell:true,
+    desc:'攻击 +28，暴击率 +6%。一雌一雄，落雷时两声，先响的那声是给人听的。', stat:{atk:28,crit:0.06} },
+  lz_jia: { name:'雷祖金甲', slot:'armor', grade:'仙品', price:0, icon:'雷', set:'lei_zu', noShop:true, noSell:true,
+    desc:'防御 +18，神躯上限 +78。甲上雷纹是烧出来的，不是刻的。', stat:{def:18,hp:78} },
+  lz_yin: { name:'玉枢雷印', slot:'trinket', grade:'仙品', price:0, icon:'枢', set:'lei_zu', noShop:true, noSell:true,
+    desc:'神力上限 +35，暴击伤害 +13%。印一落，雷才敢落。', stat:{maxMp:35,critDmg:0.13} },
+  xy_feng:{ name:'金锋剑', slot:'weapon', grade:'仙品', price:0, icon:'锋', set:'xi_yue', noShop:true, noSell:true,
+    desc:'攻击 +27，暴击率 +6%。剑出华山金气，切石如切纸。', stat:{atk:27,crit:0.06} },
+  xy_pao: { name:'华岳金袍', slot:'armor', grade:'仙品', price:0, icon:'华', set:'xi_yue', noShop:true, noSell:true,
+    desc:'防御 +18，神躯上限 +76。袍色是金的，金底下压着一座山的影子。', stat:{def:18,hp:76} },
+  xy_yin: { name:'金天印', slot:'trinket', grade:'仙品', price:0, icon:'金', set:'xi_yue', noShop:true, noSell:true,
+    desc:'神力上限 +32，暴击伤害 +13%。印文「金天顺圣」，边角磕掉过一块——磕的是山。', stat:{maxMp:32,critDmg:0.13} },
+  xn_juan:{ name:'六壬天书', slot:'weapon', grade:'仙品', price:0, icon:'壬', set:'xuan_nv', noShop:true, noSell:true,
+    desc:'攻击 +26，神力上限 +18。书页没有字，翻开时字才浮上来，合上就忘。', stat:{atk:26,maxMp:18} },
+  xn_yi:  { name:'玄女羽衣', slot:'armor', grade:'仙品', price:0, icon:'羽', set:'xuan_nv', noShop:true, noSell:true,
+    desc:'防御 +17，神躯上限 +70。羽是青的，风过时整件衣裳都在响。', stat:{def:17,hp:70} },
+  xn_fu:  { name:'兵符', slot:'trinket', grade:'仙品', price:0, icon:'符', set:'xuan_nv', noShop:true, noSell:true,
+    desc:'神力上限 +35，暴击伤害 +13%。符分两半，一半在将，一半在君。', stat:{maxMp:35,critDmg:0.13} },
+  dz_zhang:{name:'九环锡杖', slot:'weapon', grade:'仙品', price:0, icon:'锡', set:'di_zang', noShop:true, noSell:true,
+    desc:'攻击 +26，神力上限 +16。走一步，九环响一次；响一次，地狱里就少一个人。', stat:{atk:26,maxMp:16} },
+  dz_yi:  { name:'九华僧衣', slot:'armor', grade:'仙品', price:0, icon:'华', set:'di_zang', noShop:true, noSell:true,
+    desc:'防御 +17，神躯上限 +72。衣上补丁二十七块，每一块都替一个人挡过。', stat:{def:17,hp:72} },
+  dz_zhu: { name:'如意宝珠', slot:'trinket', grade:'仙品', price:0, icon:'珠', set:'di_zang', noShop:true, noSell:true,
+    desc:'神力上限 +35，暴击伤害 +12%。珠光照到的地方，连鬼都不那么冷了。', stat:{maxMp:35,critDmg:0.12} },
+  wt_chu: { name:'降魔杵', slot:'weapon', grade:'仙品', price:0, icon:'杵', set:'wei_tuo', noShop:true, noSell:true,
+    desc:'攻击 +29，暴击率 +5%。杵重八十一斤，落地时山门都要抖一下。', stat:{atk:29,crit:0.05} },
+  wt_jia: { name:'护法明光甲', slot:'armor', grade:'仙品', price:0, icon:'护', set:'wei_tuo', noShop:true, noSell:true,
+    desc:'防御 +18，神躯上限 +74。甲片擦得能照见人——他说护法的人，先得让人看清。', stat:{def:18,hp:74} },
+  wt_li:  { name:'舍利匣', slot:'trinket', grade:'仙品', price:0, icon:'舍', set:'wei_tuo', noShop:true, noSell:true,
+    desc:'神力上限 +32，暴击伤害 +12%。匣子不重，可押它的人，一辈子不敢跑。', stat:{maxMp:32,critDmg:0.12} },
+  /* 第七批神明套装：酆都、东岳、西王母（S级） */
+  fd_ling:{ name:'罗酆令', slot:'weapon', grade:'仙品', price:0, icon:'酆', set:'feng_du', noShop:true, noSell:true,
+    desc:'攻击 +30，神力上限 +20。令出罗酆，六天宫的鬼都得低头——低的是令，不是人。', stat:{atk:30,maxMp:20} },
+  fd_pao: { name:'北阴玄袍', slot:'armor', grade:'仙品', price:0, icon:'阴', set:'feng_du', noShop:true, noSell:true,
+    desc:'防御 +20，神躯上限 +90。袍是黑的，黑了三千年，黑得连影子都不肯沾。', stat:{def:20,hp:90} },
+  fd_yin: { name:'六天宫印', slot:'trinket', grade:'仙品', price:0, icon:'宫', set:'feng_du', noShop:true, noSell:true,
+    desc:'神力上限 +40，暴击伤害 +14%。六宫六印，如今只剩这一方还在自己手里。', stat:{maxMp:40,critDmg:0.14} },
+  dy_fu:  { name:'天齐玉符', slot:'weapon', grade:'仙品', price:0, icon:'齐', set:'dong_yue', noShop:true, noSell:true,
+    desc:'攻击 +30，神力上限 +20。符上刻「天齐」，落笔那一划，压着泰山。', stat:{atk:30,maxMp:20} },
+  dy_pao: { name:'泰山衮服', slot:'armor', grade:'仙品', price:0, icon:'泰', set:'dong_yue', noShop:true, noSell:true,
+    desc:'防御 +20，神躯上限 +92。衮服十二纹，最后一道是山，绣得比龙还沉。', stat:{def:20,hp:92} },
+  dy_ce:  { name:'生死簿影', slot:'trinket', grade:'仙品', price:0, icon:'簿', set:'dong_yue', noShop:true, noSell:true,
+    desc:'神力上限 +40，暴击伤害 +14%。簿影没有字，可翻到哪一页，哪一页的人就心里一紧。', stat:{maxMp:40,critDmg:0.14} },
+  xw_tao: { name:'蟠桃', slot:'weapon', grade:'仙品', price:0, icon:'桃', set:'xi_wangmu', noShop:true, noSell:true,
+    desc:'攻击 +28，神力上限 +22。桃三千年一熟，熟一次，瑶池的宴就开一次。', stat:{atk:28,maxMp:22} },
+  xw_pao: { name:'瑶池金母袍', slot:'armor', grade:'仙品', price:0, icon:'瑶', set:'xi_wangmu', noShop:true, noSell:true,
+    desc:'防御 +20，神躯上限 +95。袍上云纹是活的，走一步，云就挪一步。', stat:{def:20,hp:95} },
+  xw_jing:{ name:'昆仑玉镜', slot:'trinket', grade:'仙品', price:0, icon:'镜', set:'xi_wangmu', noShop:true, noSell:true,
+    desc:'神力上限 +40，暴击伤害 +15%。镜里照的不是脸，是这个人还能活多久。', stat:{maxMp:40,critDmg:0.15} },
   /* 礼物（七样白名单，诸神偏好见 GODS[g].gifts；loved+18 / liked+8 / 忌讳+1 / 其余+4） */
   taomu:   { name:'桃木如意', slot:'gift', grade:'凡品', price:150, icon:'桃', desc:'老桃木雕的小如意，平实讨喜，各路神明都不至于嫌弃。' },
   wugu:    { name:'五谷福袋', slot:'gift', grade:'凡品', price:200, icon:'谷', desc:'新粟新稻缝成的福袋，盛满人间烟火气。' },
@@ -1377,6 +1519,75 @@ const SET_BONUS = {
   lu_ban: { name:'公输规矩', god:'lu_ban', quest:'s47', gift:'lb_chi',
     two: { label:'规矩', desc:'两件套「规矩」：防御 +14，神躯上限 +40', stat:{def:14,hp:40} },
     three:{ label:'机关百出', desc:'三件套「机关百出」：普攻后 30% 概率追加两连击（各 45% 攻击）', hook:'combo' } },
+  lv_dongbin:{ name:'纯阳剑胆', god:'lv_dongbin', quest:'s48', gift:'lv_hu',
+    two: { label:'酒中剑', desc:'两件套「酒中剑」：暴击率 +7%', stat:{crit:0.07} },
+    three:{ label:'江淮斩蛟', desc:'三件套「江淮斩蛟」：对妖类敌人攻击 +30%', hook:'vsYao30' } },
+  he_xiangu:{ name:'荷风甘露', god:'he_xiangu', quest:'s49', gift:'hx_ye',
+    two: { label:'荷风', desc:'两件套「荷风」：神通神力消耗 −10%', proc:{mpCost:0.90} },
+    three:{ label:'八仙过海', desc:'三件套「八仙过海」：受到的伤害减少 12%', proc:{dmgReduce:0.12} } },
+  dian_mu:{ name:'电光雷母', god:'dian_mu', quest:'s50', gift:'dm_cha',
+    two: { label:'照妖', desc:'两件套「照妖」：暴击率 +8%', stat:{crit:0.08} },
+    three:{ label:'补雷', desc:'三件套「补雷」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  zhao_gongming:{ name:'玄坛黑虎', god:'zhao_gongming', quest:'s51', gift:'zg_zhu',
+    two: { label:'铁鞭', desc:'两件套「铁鞭」：暴击伤害 +25%', stat:{critDmg:0.25} },
+    three:{ label:'黑虎连扑', desc:'三件套「黑虎连扑」：普攻后 30% 概率追加两连击（各 45% 攻击）', hook:'combo' } },
+  wen_chang:{ name:'魁星点斗', god:'wen_chang', quest:'s52', gift:'wc_dou',
+    two: { label:'文昌', desc:'两件套「文昌」：神力上限 +50', stat:{maxMp:50} },
+    three:{ label:'点斗', desc:'三件套「点斗」：每回合开始时回复 10% 神力', hook:'mpRegen' } },
+  ma_zu:{ name:'湄洲慈航', god:'ma_zu', quest:'s53', gift:'mz_deng',
+    two: { label:'慈航', desc:'两件套「慈航」：每场战斗开始时恢复 20% 生命', proc:{healStart:0.20} },
+    three:{ label:'压风', desc:'三件套「压风」：受到的伤害减少 12%', proc:{dmgReduce:0.12} } },
+  wang_lingguan:{ name:'都天纠察', god:'wang_lingguan', quest:'s54', gift:'wl_yin',
+    two: { label:'三眼', desc:'两件套「三眼」：暴击率 +6%，攻击 +6', stat:{crit:0.06,atk:6} },
+    three:{ label:'金鞭', desc:'三件套「金鞭」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  zeng_zhang:{ name:'青云护法', god:'zeng_zhang', quest:'s55', gift:'zz_ling',
+    two: { label:'风起', desc:'两件套「风起」：暴击率 +7%', stat:{crit:0.07} },
+    three:{ label:'剑风', desc:'三件套「剑风」：暴击后 40% 概率回锋追斩（60% 攻击）', hook:'critFollow' } },
+  duo_wen:{ name:'毗沙门福德', god:'duo_wen', quest:'s56', gift:'dw_shu',
+    two: { label:'宝伞', desc:'两件套「宝伞」：每场战斗开始时恢复 20% 生命', proc:{healStart:0.20} },
+    three:{ label:'护北', desc:'三件套「护北」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  qin_guang:{ name:'孽镜初判', god:'qin_guang', quest:'s57', gift:'qg_jing',
+    two: { label:'孽镜', desc:'两件套「孽镜」：暴击率 +7%', stat:{crit:0.07} },
+    three:{ label:'初判', desc:'三件套「初判」：对魂类敌人攻击 +30%', hook:'vsHun30' } },
+  yan_luo:{ name:'五殿惊堂', god:'yan_luo', quest:'s58', gift:'yl_ling',
+    two: { label:'惊堂', desc:'两件套「惊堂」：攻击 +9，防御 +9', stat:{atk:9,def:9} },
+    three:{ label:'狱火', desc:'三件套「狱火」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  zhuan_lun:{ name:'六道转轮', god:'zhuan_lun', quest:'s59', gift:'zl_ce',
+    two: { label:'轮回', desc:'两件套「轮回」：神力上限 +45', stat:{maxMp:45} },
+    three:{ label:'转轮', desc:'三件套「转轮」：每回合开始时回复 10% 神力', hook:'mpRegen' } },
+  ao_guang:{ name:'东海行雨', god:'ao_guang', quest:'s60', gift:'ag_zhu',
+    two: { label:'龙鳞', desc:'两件套「龙鳞」：防御 +12，神躯上限 +50', stat:{def:12,hp:50} },
+    three:{ label:'行雨', desc:'三件套「行雨」：对妖类敌人攻击 +30%', hook:'vsYao30' } },
+  zhong_yue:{ name:'中天镇岳', god:'zhong_yue', quest:'s61', gift:'zy_shu',
+    two: { label:'地脉', desc:'两件套「地脉」：防御 +16，神躯上限 +70', stat:{def:16,hp:70} },
+    three:{ label:'镇岳', desc:'三件套「镇岳」：受到的伤害减少 12%', proc:{dmgReduce:0.12} } },
+  zhen_wu:{ name:'玄天荡魔', god:'zhen_wu', quest:'s62', gift:'zw_ling',
+    two: { label:'龟蛇', desc:'两件套「龟蛇」：防御 +18，神躯上限 +80', stat:{def:18,hp:80} },
+    three:{ label:'荡魔', desc:'三件套「荡魔」：对妖类敌人攻击 +30%', hook:'vsYao30' } },
+  lei_zu:{ name:'九天应元', god:'lei_zu', quest:'s63', gift:'lz_yin',
+    two: { label:'应元', desc:'两件套「应元」：神力上限 +40，暴击伤害 +10%', stat:{maxMp:40,critDmg:0.10} },
+    three:{ label:'五雷', desc:'三件套「五雷」：暴击后 40% 概率追加一记 60% 攻击的追斩', hook:'critFollow' } },
+  xi_yue:{ name:'金天顺圣', god:'xi_yue', quest:'s64', gift:'xy_yin',
+    two: { label:'金气', desc:'两件套「金气」：暴击伤害 +20%', stat:{critDmg:0.20} },
+    three:{ label:'西岳', desc:'三件套「西岳」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  xuan_nv:{ name:'玄女天书', god:'xuan_nv', quest:'s65', gift:'xn_fu',
+    two: { label:'六壬', desc:'两件套「六壬」：暴击率 +8%', stat:{crit:0.08} },
+    three:{ label:'天书', desc:'三件套「天书」：每回合开始时回复 10% 神力', hook:'mpRegen' } },
+  di_zang:{ name:'大愿谛听', god:'di_zang', quest:'s66', gift:'dz_zhu',
+    two: { label:'谛听', desc:'两件套「谛听」：每场战斗开始时恢复 22% 生命', proc:{healStart:0.22} },
+    three:{ label:'大愿', desc:'三件套「大愿」：每场战斗首次濒死时免死并回复 30% 生命', proc:{firstSave:{heal:0.30}} } },
+  wei_tuo:{ name:'护法金刚', god:'wei_tuo', quest:'s67', gift:'wt_li',
+    two: { label:'金刚', desc:'两件套「金刚」：攻击 +12', stat:{atk:12} },
+    three:{ label:'护法', desc:'三件套「护法」：暴击后 40% 概率追加一记 60% 攻击的追斩', hook:'critFollow' } },
+  feng_du:{ name:'罗酆北阴', god:'feng_du', quest:'s68', gift:'fd_yin',
+    two: { label:'北阴', desc:'两件套「北阴」：防御 +20，神躯上限 +90', stat:{def:20,hp:90} },
+    three:{ label:'罗酆', desc:'三件套「罗酆」：对魂类敌人攻击 +30%', hook:'vsHun30' } },
+  dong_yue:{ name:'天齐仁圣', god:'dong_yue', quest:'s69', gift:'dy_ce',
+    two: { label:'天齐', desc:'两件套「天齐」：暴击伤害 +25%', stat:{critDmg:0.25} },
+    three:{ label:'仁圣', desc:'三件套「仁圣」：对鬼类敌人攻击 +30%', hook:'vsGui30' } },
+  xi_wangmu:{ name:'瑶池金母', god:'xi_wangmu', quest:'s70', gift:'xw_jing',
+    two: { label:'瑶池', desc:'两件套「瑶池」：每场战斗开始时恢复 25% 生命', proc:{healStart:0.25} },
+    three:{ label:'金母', desc:'三件套「金母」：每场战斗首次濒死时免死并回复 40% 生命', proc:{firstSave:{heal:0.40}} } },
 };
 
 /* ================= 阴兵 ================= */
@@ -3044,6 +3255,548 @@ const MISSIONS = [
     {t:'傀儡留着修堤坝，工钱折半补给真工匠',r:{favor:{lu_ban:10},flags:{flag_mercy_cut:1},log:'鲁班想了想，点头：东西是好东西，用歪了。留着干粗活，让活人干细活。墨斗与短褐你带去——记得，尺量得出长短，量不出良心。'}},
     {t:'收下总监工的「技术顾问」俸，把名册改成「人机协作」',r:{money:140,erode:8,flags:{flag_ruthless:1},favor:{lu_ban:-16},log:'鲁班把曲尺折成两截，扔在铜牌上，转身就走，走了两步又回头：俺祖师爷的规矩，只传手，不传印。你这印，俺不认。'}}
    ]}
+ ]},
+
+{id:'s48',name:'岳阳楼·度牒黄牛案',god:'lv_dongbin',chapter:4,side:'s48',danger:3,money:120,merit:27,
+ scroll:'度牒是度人成仙的凭证，如今在岳阳楼下一手交钱、一手交牒。可这牒度出来的「仙人」，连御剑都飞不稳。',
+ reward:{items:['lv_jian','lv_pao']},
+ nodes:[
+  {type:'event',text:'岳阳楼下的酒肆里，吕洞宾把酒壶倒扣在桌上，酒液一滴不剩：有人在卖本仙的度牒。三百两一张，说是本仙亲手度的。本仙这双手，一年也度不了三个。他抬眼笑了笑：更妙的是——买的人里头，有一半明知是假的。他们不买仙，买的是「我已经是仙了」这句话。',
+   choices:[
+    {t:'查度牒的来路：谁在刻印，谁在放盘',r:{flags:{flag_know_truth:1},log:'牒上的云纹刻得极工整，工整得不像人手，倒像同一块版翻出来的。吕洞宾用指甲刮下一层朱砂：官牒的朱砂掺金粉，这个掺的是铁锈。三百两一张，成本不到二十文。'}},
+    {t:'先去买牒的人家，看他们如今怎样了',r:{favor:{lv_dongbin:6},flags:{flag_mercy_cut:1},log:'一个老秀才把度牒供在堂屋正中，每日焚香。他儿子说，爹把祖屋卖了换这张纸，如今一家六口挤在柴房。吕洞宾站在堂前看了半晌，一句话没说，把酒壶递给了那个儿子。'}},
+    {t:'劝他：人家愿买愿卖，何必扫人兴致',r:{erode:3,log:'吕洞宾摇了摇空壶：度人不是卖货。本仙度的是人心里的那点明白，不是一张能挂在墙上的纸。你把明白卖了，他买到的就只有纸。'}}
+   ]},
+  {type:'quiz',who:'吕洞宾',text:'酒肆请来的说书人拍响醒木：「要说纯阳祖师，先问客官两句——」',
+   qs:[
+    {q:'点化吕洞宾、让他在黄粱一梦中大悟的是哪位神仙？',opts:['钟离权（汉钟离）','铁拐李','张果老'],a:0,why:'《钟吕传道集》记吕洞宾于长安酒肆遇钟离权，一枕黄粱未熟而悟道。'},
+    {q:'吕洞宾在江淮一带最出名的除害事迹是？',opts:['斩蛟','射日','锁龙'],a:0,why:'传说江淮有蛟为害，吕洞宾以纯阳剑斩之，故有「江淮斩蛟」之说。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{lv_dongbin:5},log:'满堂喝彩里，吕洞宾靠在柱子上笑：讲得比本仙还真。不过——斩蛟那回，本仙其实是喝多了才去的。'}},
+  {type:'battle',enemy:'juanxiansheng',name:'假度牒·卷仙生',scale:1.0},
+  {type:'event',text:'卷仙生散成一地纸屑，纸屑里翻出一块雕版，版上刻着「纯阳亲度」四个反字。',
+   choices:[
+    {t:'依律办：雕版入炉，赃银退赔，买牒者销籍',r:{favor:{lv_dongbin:15},merit:10,flags:{flag_refuse_count:1},log:'吕洞宾把纯阳剑与道袍交给你：剑不刻名，是因为它只认该斩的东西；袍上酒渍洗不掉，是因为走过的地方都留着。退赔那日，老秀才抱着祖屋的契书哭，吕洞宾在楼头喝酒，喝到一半，把壶里剩下的一口，泼进了江里。'}},
+    {t:'退银不退牒，让买牒的人自己撕了那张纸',r:{favor:{lv_dongbin:10},flags:{flag_mercy_cut:1},log:'吕洞宾点头：自己撕，比本仙去撕有用。剑与袍你拿着。那天岳阳楼下排了很长的队，人人手里一张黄纸，撕得哗哗响，像下了场纸雪。'}},
+    {t:'收下雕版，改刻「天官赐福」继续卖',r:{money:150,erode:8,flags:{flag_ruthless:1},favor:{lv_dongbin:-16},log:'吕洞宾把酒壶抛起来又接住，壶里已经空了：本仙卖酒，从不卖名。你连本仙的名都敢拿去典当，往后谁的名不敢？他背过身去，江风把他的道袍吹得作响。'}}
+   ]}
+ ]},
+
+{id:'s49',name:'荷池·仙露灌装案',god:'he_xiangu',chapter:4,side:'s49',danger:3,money:115,merit:26,
+ scroll:'城里各家药铺都卖起了「荷仙姑亲制仙露」，一瓶难求。可喝了仙露的人，病没好，反倒咳出一股荷腥气。',
+ reward:{items:['hx_zan','hx_yi']},
+ nodes:[
+  {type:'event',text:'何仙姑蹲在池边，指尖拨开一片荷叶，叶下浮着一层油花：本仙的露，是子时从荷叶上收的，一夜收不满半盏。他们的露，是从这池子里直接抽的——抽完还往里头倒东西，好叫它看着清。她把湿手在衣上按了按：这池水，本仙养了三百年。',
+   choices:[
+    {t:'查药铺的进货账与灌装作坊',r:{flags:{flag_know_truth:1},log:'账上写着「仙露」，进价三文一斤。作坊在后巷，一口大缸，一根竹管，一桶井水加两把明矾。墙上贴着张字条：照此配，色白、味淡、放三天不起沫。'}},
+    {t:'先去看喝过仙露的病人',r:{favor:{he_xiangu:6},flags:{flag_mercy_cut:1},log:'城南一间小院里躺着七个人，都是舍不得请大夫、只想省钱的。最小的孩子才四岁，咳得说不出话。何仙姑在床边坐了很久，把带来的真露一勺一勺喂下去，喂到最后，手一直在抖。'}},
+    {t:'劝她：井水明矾喝不死人，何必较真',r:{erode:3,log:'何仙姑把荷叶轻轻合上：喝不死人，可也治不好人。病人把命交给一瓶水，这瓶水就该担得起那条命。本仙担不起的，不敢卖。'}}
+   ]},
+  {type:'game',game:'pairs',difficulty:2,
+   text:'药铺后堂摆着两排瓶子：一排是从池里收的真露，一排是灌装的假露。何仙姑把真露滴在指尖：真的粘手，假的滑手。依次配对，把假的挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{he_xiangu:5},log:'配到最后，假露剩下整整三十六瓶，瓶底都沉着一层白。何仙姑拿起来摇了摇：明矾沉底，摇一摇就看不见了。可喝下去，它还是沉在那儿。'}},
+  {type:'battle',enemy:'yigui',name:'荷腥化疫·装瓶鬼',scale:1.05},
+  {type:'event',text:'装瓶鬼碎成一地玻璃，玻璃碴里泡着半张标签，印着「荷仙姑亲制」五个字，字是描红的。',
+   choices:[
+    {t:'依律办：假露尽毁，药铺封门，病家免费施真露',r:{favor:{he_xiangu:15},merit:10,flags:{flag_refuse_count:1},log:'何仙姑把玉簪与仙衣递给你：簪上那点露，天亮不干，是留给赶路的人的；这衣裳抽的是藕丝，断了还连着，是叫人别断了念想。施露那七日，池边排着长队，她一夜一夜地收露，收满了就分，分完了再收。'}},
+    {t:'封作坊留铺子，让掌柜的用真露赔三年',r:{favor:{he_xiangu:10},flags:{flag_mercy_cut:1},log:'何仙姑沉吟了一下：三年够他把欠的还上，也够他记住。玉簪与仙衣你带着。本仙只有一个要求——赔的露，不许掺一滴井水。'}},
+    {t:'收下作坊三成利，把假露改名「荷香饮」照卖',r:{money:145,erode:8,flags:{flag_ruthless:1},favor:{he_xiangu:-15},log:'何仙姑把手里那片荷叶放回水里，看它慢慢沉下去：本仙的池子，从今往后不照你了。她转身走进荷丛，荷叶一片片合拢，把她的背影收得干干净净。'}}
+   ]}
+ ]},
+
+{id:'s50',name:'雷部·错劈赔付案',god:'dian_mu',chapter:4,side:'s50',danger:4,money:125,merit:28,
+ scroll:'雷部新设「代劈」一职：谁出得起香火，雷就往谁指的头上落。三个月里，劈错了七个人。',
+ reward:{items:['dm_jing','dm_yi']},
+ nodes:[
+  {type:'event',text:'电母把两面镜子立在案上，镜中映出七道焦痕：七个人，七个名字，七份「该劈」的批文。她指着其中一份：这人是个货郎，走夜路被雷追了三里地。批文上写他「忤逆」。本君照了三遍——他这辈子忤逆的，只有他那个赌钱的爹。她合上镜：先照后劈，是雷部的规矩。如今是先收钱，后照。',
+   choices:[
+    {t:'查批文是谁签的，代劈的价码怎么定',r:{flags:{flag_know_truth:1},log:'批文底下一行小字：「代办费，视香火厚薄，上不封顶」。电母用镜光一照，纸上浮出另一层字迹——原本写的是「查无实据」，「忤逆」二字是后描上去的，墨色还新。'}},
+    {t:'先去七户人家，看他们如今怎样',r:{favor:{dian_mu:6},flags:{flag_mercy_cut:1},log:'货郎的媳妇把烧焦的扁担挂在门后，说留着给娃看：你爹不是坏人，是雷劈错了。电母在门外站着，镜子里映出她自己的脸，她看了很久，把镜子翻了过去。'}},
+    {t:'劝她：雷部事忙，偶有错漏也是常情',r:{erode:3,log:'电母把镜子一转，光直直照在你脸上：雷劈错的，赔不回来。本君这面镜子，照得出妖，照不出「常情」二字。'}}
+   ]},
+  {type:'game',game:'spot',difficulty:2,
+   text:'电母把七道雷痕并排照在镜上：真雷的痕迹是斜的，落地会炸开三道裂纹；代劈的雷，痕是直的，裂纹只有一道。找出那几道不对的。',
+   pass:{enemyVuln:true,merit:7,favor:{dian_mu:5},log:'镜光扫过，三道假雷痕露了出来，直得像用尺子划的。电母冷笑：雷是从云里挣出来的，哪有这么听话。'}},
+  {type:'battle',enemy:'huanzhongzhuyi',name:'代劈幻形·朱衣假雷',scale:1.05},
+  {type:'event',text:'朱衣假雷在镜光里化了，化成一件空荡荡的朱袍，袍里掉出一串铜钱，钱孔里穿着七根头发。',
+   choices:[
+    {t:'依律办：代劈尽废，七户抚恤，私批文入炉',r:{favor:{dian_mu:15},merit:10,flags:{flag_refuse_count:1},log:'电母把电光镜与云雷衣给你：镜照的是妖，也照的是自己；这衣裳补丁歪歪扭扭，可雷劈不透。抚恤那日，她亲自去货郎家，把烧焦的扁担换成了新的，一句话没说，转身时镜光闪了一下。'}},
+    {t:'留代劈一职，改由雷部直批、不收费',r:{favor:{dian_mu:10},flags:{flag_mercy_cut:1},log:'电母想了想：代劈本身没错，错在收钱。她提笔把「代办费」三字划掉，改成「直批」。镜与衣你拿去——记住，镜子里的人，也得照。'}},
+    {t:'收下代劈的干股，把七桩改成「雷劫误伤」',r:{money:155,erode:8,flags:{flag_ruthless:1},favor:{dian_mu:-16},log:'电母把两面镜子背对背扣在案上，殿里一下子暗了：镜不对着你，是怕照出什么来。她没再看你：走吧。雷部往后劈谁，本君都先照三遍——包括你。'}}
+   ]}
+ ]},
+
+{id:'s51',name:'玄坛·财符转租案',god:'zhao_gongming',chapter:4,side:'s51',danger:4,money:145,merit:30,
+ scroll:'玄坛的财符本是保佑正经营生，如今被整沓租给赌坊。一夜之间，整条街的铺子都关了门。',
+ reward:{items:['zg_bian','zg_jia']},
+ nodes:[
+  {type:'event',text:'赵公明踩着黑虎走进空街，靴底碾过一张黄符：本帅的符，一张保一间铺子一年。如今有人把符收上来，整沓租给赌坊，一张符押三家。他弯腰捡起符纸，对着光看了看：符是死的，人是活的。可这符要是被人当成了活物，就有人要拿命去填。',
+   choices:[
+    {t:'查符是从哪条线收上来的，租金又归谁',r:{flags:{flag_know_truth:1},log:'收符的是几个游方道士，穿得像，念得也像，就是不会画。符上的朱砂纹是印的，边角还有裁切的白茬。赵公明把符在指间一搓：本帅画符，从不裁边。'}},
+    {t:'先去关门的铺子，问掌柜为何不做了',r:{favor:{zhao_gongming:6},flags:{flag_mercy_cut:1},log:'绸缎庄的掌柜坐在空铺子里理账，说赌坊的人来收过三回符，不给就砸。他指指柜台：货都在，客人没了。赌坊把整条街的香火都揽过去，谁还来买布？赵公明听完，把铁鞭往地上一顿，青石板裂了道缝。'}},
+    {t:'劝他：符既租出去了，钱货两清',r:{erode:3,log:'赵公明冷笑：钱货两清？本帅这符，保的是营生，不是赌本。你收了赌坊的钱，就等于替本帅认了这个价。本帅早年管瘟，最知道拿人命换银子是什么滋味。'}}
+   ]},
+  {type:'game',game:'lights',difficulty:2,
+   text:'玄坛库房里挂着一排灯，每盏灯对应一间铺子的香火：亮着的是还有人气的营生，灭的是被押给赌坊的。赵公明把灯芯递给你：把该留的留下。',
+   pass:{enemyVuln:true,merit:7,favor:{zhao_gongming:5},log:'灯一盏盏点回去，最后剩下三盏怎么点都不亮——那三间铺子，早被赌坊的地契吞了。赵公明盯着那三盏黑灯看了半晌：灯灭了的，本帅赔。'}},
+  {type:'battle',enemy:'qiwei',name:'转租契卫·财符业主',scale:1.1},
+  {type:'event',text:'契卫碎成一地契纸，最上头一张写着「财符租赁，年息七分」，落款处按着赌坊的手印。',
+   choices:[
+    {t:'依律办：租赁契尽废，赌坊退符，铺子复业',r:{favor:{zhao_gongming:15},merit:10,flags:{flag_refuse_count:1},log:'赵公明把玄坛铁鞭与金甲交到你手上：鞭上那条红绳，是黑虎的缰绳——勒得住畜生，也勒得住贪心；甲片上刻的是还款日，不是欠账日。复业那日，整条街的灯一盏盏亮起来，黑虎趴在街口，谁也不敢再进来收符。'}},
+    {t:'让赌坊补缴租金，铺子的符照旧发',r:{favor:{zhao_gongming:10},flags:{flag_mercy_cut:1},log:'赵公明点头：钱要退，路要留。铁鞭与金甲你拿着。他补了一句：本帅不怕人赌，怕的是有人拿本帅的名去赌。'}},
+    {t:'收下赌坊的「香火分红」，把符改成「可转让」',r:{money:170,erode:8,flags:{flag_ruthless:1},favor:{zhao_gongming:-16},log:'赵公明把铁鞭横在门前，黑虎低吼了一声：本帅这符，一符一铺，一铺一家。你把它变成能转手的纸，就成了催命的状。他跨上虎背，走了很远才回头：钱是好东西——可不是这么挣的。'}}
+   ]}
+ ]},
+
+{id:'s52',name:'文昌阁·点斗外包案',god:'wen_chang',chapter:4,side:'s52',danger:4,money:150,merit:31,
+ scroll:'今年秋闱，上榜的名字和文章对不上——有人在文昌阁外接单：代点魁斗，价高者得。',
+ reward:{items:['wc_bi','wc_pao']},
+ nodes:[
+  {type:'event',text:'文昌阁的廊下堆着一摞落卷，文昌帝君一份份翻过，翻到最后停下：这篇该是第一，落榜了；那篇连韵都押不上，中了。他把两份卷子并排铺开：本君的朱笔，点在谁头上，是看文章。如今有人替本君点——点的不是文章，是银子。天聋地哑立在阶下，一个听不见，一个说不出。',
+   choices:[
+    {t:'查落卷与中卷的差别，摸清接单的门路',r:{flags:{flag_know_truth:1},log:'落卷的卷面干净，中卷的卷角有个极小的墨点——像是被人掐过。文昌帝君把两卷对着光一照：墨点是暗记。记号对上了，文章好坏就不必看了。'}},
+    {t:'先去落榜的人家，看他们怎么过这个秋天',r:{favor:{wen_chang:6},flags:{flag_mercy_cut:1},log:'一间柴屋里，书生把落卷一张张裱起来，说留着给自己看：我写得不好，我认。他娘在灶前抹眼泪，锅里煮的是草根。文昌帝君在门外站了很久，回身对天聋地哑说：这话，本君听见了。'}},
+    {t:'劝他：榜已经放了，改也改不回来',r:{erode:3,log:'文昌帝君把朱笔搁下：榜能改。本君案头的禄籍，一日未定，一日可改。难的不是改榜，是改了之后，谁还信这支笔。'}}
+   ]},
+  {type:'game',game:'memory',difficulty:2,
+   text:'文昌阁里摆着十二份卷子，暗记只有一个字大小。帝君把卷子一份份展开：看清楚哪几份的卷角有墨点。记住它，再挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{wen_chang:5},log:'十二份卷子摊开，四份卷角有墨点，点法一模一样。文昌帝君用朱笔在每一点上添了一横：本君的笔是好笔，可惜被人拿去当了印。'}},
+  {type:'battle',enemy:'moguigui',name:'代点墨柜鬼',scale:1.1},
+  {type:'event',text:'墨柜鬼化成一摊浓墨，墨里沉着四份卷子，卷上名字各不同，字迹却是同一只手写的。',
+   choices:[
+    {t:'依律办：四卷作废，榜次重排，接单者销籍',r:{favor:{wen_chang:15},merit:10,flags:{flag_refuse_count:1},log:'文昌帝君把点斗朱笔与锦袍给你：这笔只点三下，点天、点地、点人心里那口气；袍上绣的星图，是给寒门子弟照路的。重排那日，落榜的书生被叫回阁中，他捧着卷子手直抖，一句话也说不出来。帝君背过身：不必谢，这是你自己写出来的。'}},
+    {t:'只废四卷，其余不究，给落榜者补一次机会',r:{favor:{wen_chang:10},flags:{flag_mercy_cut:1},log:'文昌帝君沉吟良久：榜可以只改四处，人心得慢慢补。朱笔与锦袍你带去。他补了一句：补考那日，本君亲自看着。'}},
+    {t:'收下接单者的分成，把四卷改成「特招」',r:{money:175,erode:8,flags:{flag_ruthless:1},favor:{wen_chang:-16},log:'文昌帝君把朱笔一折两段，扔在墨里：天聋地哑跟了本君三千年，今日才算明白——他们不是听不见、说不出，是不想听、不想说。你走罢。这支笔，本君要重新磨。'}}
+   ]}
+ ]},
+
+{id:'s53',name:'湄洲·护航转包案',god:'ma_zu',chapter:4,side:'s53',danger:5,money:155,merit:32,
+ scroll:'漕运衙门把「护航」包给了外头的「顺风堂」：交了钱，旗子插上，风雨照来，船照翻。',
+ reward:{items:['mz_fan','mz_yi']},
+ nodes:[
+  {type:'event',text:'妈祖站在湄洲的礁石上，手里那盏引航灯忽明忽暗：本宫的灯，只在雾里亮，因为雾里的人才看得见。如今漕船挂的是一面「顺风旗」，交了银子就发。她抬手指向海面：昨夜翻了三条船，旗子都还在桅杆上飘着。风不认旗，只认灯。',
+   choices:[
+    {t:'查顺风堂是什么来路，旗子谁发的',r:{flags:{flag_know_truth:1},log:'顺风堂的旗，布是旧的，字是新描的，旗角还留着原来的半截纹样——是本宫庙里撤下来的旧幡。妈祖把旗子抖开看了看，忽然笑了：拿本宫的旧幡，收人家的买命钱。'}},
+    {t:'先去码头，看翻船的家人怎么过',r:{favor:{ma_zu:6},flags:{flag_mercy_cut:1},log:'码头上摆着七副湿透的铺盖，几个妇人跪在潮线边上烧纸，纸灰被风一卷就散。妈祖蹲下去，把一盏小灯放在她们脚边：本宫来晚了。这句话她说得很轻，海风却一下子静了。'}},
+    {t:'劝她：海上风险自古如此，怪不得人',r:{erode:3,log:'妈祖把灯举高，光照在海面上：风险是天给的，收钱不办事是人给的。本宫管不了天，管得了人——收钱的那只手，本宫记得住。'}}
+   ]},
+  {type:'game',game:'spot',difficulty:2,
+   text:'妈祖把七面顺风旗并排铺在礁石上：真旗的针脚是双线，遇水不散；假旗是单线，泡一夜就开。找出那几面开线的。',
+   pass:{enemyVuln:true,merit:7,favor:{ma_zu:5},log:'海水一泼，五面旗的边角齐齐散开，线头像水草一样浮着。妈祖把散了的旗子一片片收进袖里：线都舍不得用双股，还敢保人平安。'}},
+  {type:'battle',enemy:'bailangjiaojiang',name:'顺风堂·白浪蛟将',scale:1.15},
+  {type:'event',text:'白浪蛟将沉进海里，海面浮起一块木牌，牌上刻着「顺风堂护航，概不负责」，牌背钉着漕运衙门的官印。',
+   choices:[
+    {t:'依律办：顺风堂查封，旗子尽收，抚恤七家',r:{favor:{ma_zu:15},merit:10,flags:{flag_refuse_count:1},log:'妈祖把顺风帆与霞帔交给你：帆上每一块补丁，都是被救回来的船留下的；霞帔挡的不是风，是风里那口气。抚恤那日，她把七盏小灯一盏盏放到海里，灯顺着潮水漂远，一盏也没灭。'}},
+    {t:'留顺风堂，改为官办，旗子一律免费',r:{favor:{ma_zu:10},flags:{flag_mercy_cut:1},log:'妈祖点头：旗子本身没错，错在拿它当买卖。帆与霞帔你拿着。她只说一句：往后发旗，先来本宫灯下照一照。'}},
+    {t:'收下漕运衙门的分成，把「概不负责」改成「尽力而为」',r:{money:180,erode:8,flags:{flag_ruthless:1},favor:{ma_zu:-16},log:'妈祖把那盏引航灯吹灭了，海上顿时暗了一截：本宫的灯，从不替人免责。她转身走向海边，脚下浪头自己分开：你回去罢——下次出海，别挂本宫的名。'}}
+   ]}
+ ]},
+
+{id:'s54',name:'纠察司·罚单代缴案',god:'wang_lingguan',chapter:4,side:'s54',danger:4,money:130,merit:28,
+ scroll:'天庭纠察司的罚单，如今可以找人代缴：出银子，自有「替身」去雷台上站着。三个月里，挨雷的全不是该挨的那个。',
+ reward:{items:['wl_bian','wl_jia']},
+ nodes:[
+  {type:'event',text:'王灵官额上第三只眼一直睁着，眼白泛红：本官这双眼，看的是谁犯了错。如今看的是谁出了钱。他把一沓罚单拍在案上：单子上的名字没错，站着挨雷的人错了。本官抽了三十年，头一回抽错人。',
+   choices:[
+    {t:'查代缴的门路：谁在牵线，替身从哪来',r:{flags:{flag_know_truth:1},log:'代缴的中间人是个还俗的道士，专找走投无路的游魂：替人挨一道雷，换三年阳寿。罚单底下的编号是连号的——同一批印，同一批卖。王灵官把单子捏出了褶：连号，就是说他们在批量卖雷。'}},
+    {t:'先去雷台，看那些替身如今怎样了',r:{favor:{wang_lingguan:6},flags:{flag_mercy_cut:1},log:'雷台边的石头上坐着三个游魂，魂体焦黑，见人来只摆手：别看了，我们是自愿的。王灵官站在台下，额头那只眼慢慢闭上：自愿两个字，最会替人挡罪。'}},
+    {t:'劝他：一个愿打一个愿挨，纠察何必管',r:{erode:3,log:'王灵官把金鞭往地上一顿，火星溅起三尺：本官不管谁愿挨，本官管谁该挨。该挨的躲了，不该挨的顶了，这叫乱了套。'}}
+   ]},
+  {type:'quiz',who:'王灵官',text:'纠察司的旧吏抱来一本《灵官职司考》，翻到第一页：大人，先考您自己一句——',
+   qs:[
+    {q:'王灵官在天庭的职司，最准确的说法是？',opts:['纠察众神过失的护法御史','掌管人间财库','专司行云布雨'],a:0,why:'道教尊其为「都天纠察大灵官」，职在纠察天上人间过失，故塑像额生三目、手持金鞭。'},
+    {q:'王灵官塑像最显眼的特征是哪一处？',opts:['额头上的第三只眼','背后的双翼','脚下的莲台'],a:0,why:'三目象征纠察善恶、明察秋毫；金鞭与风火轮则象征执法迅疾。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{wang_lingguan:5},log:'旧吏合上书，躬身退下。王灵官哼了一声：考本官，倒比考别人难。'}},
+  {type:'battle',enemy:'chizhengxuhao',name:'代罚·持证虚耗',scale:1.1},
+  {type:'event',text:'持证虚耗散成一地烧焦的凭据，凭据背面印着「代缴已讫」四个字，油墨还是新的。',
+   choices:[
+    {t:'依律办：代缴尽废，罚单重审，替身销籍',r:{favor:{wang_lingguan:15},merit:10,flags:{flag_refuse_count:1},log:'王灵官把金鞭与火轮甲交给你：鞭上的火，专烧「有人替我」这四个字；甲下的轮，是站岗站出来的。重审那日，雷台上站着的人一个个换回该站的位置，他抽了三十鞭，一鞭没抽错。'}},
+    {t:'废代缴不追旧账，给替身三年安身',r:{favor:{wang_lingguan:10},flags:{flag_mercy_cut:1},log:'王灵官把鞭子收回来，火苗一寸寸熄了：本官不追，是可怜他们；可这三年，得他们自己挣。鞭与甲你拿着——记住，先查自己。'}},
+    {t:'收下代缴的抽成，把替身改成「自愿协办」',r:{money:160,erode:8,flags:{flag_ruthless:1},favor:{wang_lingguan:-16},log:'王灵官额上那只眼睁开又闭上，第三次闭上时，眼皮上渗出血来：本官这只眼，看不下去了。他转身走进纠察司，门从里头插上了。'}}
+   ]}
+ ]},
+
+{id:'s55',name:'南天门·善根KPI案',god:'zeng_zhang',chapter:4,side:'s55',danger:4,money:135,merit:29,
+ scroll:'南天门的护法按「善根增长指标」放行：本季善根涨得多，就多放几个。可指标是可以用钱填的。',
+ reward:{items:['zz_jian','zz_kai']},
+ nodes:[
+  {type:'event',text:'增长天王把青云剑横在膝上，剑锋擦着门框：本天王守南天门，看的是来人的善根。如今看的是「本季指标完成了几成」。他抬眼看你：指标是谁定的？定了以后，谁在填？填的人，又是拿什么填的？',
+   choices:[
+    {t:'查指标是谁定、谁在填、拿什么填',r:{flags:{flag_know_truth:1},log:'指标册上写着「善根增长，季增三成」。底下的填报栏里，同一笔迹一天填了四百条，条目内容一模一样：「施粥一碗」。增长天王看了半晌：一碗粥，怎么一天施四百回？'}},
+    {t:'先去南天门下，看被卡住的是些什么人',r:{favor:{zeng_zhang:6},flags:{flag_mercy_cut:1},log:'天门外的队伍排了三里，排在最后的都是些没名没姓的：给邻居挑过水的、把最后半块饼分出去的。他们没有「可填报」的善事。增长天王站在门楼上看了很久：本天王守的是门，不是账。'}},
+    {t:'劝他：指标也是为了激励善行，别太较真',r:{erode:3,log:'增长天王把剑锋一转，风把案上的指标册吹得哗哗响：激励？本天王只看见有人拿它换过门的条子。善根要是能填，就不是善根了。'}}
+   ]},
+  {type:'game',game:'pairs',difficulty:2,
+   text:'增长天王把填报册摊开：真善事有来处、有去处，假善事只有日期和数量。两两配对，把凑数的挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{zeng_zhang:5},log:'配到最后，凑数的条目摞了厚厚一沓，全是同一天、同一句、同一个数目。增长天王用剑尖一挑，纸页散了一地，风一吹就没了。'}},
+  {type:'battle',enemy:'kongmaogongcao',name:'凑数·空帽功曹',scale:1.1},
+  {type:'event',text:'空帽功曹的帽子落地，帽里空空的，只有一本填满的指标册，最后一页写着「下季目标：翻倍」。',
+   choices:[
+    {t:'依律办：指标作废，改核来处去处，凑数者销籍',r:{favor:{zeng_zhang:15},merit:10,flags:{flag_refuse_count:1},log:'增长天王把青云剑与明光铠递给你：剑无鞘，是因为风一停，人心就死了；铠上的划痕，都是替人挡的。新规贴出来那日，天门下的长队动了，动得很慢，却没有人再被拦下。'}},
+    {t:'废指标不销籍，让填报者去天门下站一季',r:{favor:{zeng_zhang:10},flags:{flag_mercy_cut:1},log:'增长天王笑了一下：站一季，比销籍管用。剑与铠你带着。他补了一句：让他们自己看看，那些没法填报的人，是怎么过日子的。'}},
+    {t:'收下「指标代办」的孝敬，把册子照原样往上递',r:{money:165,erode:8,flags:{flag_ruthless:1},favor:{zeng_zhang:-16},log:'增长天王把剑收回鞘里——三百年没收过鞘，这一回收了。风停了。他背对着你：这扇门，本天王守到今天，头一回觉得它太宽了。'}}
+   ]}
+ ]},
+
+{id:'s56',name:'北俱芦洲·福德税案',god:'duo_wen',chapter:4,side:'s56',danger:4,money:140,merit:30,
+ scroll:'北俱芦洲的福德，本是天王赐下的，如今被人抽了三成「福德税」——交不上税的，连吐宝鼠都不认他。',
+ reward:{items:['dw_san','dw_jia']},
+ nodes:[
+  {type:'event',text:'多闻天王的混元珠伞缓缓转着，伞面上浮着无数细小的光点：这些是北洲的福德，一家一点。他指着一处发暗的光：这家抽了三成，快灭了。又指另一处：这家抽了七成，已经灭了。伞停住：本天王赐福，从来没收过回扣。',
+   choices:[
+    {t:'查福德税是谁在收、凭的什么名目',r:{flags:{flag_know_truth:1},log:'收税的名目是「护北军需」，凭的是一纸盖了毗沙门印的文书。多闻天王把文书接到手里，对着光看了很久：这印是旧的，本天王二十年前就换了新印。有人拿旧印，收新钱。'}},
+    {t:'先去北洲边塞，看断税的人家怎样',r:{favor:{duo_wen:6},flags:{flag_mercy_cut:1},log:'边塞的土屋里，一个妇人把最后一把粟米倒进锅里，说福德税交不上，去年冬天没有炭。她的孩子把一颗乳牙放在窗台上，说等爹回来换钱。多闻天王站在门外，从甲里摸出一只小布袋，里面的乳牙叮当作响。'}},
+    {t:'劝他：收税也是为了护北，情有可原',r:{erode:3,log:'多闻天王把伞往下一压，光点暗了一片：护北是本天王的差事，不是向百姓收钱的理由。拿军需当名目，最先饿死的就是军需护着的人。'}}
+   ]},
+  {type:'game',game:'pairs',difficulty:2,
+   text:'多闻天王把福德簿摊开：真福德有来处，税目有明账；假的有进无出。两两配对，把抽过头的挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{duo_wen:5},log:'挑到最后，七户的税目对不上，收走的福德不知去向。多闻天王把吐宝鼠放上桌：它闻得出银子在谁手里。小鼠一溜烟跑了，跑向的正是北洲的军需库。'}},
+  {type:'battle',enemy:'zhengshuichaiding',name:'抽成·征税差丁',scale:1.1},
+  {type:'event',text:'征税差丁的税袋破了，洒出来的不是福德，是一把把生锈的铜钱，钱上铸着「护北」二字。',
+   choices:[
+    {t:'依律办：福德税尽废，已收退还，旧印销缴',r:{favor:{duo_wen:15},merit:10,flags:{flag_refuse_count:1},log:'多闻天王把混元珠伞与毗沙门甲交给你：伞一旋，风是风、雨是雨、账是账；甲里那只布袋，装的是边塞孩子的乳牙——本天王护北，护的是这些。退福那天，北洲的光点一颗颗亮回来，亮得很慢，像雪化。'}},
+    {t:'废税不追缴，让军需另开明账',r:{favor:{duo_wen:10},flags:{flag_mercy_cut:1},log:'多闻天王点头：钱已经花了，追不回来；账得重新记。伞与甲你拿着。他添了一句：明账，是给活人看的，也是给死人看的。'}},
+    {t:'收下军需库的分成，把福德税改成「乐输」',r:{money:170,erode:8,flags:{flag_ruthless:1},favor:{duo_wen:-16},log:'多闻天王把伞收拢，北洲一下子暗了：乐输？逼到没炭过冬，还叫乐。他把吐宝鼠放回怀里，转身走进暗处：本天王这伞，往后只遮雨，不遮账。'}}
+   ]}
+ ]},
+
+{id:'s57',name:'一殿·排号插队案',god:'qin_guang',chapter:4,side:'s57',danger:4,money:140,merit:30,
+ scroll:'一殿的孽镜台前排着长队，如今有人倒卖号牌：加钱，可以从后门先进镜。先进镜的，往往先「过关」。',
+ reward:{items:['qg_bi','qg_pao']},
+ nodes:[
+  {type:'event',text:'秦广王把号牌在指间转了一圈：本殿的规矩，是先来后到。如今是先钱后到。他指了指镜台后头那扇小门：加钱进去的，孽镜照出来的都是「善」。他把号牌搁下：孽镜不会说谎，会说谎的是让它先照谁。',
+   choices:[
+    {t:'查号牌怎么流出去、后门谁在看',r:{flags:{flag_know_truth:1},log:'号牌是同一批竹签，签尾刻着极小的一个「叁」字——三号柜的。三号柜的柜吏今年刚补上，是他舅舅举荐的。秦广王把竹签折断：本殿的号，是从柜上流出去的，不是从门上。'}},
+    {t:'先去队尾，看排了几天的都是些什么魂',r:{favor:{qin_guang:6},flags:{flag_mercy_cut:1},log:'队尾有个老妇，排了十一天，怀里抱着一只空碗。她说想先进镜，好早些知道自己这辈子错在哪。秦广王蹲下来看了看那只碗，起身时脸上的客套一点不剩：本官这就去把号牌的事办了。'}},
+    {t:'劝他：插队而已，镜台总会照到',r:{erode:3,log:'秦广王把笔往案上一搁：照到是照到，可早照晚照，中间隔着十一天。十一天里，有人冻着、饿着、怕着。本官这声「莫急」，说得太顺口了。'}}
+   ]},
+  {type:'game',game:'lights',difficulty:2,
+   text:'一殿的回廊上挂着一排号灯，灯亮着表示号还在队里，灭了表示被人领走。秦广王把灯芯递给你：把从后门走掉的号，一盏盏点回来。',
+   pass:{enemyVuln:true,merit:7,favor:{qin_guang:5},log:'灯点回来四十七盏，每一盏底下都刻着号数。秦广王把号数抄下：四十七个号，四十七笔钱。他抄到最后一个，笔尖顿了顿：这个号，是本官的外甥。'}},
+  {type:'battle',enemy:'lipeiqichai',name:'倒号·立牌契差',scale:1.1},
+  {type:'event',text:'立牌契差散成一堆竹签，签上号数从「壹」排到「肆柒」，中间缺了两个号——那是留给他自己的。',
+   choices:[
+    {t:'依律办：倒号尽废，柜吏革职，亲眷同罪',r:{favor:{qin_guang:15},merit:10,flags:{flag_refuse_count:1},log:'秦广王把销牒朱笔与一殿皂袍交给你：笔杆磨亮了，是三十年排号排出来的；袍袖沾着墨，也沾着别人的眼泪。革职那日，他把外甥的号牌亲手投进炉里，投完才说了一句：本官对不住排队的。'}},
+    {t:'只革柜吏，亲属从轻，补一个公平号队',r:{favor:{qin_guang:10},flags:{flag_mercy_cut:1},log:'秦广王沉吟半晌：从轻，是本官的私心；补队，是本官的差事。笔与袍你拿着。他添了一句：从今往后，号牌用木，不用竹——木头上刻不出小字。'}},
+    {t:'收下倒号的抽成，把后门改成「加急通道」',r:{money:175,erode:8,flags:{flag_ruthless:1},favor:{qin_guang:-16},log:'秦广王把笔搁下，笔尖在案上洇出一小团红：加急通道——本官在前台站了三百年，头一回听见有人把后门说得这么体面。他抬手一指：你从后门进，本官当没看见；可孽镜看着。'}}
+   ]}
+ ]},
+
+{id:'s58',name:'五殿·冤单外包案',god:'yan_luo',chapter:4,side:'s58',danger:4,money:145,merit:31,
+ scroll:'五殿的喊冤状子，如今有人代写：一份三百文，包「上达天听」。可代写的状子，写的不是冤，是套路。',
+ reward:{items:['yl_mu','yl_pao']},
+ nodes:[
+  {type:'event',text:'阎罗王把一摞状子翻开，每一份开头都是同一句：「小魂冤深似海」。他翻到第十份，停住了：这十个人的冤，是真的；可这十份状子，是一只手写的。他抬眼看你：本王审的是冤，不是文章。如今倒好，文章写得好的，冤先审。',
+   choices:[
+    {t:'查代写的是谁、状子递到哪一层',r:{flags:{flag_know_truth:1},log:'代写的铺子开在鬼市东头，招牌写「代书冤状，上达天听」。铺里的纸是同一批，墨是同一批，连按手印的位置都用炭粉画好了。阎罗王把状子翻过来，背面有一行小字：加五两，可指定审官。'}},
+    {t:'先去喊冤的鬼中间，听他们自己怎么说',r:{favor:{yan_luo:6},flags:{flag_mercy_cut:1},log:'一个老鬼说了半个时辰，说得颠三倒四，可句句都是自己的话。他说完，抹了抹脸：我自己写的没人看，代写的倒审得快。阎罗王在本子上记了很久，记完把笔一放：这才是状子。'}},
+    {t:'劝他：有人代写也省事，何必自找麻烦',r:{erode:3,log:'阎罗王冷笑一声：省事？本王这殿上，最怕的就是省事。省的是审官的事，多的是冤枉的人。他一拍惊堂木：本王自己那桩冤，就是被「省事」省掉的。'}}
+   ]},
+  {type:'quiz',who:'阎罗王',text:'堂下的书吏捧着旧典，声音发虚：王爷，这状子审之前，先问您一句——',
+   qs:[
+    {q:'「阎罗」二字来自梵语，本来的意思是？',opts:['平等','审判','黑夜'],a:0,why:'阎罗（Yama）意译「平等」，谓治狱公平、不徇私情，故又称平等王。'},
+    {q:'民间最常把哪位清官附会成阎罗王？',opts:['包拯','海瑞','狄仁杰'],a:0,why:'民间有「包公日断阳、夜断阴」之说，故常以包拯附会阎罗。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{yan_luo:5},log:'书吏退下。阎罗王哼了一声：平等二字，本王审了三百年，还没审明白。'}},
+  {type:'battle',enemy:'bianzhishou',name:'代书·编纸手',scale:1.1},
+  {type:'event',text:'编纸手散成一地状纸，最底下那份没有套路，只有歪歪扭扭六个字：我想回家看看。',
+   choices:[
+    {t:'依律办：代书铺查封，状子退回自写，冤者重审',r:{favor:{yan_luo:15},merit:10,flags:{flag_refuse_count:1},log:'阎罗王把惊堂木与五殿玄袍递给你：这一拍，堂下就静了；可本王自己那桩冤，得靠别人来拍。袍角那块焦，是替他挡过的火。重审那日，堂上没了成套的辞藻，只有一句句结结巴巴的话，他一份一份听完，听到了后半夜。'}},
+    {t:'查封铺子，收下的状子仍照审，只是不再指定审官',r:{favor:{yan_luo:10},flags:{flag_mercy_cut:1},log:'阎罗王点头：状子是假的，冤是真的。惊堂木与玄袍你拿着。他把「指定审官」那行字用朱笔涂了：这四个字一涂，铺子就没什么可卖的了。'}},
+    {t:'收下代书铺的孝敬，把「指定审官」改成「优先审」',r:{money:180,erode:8,flags:{flag_ruthless:1},favor:{yan_luo:-16},log:'阎罗王把惊堂木往案上一拍，拍完自己也愣住了：这声音，跟三百年前本王被押上堂时听见的一模一样。他慢慢坐下：你走吧。本王的号，还在你手里排着呢。'}}
+   ]}
+ ]},
+
+{id:'s59',name:'轮回门·投胎加急案',god:'zhuan_lun',chapter:4,side:'s59',danger:4,money:145,merit:31,
+ scroll:'轮回门前排着十万游魂，如今有人卖「加急」：加钱可插队，再加钱可挑胎。挑剩下的，才轮到你。',
+ reward:{items:['zl_lun','zl_pao']},
+ nodes:[
+  {type:'event',text:'转轮王坐在轮回盘旁，盘上的光一格一格转着：本殿的规矩，是排到谁就是谁。他指了指针盘边缘一处乱掉的光：如今有人替本殿排——排在前头的，都是出过钱的。他叹了口气：本殿送了三千年魂，头一回觉得自己像个看门的。',
+   choices:[
+    {t:'查加急的摊位、挑胎的价目、谁在抽成',r:{flags:{flag_know_truth:1},log:'加急摊摆在轮回门外的桥头，价目写在木牌上：插队五十两，挑富贵胎三百两，挑男胎一百两。转轮王听完，手指在膝上敲了敲：挑胎？胎是六道轮出来的，不是柜上挑出来的。他们把本殿的盘子，当成了柜子。'}},
+    {t:'先去队里，看排得最久的魂怎样',r:{favor:{zhuan_lun:6},flags:{flag_mercy_cut:1},log:'一个游魂排了四十年，魂体都淡了。他说他不敢投，投了就忘了，忘了就找不着媳妇了。转轮王蹲下来，把轮回盘的一格光照在他手上：记不住，也能过得好。这话他说得很轻，像送人出远门。'}},
+    {t:'劝他：加急也是给人方便，何必堵死',r:{erode:3,log:'转轮王摇摇头：方便是有余力的人的事。排在后头的，连饭都没有，哪来的钱买方便？本殿这道门，谁都能过；现在倒成了谁都能买。'}}
+   ]},
+  {type:'game',game:'spot',difficulty:2,
+   text:'转轮王把六道的往生凭证并排铺开：真凭证的印是轮纹，假的印是刻死的直线。找出那几张不对的。',
+   pass:{enemyVuln:true,merit:7,favor:{zhuan_lun:5},log:'光一照，五张凭证的印纹是直的，像用尺子划的。转轮王把假凭证一张张撕了：盘子上转出来的印，边是毛的。他们连毛边都懒得仿。'}},
+  {type:'battle',enemy:'daibanpuzhanggui',name:'加急·代办铺掌柜',scale:1.1},
+  {type:'event',text:'代办铺的柜台塌了，柜下压着一本账：插队多少、挑胎多少、退单多少。最后一页写着「本年净利」。',
+   choices:[
+    {t:'依律办：加急全废，已收退还，挑胎者重入六道',r:{favor:{zhuan_lun:15},merit:10,flags:{flag_refuse_count:1},log:'转轮王把转轮盘与十殿素袍交给你：盘转一格，就有一个魂忘掉来路；这袍素得像送站老人穿的，袖口磨起了毛。退钱那日，桥头的队伍散了一半——那些人本来就不该在队里。'}},
+    {t:'废挑胎留插队，只准老弱病残用「加急」',r:{favor:{zhuan_lun:10},flags:{flag_mercy_cut:1},log:'转轮王想了想：加急本身不是坏事，坏在拿它卖钱。盘与袍你拿着。他提笔在木牌上加了一行：老弱病残，免费。'}},
+    {t:'收下代办铺的干股，把「挑胎」改成「择善而投」',r:{money:185,erode:8,flags:{flag_ruthless:1},favor:{zhuan_lun:-16},log:'转轮王把轮回盘往下一按，盘停了。他低头看着停住的那一格：本殿转了三千年，头一回停。停了也好——本殿正好看看，这些年的魂，都投到哪儿去了。'}}
+   ]}
+ ]},
+
+{id:'s60',name:'东海·雨票倒卖案',god:'ao_guang',chapter:4,side:'s60',danger:4,money:150,merit:31,
+ scroll:'东海的雨，要请旨才下。如今有人卖「雨票」：买了票的地方下雨，没买的，旱着。',
+ reward:{items:['ag_jian','ag_pao']},
+ nodes:[
+  {type:'event',text:'敖广把雨簿翻得哗响：本王的雨，一场一场请旨下来的。他指着簿上一处：这一场，旨上写的是「润三县」，可雨只落了半个县。他抬眼看你：另两个半县，有人替本王「调度」了。雨票，你听过没有？',
+   choices:[
+    {t:'查雨票是谁印的、怎么调度',r:{flags:{flag_know_truth:1},log:'雨票是黄纸印的，票面写着「东海行雨，凭票即落」。敖广把票对着光看，忽然笑了：这纸是本王府里包贡品的。他笑意一收：他们连纸都懒得换。'}},
+    {t:'先去旱着的县，看地里什么样',r:{favor:{ao_guang:6},flags:{flag_mercy_cut:1},log:'田地裂成一块块，井底能看见底。老农蹲在田埂上，把一捧干土从指缝里漏下去，说：听说有雨票，一张够我们村吃半年。敖广站在田边，龙袍下摆沾了土，他没拍。'}},
+    {t:'劝他：雨落哪儿都是落，何必计较',r:{erode:3,log:'敖广把雨簿一合：雨落哪儿都是落，可旨上写的是三县。本王朝廷里混了三千年，最不敢改的就是旨上的字。一改，就有人说：反正龙王也不会计较。'}}
+   ]},
+  {type:'game',game:'memory',difficulty:2,
+   text:'敖广把旨意与雨簿摊开：旨上写几个县，簿上就该落几处。记住旨上的县名，再在簿上挑出来。',
+   pass:{enemyVuln:true,merit:7,favor:{ao_guang:5},log:'簿上对不上三处。敖广用笔圈了圈：这三处，旨上都有；这三处的雨，都没落。他圈完把笔一扔：本王这龙椅，坐得越来越像账房了。'}},
+  {type:'battle',enemy:'jiaowang',name:'倒票·私雨蛟王',scale:1.15},
+  {type:'event',text:'私雨蛟王沉进海沟，海面浮起一叠雨票，票角都盖着东海的印——印是假的，可假得连敖广自己都多看了一眼。',
+   choices:[
+    {t:'依律办：雨票尽毁，私雨者锁海眼，旱县补雨',r:{favor:{ao_guang:15},merit:10,flags:{flag_refuse_count:1},log:'敖广把龙渊剑与龙王衮服交给你：剑沉在东海三千年，出鞘时海水跟着上来；衮服上的每一片鳞，都记着一场没请旨的雨。补雨那日，他亲自请旨，旨上仍写三县，一个不少。雨落下来的时候，老农蹲在田埂上哭，他在云头上站着，没敢下去。'}},
+    {t:'毁票锁人，旱县补雨改由本地自请',r:{favor:{ao_guang:10},flags:{flag_mercy_cut:1},log:'敖广点头：自己请的雨，落下来才踏实。剑与衮服你拿着。他添了一句：往后谁再说「反正龙王不会计较」，你替本王回一句——本王计较。'}},
+    {t:'收下雨票的三成利，把私雨改成「特许行雨」',r:{money:190,erode:8,flags:{flag_ruthless:1},favor:{ao_guang:-16},log:'敖广把雨簿推到一边，慢慢靠回椅背：本王研究研究。这四个字他说了三千年，头一回说得这么冷。他闭上眼：你走吧，雨的事，本王不管了——反正，也能卖。'}}
+   ]}
+ ]},
+
+{id:'s61',name:'嵩山·地脉租约案',god:'zhong_yue',chapter:4,side:'s61',danger:4,money:150,merit:32,
+ scroll:'地脉被人租去开矿，租约一签百年，嵩山底下被掏空了三成。岳神收着租，却不知道山下塌了。',
+ reward:{items:['zy_yin','zy_pao']},
+ nodes:[
+  {type:'event',text:'中岳大帝把玉印按在案上，印下压着一沓租约：本帝的规矩，地脉是借，不是卖。他把租约翻开：百年为期，一年一租。可你看这一条——「承租方可自行开凿」。他抬头：地是活的，凿穿了，是要塌的。',
+   choices:[
+    {t:'查承租的是谁、凿到哪一层、租银去哪了',r:{flags:{flag_know_truth:1},log:'承租方是一家「嵩岳矿务」，租银每年照付，一分不少。可矿道图比报上来的深了两层，最深处已经摸到地脉主支。中岳大帝的手按在地图上，指节发白：他们付的是租银，挖的是本帝的骨头。'}},
+    {t:'先去山下村子，看塌了没有',r:{favor:{zhong_yue:6},flags:{flag_mercy_cut:1},log:'山脚下三个村子，两口井干了，一户人家的院墙裂了一道缝，缝里往外冒凉气。老人说夜里能听见地下有响动，像有人一直在走。中岳大帝蹲下去摸了摸那道缝，半晌才说：本帝听见了，是本帝一直没听。'}},
+    {t:'劝他：租约白纸黑字，按约办事就行',r:{erode:3,log:'中岳大帝把玉印拿起来又放下：白纸黑字，写的是租地，不是租命。本帝守着这座山，守的不是银子，是山底下睡着的东西。'}}
+   ]},
+  {type:'game',game:'lights',difficulty:2,
+   text:'中岳大帝把地脉图挂起来，图上每个光点是一口井：井水还有的亮着，干了的灭着。他把灯芯递给你：把该亮的位置记住。',
+   pass:{enemyVuln:true,merit:7,favor:{zhong_yue:5},log:'图上有十九个光点灭了，全在矿道两侧。中岳大帝把灭掉的位置一个个标出来，连成一条线：这条线，就是他们凿穿的地方。'}},
+  {type:'battle',enemy:'keshenkuilei',name:'凿脉·科神傀儡',scale:1.15},
+  {type:'event',text:'科神傀儡散成一堆木榫，木榫上刻着尺度，每一根都比报上来的短一寸——短的那一寸，就是多挖的。',
+   choices:[
+    {t:'依律办：租约作废，矿道回填，塌村赔偿',r:{favor:{zhong_yue:15},merit:10,flags:{flag_refuse_count:1},log:'中岳大帝把中岳玉印与嵩岳法袍交给你：印压的是地脉，抬起来，山就喘一口气；袍上绣的不是云，是地底下的水脉。回填那日，他站在井口听了很久，听到水声一点点回来，才转身：本帝这山，还能再站三千年。'}},
+    {t:'废开凿条款留租约，改由岳府监工',r:{favor:{zhong_yue:10},flags:{flag_mercy_cut:1},log:'中岳大帝把租约上的「自行开凿」划了，改成「岳府监工」：租可以租，凿不行。印与袍你拿着。他添了一句：监工的人，得下井看，不能只看图。'}},
+    {t:'收下矿务的干股，把租约续成两百年',r:{money:195,erode:8,flags:{flag_ruthless:1},favor:{zhong_yue:-16},log:'中岳大帝把玉印收回袖里，山风忽然停了：两百年。他轻声重复了一遍，像在数什么。数完他说：本帝守这座山，守了三千年；两百年后，本帝再来看看，还剩下什么。'}}
+   ]}
+ ]},
+
+{id:'s62',name:'北宫·荡魔外包案',god:'zhen_wu',chapter:4,side:'s62',danger:5,money:170,merit:34,
+ scroll:'北宫荡魔的差事，如今分包给了外头的「镇魔行」：按头收费，收了钱才荡魔。不交钱的人家，魔就堵在门口，等着。',
+ reward:{items:['zw_jian','zw_jia']},
+ nodes:[
+  {type:'event',text:'真武大帝披发跣足坐在北宫，龟蛇盘在脚边，一动不动。他指了指案上一沓契约：本帝荡魔，从不收钱。如今有人打着本帝的旗号收钱，收完还派人来问，本帝要不要抽三成。他抬起眼：本帝要的不是三成，是那些被「程序」放进门的魔。',
+   choices:[
+    {t:'查镇魔行的底细、荡魔名册、抽成流向',r:{flags:{flag_know_truth:1},log:'镇魔行的名册上，每一头魔都编了号，旁边写着「已受理」「待受理」「不受理」。真武大帝一页页翻过去，翻到「不受理」那一叠，停住了：这些魔，本帝荡过。它们本该在三年前就没了。'}},
+    {t:'先去没交钱的人家，看门口堵着什么',r:{favor:{zhen_wu:6},flags:{flag_mercy_cut:1},log:'一户人家的门被一块黑石顶着，石上贴着「待缴费」的黄条。石缝里有东西在呼吸。真武大帝蹲下去，伸手按了按那块石，石裂了，里头是一头瘦得只剩骨架的小魔。他说：本帝荡魔，荡的是这个；不是这张条。'}},
+    {t:'劝他：外包也是办事，何必较真',r:{erode:3,log:'真武大帝把契约合上：办事。他重复了一遍，声音没什么起伏：本帝办了三十年的事，头一回听说，事还能包出去。包出去的事，出了岔子，算谁的？'}}
+   ]},
+  {type:'quiz',who:'真武大帝',text:'龟蛇在他脚边动了动，他抬手示意：问吧，问完本帝还要去北边。',
+   qs:[
+    {q:'真武大帝脚下所踏的是哪两样？',opts:['龟与蛇','麒麟与凤','虎与豹'],a:0,why:'真武（玄武）为北方水神，形象为披发跣足、踏龟蛇，龟蛇即玄武之象。'},
+    {q:'明代哪位皇帝特别尊奉真武大帝？',opts:['朱棣','赵匡胤','李世民'],a:0,why:'朱棣以「靖难」起兵，托言真武护佑，即位后大修武当山，真武信仰遂盛。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{zhen_wu:5},log:'真武大帝听完，只说了两个字：尚可。龟蛇却把头转向你，看了很久。'}},
+  {type:'battle',enemy:'heguimoshou',name:'镇魔行·规鬼魔手',scale:1.15},
+  {type:'event',text:'规鬼魔手散了，契约一页页飘下来，最底下压着一张没编号的收据：「已荡，未收费」。',
+   choices:[
+    {t:'依律办：镇魔行查封，名册重审，不收费者补荡',r:{favor:{zhen_wu:15},merit:10,flags:{flag_refuse_count:1},log:'真武大帝把七星剑与玄甲交给你：剑上的七个孔，是本帝自己凿的，凿一个，记一头没荡完的魔。甲你穿上——甲是黑的，黑得看不见伤。补荡那日，他没让任何人跟着，一个人在北边走了三天。'}},
+    {t:'查封镇魔行，留下的「待受理」由北宫接手',r:{favor:{zhen_wu:10},flags:{flag_mercy_cut:1},log:'真武大帝点头：本该如此。剑与甲你拿着。他顿了顿，补了一句：本帝不抽成。这四个字他说得很慢，像怕人听漏。'}},
+    {t:'收下镇魔行的三成，改名叫「荡魔代捐」',r:{money:210,erode:8,flags:{flag_ruthless:1},favor:{zhen_wu:-16},log:'真武大帝站起来，龟蛇跟着抬头。他没看你，只看着北边的天：本帝荡了三千年魔，头一回知道，魔还能分成。说完他往北走了，背影很直，一步没停。'}}
+   ]}
+ ]},
+
+{id:'s63',name:'雷部·雷票超发案',god:'lei_zu',chapter:4,side:'s63',danger:5,money:172,merit:34,
+ scroll:'雷部的雷票超发了三倍：一张票许一道雷，如今同一道雷，卖给了三个人。劈下来的时候，三个人一起抬头。',
+ reward:{items:['lz_bian','lz_jia']},
+ nodes:[
+  {type:'event',text:'雷祖坐在雷城正中，双鞭横在膝上，鞭梢还冒着细烟。他把一沓雷票摊开：本尊这雷，一道是一道。他拈起三张票，票号不同，批的是同一个时辰、同一处地方：这三个人，都以为那道雷是自己的。他抬眼看你：雷只有一道。你说，该劈谁？',
+   choices:[
+    {t:'查雷票的号、超发的量、谁在盖章',r:{flags:{flag_know_truth:1},log:'雷票的号是连着的，连到第三千张就断了，断处有人用另一批号接上。雷祖把两批票并排一比，票纸的纹不一样：这批是雷部库里的，那批不是。他笑了一下，笑得很短：本尊的库，进人了。'}},
+    {t:'先去被劈的人家，看他们信的是哪张票',r:{favor:{lei_zu:6},flags:{flag_mercy_cut:1},log:'三家都供着雷票，都说是花了大价钱求的。最穷那家把票压在枕头下，说劈下来的时候，他正跪着谢雷。雷祖站在那家的院子里，看了很久，才说：本尊的雷，从来不收钱。'}},
+    {t:'劝他：多卖几张也无妨，反正雷够用',r:{erode:3,log:'雷祖双鞭往地上一顿，雷城晃了一下：够用？他指着城外：本尊劈的是该劈的地方、该劈的时辰。多卖一张，就有一处该劈的，没人管。'}}
+   ]},
+  {type:'quiz',who:'雷祖',text:'雷部的书吏捧着玉枢宝经上前，雷祖抬手止住他：不必念，问他。',
+   qs:[
+    {q:'雷祖的完整尊号是？',opts:['九天应元雷声普化天尊','九天玄女元君','北极玄天上帝'],a:0,why:'雷祖即九天应元雷声普化天尊，居九天应元府，统摄雷部诸神。'},
+    {q:'《封神演义》中，雷部正神的主帅是？',opts:['闻仲','黄飞虎','杨戬'],a:0,why:'闻仲绝龙岭战死后封为「九天应元雷声普化天尊」，掌雷部。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{lei_zu:5},log:'雷祖听完，鞭梢的烟忽然直了：本尊这名号，如今满街的雷票上都印着。印得比本尊自己还熟。'}},
+  {type:'battle',enemy:'gongdaotianchai',name:'押票·贡道天差',scale:1.15},
+  {type:'event',text:'贡道天差的箱子里全是雷票，箱底压着一本账，账上写着「本年雷量：三万道」。雷部一年，只劈三百道。',
+   choices:[
+    {t:'依律办：超发雷票尽毁，私印者押雷城，误劈者补祭',r:{favor:{lei_zu:15},merit:10,flags:{flag_refuse_count:1},log:'雷祖把雌雄双鞭与金甲交给你：一雌一雄，落雷时两声——先响的那声是给人听的，后响的那声，才是劈的。金甲上的雷纹是烧出来的，你穿上它，天上看你就当自己人。补祭那日，他亲自劈了三道空雷，三道都落在荒地。他说：这三道，是替他们出的气。'}},
+    {t:'毁票押人，把多出来的雷量改成「备雷」',r:{favor:{lei_zu:10},flags:{flag_mercy_cut:1},log:'雷祖点头：备雷是留给该劈、没劈到的。双鞭与甲你拿着。他提笔在雷簿上添了一行：备雷三百，不得挪作他用。添完把笔一扔：这句话，本尊隔三百年得添一回。'}},
+    {t:'收下多卖的三成，把私雷记作「特许行雷」',r:{money:215,erode:8,flags:{flag_ruthless:1},favor:{lei_zu:-16},log:'雷祖把双鞭收进袖里，雷城的雷声一下子低了下去：特许。他说得不重，可每个字都像落在你脚边。行雷还有特许的？他站起来往城外走：本尊去看看，这天底下，还有哪一处，是本尊没劈到的。'}}
+   ]}
+ ]},
+
+{id:'s64',name:'华山·矿脉私采案',god:'xi_yue',chapter:4,side:'s64',danger:5,money:170,merit:34,
+ scroll:'华山的矿脉被人私采，采出来的金子，铸成了一尊西岳大帝像，又卖回给西岳庙。金子绕了一圈，回到山上，山却空了。',
+ reward:{items:['xy_feng','xy_pao']},
+ nodes:[
+  {type:'event',text:'西岳大帝把一尊小金像摆在案上，像铸得很像他，眉眼都在，就是轻。他把像推到你面前：这像，是拿本帝山里的金子铸的；铸好了，卖回本帝的庙里，卖了三倍价。他手指按在像座上：金子绕了一圈，回到山上——可山，空了。',
+   choices:[
+    {t:'查矿从哪开、金子铸成什么、卖给了谁',r:{flags:{flag_know_truth:1},log:'矿口在半山腰，用松枝遮着。铸坊在山下，铸的不只是神像，还有香炉、金牌、护身符，样样都刻着「西岳」。西岳大帝拿起一枚金牌对着光看：本帝的印，是这么用的？他把金牌放下，金牌在案上磕出一声脆响。'}},
+    {t:'先去矿口附近，看山塌了没有',r:{favor:{xi_yue:6},flags:{flag_mercy_cut:1},log:'矿口外的松树黄了半边，山溪断流。一个挑水的老人说，从前这水甜，如今涩。西岳大帝蹲在溪边，掬了一捧，尝了尝，把水泼回溪里：本帝守这山，守的是这口水。金子是死的。'}},
+    {t:'劝他：山里的东西，挖出来才算数',r:{erode:3,log:'西岳大帝把小金像转了个面，背面刻着一行小字「捐造」。他读了一遍，笑了一声：挖出来才算数。他说：挖出来，本帝这山就只剩个数了。数完了，谁还记得山长什么样。'}}
+   ]},
+  {type:'quiz',who:'西岳大帝',text:'金殿外的松风一阵一阵。西岳大帝抬手，让侍立的山神退下。',
+   qs:[
+    {q:'五岳之中的「西岳」是？',opts:['华山','泰山','嵩山'],a:0,why:'东岳泰山、西岳华山、南岳衡山、北岳恒山、中岳嵩山。'},
+    {q:'西岳在五行中属？',opts:['金','木','水'],a:0,why:'西方属金，故西岳大帝号「金天顺圣」，主五金矿藏之利。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{xi_yue:5},log:'西岳大帝听完，点点头：本帝这名号，如今刻在金牌上，一枚卖十两。他顿了顿：名号是这么用的么？'}},
+  {type:'battle',enemy:'kuzhankuzu',name:'私矿·库栈库卒',scale:1.15},
+  {type:'event',text:'库栈库卒倒下，库门开着，里面码着还没铸的金锭，每一锭上都印着「西岳」二字。',
+   choices:[
+    {t:'依律办：矿口全封，金锭归山，私刻印者论罪',r:{favor:{xi_yue:15},merit:10,flags:{flag_refuse_count:1},log:'西岳大帝把金锋剑与华岳金袍交给你：剑出华山金气，切石如纸；这袍是金的，金底下压着一座山的影子。封矿那日，他把刻印的模子砸了，砸完把碎块一块块捡起来，埋回矿口。他说：本帝的东西，还给本帝的山。'}},
+    {t:'封矿，已采的金留作山神庙产，不再私铸',r:{favor:{xi_yue:10},flags:{flag_mercy_cut:1},log:'西岳大帝点头：金子挖出来了，扔回去也是块石头；拿它修山路、补石阶，倒还算它有条出路。剑与袍你拿着。他添了一句：可印，不能再刻。'}},
+    {t:'收下私矿的干股，把「西岳」印租给铸坊',r:{money:215,erode:8,flags:{flag_ruthless:1},favor:{xi_yue:-16},log:'西岳大帝把金像拿起来，掂了掂，放回案上：租印。他说：本帝这方印，压的是山；租出去，压的就成了人。山风进来，把案上的金像吹倒了，没人去扶。'}}
+   ]}
+ ]},
+
+{id:'s65',name:'天书·兵符租赁案',god:'xuan_nv',chapter:4,side:'s65',danger:5,money:168,merit:34,
+ scroll:'兵符被人租了出去：一符一军，租的人拿它去打仗，打完把符还回来，符上还带着别人家的血。',
+ reward:{items:['xn_juan','xn_yi']},
+ nodes:[
+  {type:'event',text:'九天玄女立在云台上，六壬天书摊在面前，书页无字，风一过才浮出几行。她合上书：本座授符，一符授一人，一生授一次。她抬眼看你：如今有人来租，租期三年，租金按军计。租来的兵，打的是别人的仗——死的是租来的人。',
+   choices:[
+    {t:'查符从哪流出、租给了谁、打的什么仗',r:{flags:{flag_know_truth:1},log:'流出的符有十七枚，都是从一处旧祠里「请」出来的。租符的人各有名目：有山寨，有盐帮，有替人出头的地方豪强。玄女一本本翻完，合上：本座授符，为的是天命将倾时有个破局的人；不是给有钱人，雇人替他去死。'}},
+    {t:'先去替人打仗的兵家里，看剩下什么',r:{favor:{xuan_nv:6},flags:{flag_mercy_cut:1},log:'一户人家的门框上还贴着「凯旋」的红纸，纸底下是白纸。母亲说儿子回来过一次，坐了一夜，天没亮就走了。玄女站在门口，没有进去，只把天书翻到一页空白，站了很久。'}},
+    {t:'劝她：符租出去也是用，何必问谁用',r:{erode:3,log:'玄女把天书合上，书页间漏出一线光：用？她说：本座这符，一用，就有人死。不问谁用，就是不问谁死。你这句话，本座记下了。'}}
+   ]},
+  {type:'quiz',who:'九天玄女',text:'云台下风停了一瞬。玄女把天书往前推了推，示意你先答。',
+   qs:[
+    {q:'传说中九天玄女授黄帝何物，助其破蚩尤？',opts:['兵符与兵法','不死药','九州鼎'],a:0,why:'《云笈七签》载玄女授黄帝六甲六壬兵信之符、灵宝五帝策等，助其战蚩尤。'},
+    {q:'《水浒传》中，九天玄女授宋江三卷天书的地点是？',opts:['还道村玄女庙','梁山忠义堂','东京大相国寺'],a:0,why:'宋江避难还道村，梦入玄女庙，得玄女授三卷天书。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{xuan_nv:5},log:'玄女听完，书页上的字慢慢淡下去：本座授的书，从没有一本，是这么用的。'}},
+  {type:'battle',enemy:'taoyiheichai',name:'租符·逃役黑差',scale:1.15},
+  {type:'event',text:'逃役黑差散了，十七枚兵符落在云台上，每一枚都沾着血，血已经发黑。',
+   choices:[
+    {t:'依律办：符尽收回，租约作废，租符者各担其罪',r:{favor:{xuan_nv:15},merit:10,flags:{flag_refuse_count:1},log:'玄女把六壬天书与羽衣交给你：书页无字，翻开时字才浮上来——你心里想什么，它就写什么；羽衣是青的，风过时整件都在响。收符那日，她把十七枚符一一擦干净，擦完投进云海：符认的是人，不认钱。这句话她说了两遍。'}},
+    {t:'收回兵符，已立的战功不追，只废租约',r:{favor:{xuan_nv:10},flags:{flag_mercy_cut:1},log:'玄女点头：仗打完了，人回不来；可符不能再租。书与羽衣你拿着。她把天书翻到最后一页，那页上只有一行字：授人，不授势。'}},
+    {t:'收下租金的三成，把租符改成「代授」',r:{money:210,erode:8,flags:{flag_ruthless:1},favor:{xuan_nv:-16},log:'玄女把天书合上，云台上的光暗了一层：代授。她重复着这两个字，声音很平：本座授的是破局的人。代授，授的是谁？说完她转身，羽衣一响，人已经在云外了。'}}
+   ]}
+ ]},
+
+{id:'s66',name:'九华·地狱KPI案',god:'di_zang',chapter:4,side:'s66',danger:5,money:168,merit:35,
+ scroll:'地狱开始考核：每个狱卒每月须「度化」够数，度不够的扣香火。于是没人愿意度难度的魂——难度的，度不动，就不度了。',
+ reward:{items:['dz_zhang','dz_yi']},
+ nodes:[
+  {type:'event',text:'地藏王菩萨坐在九华山下，锡杖横在膝上，谛听伏在脚边，耳朵贴着地。他把一张考核表递给你：这个月，十八层地狱的度化数，都够了。他指着表上最下面一行：只有这一层，数还是零。他抬眼看你：这一层的魂，最难。',
+   choices:[
+    {t:'查考核怎么定的、数字怎么报的、谁在核',r:{flags:{flag_know_truth:1},log:'考核表是三层衙门联签的，签得整整齐齐。可每一层的「度化」栏底下都有一行小字：「不含疑难」。地藏菩萨用指腹摩过那四个字：不含疑难。他说：本愿度的，就是疑难。'}},
+    {t:'先下最底那一层，看那些魂什么样',r:{favor:{di_zang:6},flags:{flag_mercy_cut:1},log:'最底层的魂不说话，也不抬头。有个魂的手一直往上看，像在够什么。地藏菩萨蹲下来，把锡杖上的环轻轻一摇，那魂的手动了动。他说：不是度不动，是没人肯在这儿多站一会儿。'}},
+    {t:'劝他：考核也是为督促，何必认真',r:{erode:3,log:'地藏菩萨把考核表折起来：督促。他说：督促的是数，还是人？他把表收进袖里：本愿说地狱未空誓不成佛——如今地狱没空，数先满了。'}}
+   ]},
+  {type:'quiz',who:'地藏王菩萨',text:'谛听抬起头，耳朵转了转。菩萨温声道：先答，答完再下去。',
+   qs:[
+    {q:'地藏菩萨的道场在？',opts:['九华山','五台山','普陀山'],a:0,why:'唐时新罗僧金乔觉居九华山修行，后世尊为地藏菩萨应化，九华山遂为地藏道场。'},
+    {q:'「地狱未空」的下一句是？',opts:['誓不成佛','不为诸佛','不证菩提'],a:0,why:'地藏菩萨大愿：「地狱未空，誓不成佛；众生度尽，方证菩提。」'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{di_zang:5},log:'菩萨听完，低头看了看谛听：你听，这山下的声音，数得清么？谛听没有动。'}},
+  {type:'battle',enemy:'renzhengkeli',name:'核数·认证科吏',scale:1.15},
+  {type:'event',text:'认证科吏的牌子散了一地，每块牌上都盖着「合格」，最底下那块，盖的是「免核」。',
+   choices:[
+    {t:'依律办：考核作废，疑难层重开，度化不计数',r:{favor:{di_zang:15},merit:11,flags:{flag_refuse_count:1},log:'地藏菩萨把九环锡杖与九华僧衣交给你：走一步，九环响一次；响一次，底下就少一个人。僧衣上二十七块补丁，每一块都替一个人挡过。重开那日，他没看数，只一层一层地走，走到最底，坐了下来。'}},
+    {t:'废「不含疑难」一条，其余考核照旧',r:{favor:{di_zang:10},flags:{flag_mercy_cut:1},log:'菩萨点头：数可以有，疑难不能不算。杖与衣你拿着。他提笔在考核表上添了一行：疑难层，一魂顶百魂。添完把笔放下：这行字，本愿自己添。'}},
+    {t:'收下核数衙门的孝敬，把「免核」改成「特批」',r:{money:210,erode:8,flags:{flag_ruthless:1},favor:{di_zang:-16},log:'地藏菩萨把锡杖立起来，九环一齐响了一声，又都静了：特批。他说：本愿度的是最难的那个。特批，批的是最容易的。他没再看你，只对谛听说：下去吧，底下还有人等着。'}}
+   ]}
+ ]},
+
+{id:'s67',name:'山门·舍利押运案',god:'wei_tuo',chapter:4,side:'s67',danger:5,money:170,merit:34,
+ scroll:'舍利押运的差事外包给了镖行：镖行押一半，另一半在半道上「丢」了。丢的那一半，过几日出现在别家的供桌上。',
+ reward:{items:['wt_chu','wt_jia']},
+ nodes:[
+  {type:'event',text:'韦驮立在山门内，降魔杵拄地，杵底压着一份押运单。他把单子推给你：本将押舍利，从山门到塔院，三步一停，五步一望，从不假手于人。他指着单子上的「外包」二字：如今这差事，包给镖行了。丢了七颗。他抬眼看你：七颗舍利，七户人家的供桌。',
+   choices:[
+    {t:'查镖行的底、押运的路、丢失的时辰',r:{flags:{flag_know_truth:1},log:'镖行的押运图上有三处「歇脚」，都在荒僻处。韦驮把图折了一折，对上路：这三处，都不在官道上。他说：本将押了三百年，从没在半道上歇过脚。歇脚的地方，就是丢东西的地方。'}},
+    {t:'先去得了舍利的人家，看他们怎么供',r:{favor:{wei_tuo:6},flags:{flag_mercy_cut:1},log:'七户人家都把舍利供在正堂，香火不断。有个老太太说，这是她攒了半辈子钱请的，请回来那夜，家里头一回没听见怪声。韦驮站在门槛外，看了很久，才说：她供的是真的信，不是假的利。'}},
+    {t:'劝他：镖行押运也是押，何必亲力亲为',r:{erode:3,log:'韦驮把降魔杵往地上一顿，山门抖了一下：押运也是押。他盯着你：本将押的是舍利，丢一颗，就有一处香火断。你说这也是押？'}}
+   ]},
+  {type:'quiz',who:'韦驮',text:'山门外的风把经幡吹得直响。韦驮把杵立正，站得笔直：问吧。',
+   qs:[
+    {q:'韦驮像通常供奉在寺院的什么位置？',opts:['天王殿内，弥勒背后','大雄宝殿正中','藏经楼顶层'],a:0,why:'韦驮立于天王殿弥勒佛背后，面朝大雄宝殿，护持道场。'},
+    {q:'韦驮所持的法器是？',opts:['降魔杵','金刚铃','如意'],a:0,why:'韦驮手持降魔杵（金刚杵），为护法之象征。'}
+   ],
+   pass:{enemyVuln:true,merit:7,favor:{wei_tuo:5},log:'韦驮听完，把杵换个手拄着：本将只奉法旨。他说：可法旨没说过，舍利可以外包。'}},
+  {type:'battle',enemy:'zhouxuntiying',name:'押镖·昼巡替影',scale:1.15},
+  {type:'event',text:'替影散了，镖行的押运箱开着，箱里垫着的黄绸还是热的，舍利却一颗不剩。',
+   choices:[
+    {t:'依律办：镖行查抄，七颗舍利追回，押运复归山门',r:{favor:{wei_tuo:15},merit:10,flags:{flag_refuse_count:1},log:'韦驮把降魔杵与护法明光甲交给你：杵重八十一斤，落地山门都要抖；甲擦得能照见人——他说护法的人，先得让人看清。追舍利那日，他一颗一颗从供桌上请回来，每一颗都先合十，再放进匣子。最后一颗请回来时，天已经亮了。'}},
+    {t:'查抄镖行，已供出的舍利留于原处，只追未供的',r:{favor:{wei_tuo:10},flags:{flag_mercy_cut:1},log:'韦驮想了想：供着的人心是真的，硬夺回来，断的是那份信。杵与甲你拿着。他补了一句：可从今往后，押运得本将亲自走。'}},
+    {t:'收下镖行的分成，把押运改成「特许代押」',r:{money:212,erode:8,flags:{flag_ruthless:1},favor:{wei_tuo:-16},log:'韦驮把杵横过来，挡在山门口：代押。他说：本将这门，只进不出。他让开路，声音很平：你要出去，本将不拦；可这山门里的东西，往后你别碰。'}}
+   ]}
+ ]},
+
+{id:'s68',name:'罗酆·六天宫租约案',god:'feng_du',chapter:4,side:'s68',danger:5,money:180,merit:36,
+ scroll:'罗酆山的六天宫，被人拿去签了租约：租给外头的「幽冥置业」，六宫改作仓房，鬼魂按间收租。',
+ reward:{items:['fd_ling','fd_pao']},
+ nodes:[
+  {type:'event',text:'酆都大帝坐在罗酆山下，六天宫空了五宫，只有他这一宫还点着灯。他把一份租约推到案边：本帝统北阴六天宫，三千年一替。他指着租约上的「承租方」一栏：如今这六宫，租出去了。他抬眼看你：租的人不是鬼，是衙门。鬼按间收租。',
+   choices:[
+    {t:'查租约怎么签的、六宫改成什么、租金进了谁的账',r:{flags:{flag_know_truth:1},log:'六宫的仓门上钉着铜牌，牌上写「一号仓」「二号仓」，编号一直排到第九百间。仓里堆的不是货，是魂。酆都大帝站在一号仓门口，看了很久：本帝这六宫，住的是不该再出来的东西；如今它们住的地方，租给了会算账的。'}},
+    {t:'先去按间收租的魂里，问一句',r:{favor:{feng_du:6},flags:{flag_mercy_cut:1},log:'一个魂掏出一张收据，说他住第七百三十一间，每月交三文，交不起就挪到更小的间。酆都大帝把收据捏在手里，捏得纸都透了：本帝管的是鬼，不管房。他说：如今鬼都成房客了。'}},
+    {t:'劝他：租出去也是用，总比空着强',r:{erode:3,log:'酆都大帝抬眼：空着。他重复了一遍，声音很低：本帝这六宫空了三千年，是因为里头的东西不该满。他指了指租约：满了，就有人来收租了。'}}
+   ]},
+  {type:'quiz',who:'酆都大帝',text:'六天宫的灯忽明忽暗。酆都大帝抬手，让殿下的鬼差退到门外。',
+   qs:[
+    {q:'酆都大帝所治的幽冥山是？',opts:['罗酆山','九华山','昆仑山'],a:0,why:'《真诰》载罗酆山为北阴之府，酆都大帝治于此，统六天宫鬼神。'},
+    {q:'酆都大帝所统的六宫，称为？',opts:['北阴六天宫','瑶池六宫','玄都六院'],a:0,why:'北阴六天宫为酆都治所，分宫治鬼，宫各有主。'}
+   ],
+   pass:{enemyVuln:true,merit:8,favor:{feng_du:5},log:'酆都大帝听完，把租约折起来：本帝这六宫，三千年一替；如今有人想一签三千年。'}},
+  {type:'battle',enemy:'guishexuanjiajiang',name:'置业·鬼蛇玄甲将',scale:1.2},
+  {type:'event',text:'鬼蛇玄甲将倒下，六宫的仓门一扇扇开着，九百间仓里，魂都站着，没有一间有床。',
+   choices:[
+    {t:'依律办：租约作废，六宫复归，收租者押酆都',r:{favor:{feng_du:18},merit:12,flags:{flag_refuse_count:1},log:'酆都大帝把罗酆令与北阴玄袍交给你：令出罗酆，鬼低头——低的是令，不是人。玄袍你穿上，这是本帝三千年的黑，穿久了，人就不怕黑了。复归那日，他亲自一间间开了仓门，开到第九百间，停下来：本帝这宫，本就是空着的。空着，才对。'}},
+    {t:'废租约，六宫不再改仓，已收的租退还',r:{favor:{feng_du:12},flags:{flag_mercy_cut:1},log:'酆都大帝点头：租退回去，魂就不欠了。令与袍你拿着。他把租约烧了，灰落在案上，他用手指抹开：本帝管鬼三千年，头一回管到房钱。'}},
+    {t:'续租约，把收租改成「六宫物业」归自己管',r:{money:235,erode:9,flags:{flag_ruthless:1},favor:{feng_du:-20},log:'酆都大帝把灯盏吹灭了。殿里一下子黑透，只有他的声音：物业。他说得很慢：本帝这六宫，是给不该出来的东西留着的；不是给会算账的留着的。灯再亮起来时，殿上已经没有人了。'}}
+   ]}
+ ]},
+
+{id:'s69',name:'泰山·生死簿影印案',god:'dong_yue',chapter:4,side:'s69',danger:5,money:182,merit:36,
+ scroll:'生死簿被人影印了：影印本流到人间，命可以买，寿可以改——改的，还不是自己的命。',
+ reward:{items:['dy_fu','dy_pao']},
+ nodes:[
+  {type:'event',text:'东岳大帝坐在泰山之巅，生死簿摊在膝上，纸页被山风吹得直响。他把一册薄薄的本子递给你：这是影印的。他翻到其中一页：上头的人还活着，可这页写着「已改」，改的日期，比他的死期早三年。他抬眼看你：朕的名，是这么用的？',
+   choices:[
+    {t:'查影印从哪出、谁改的页、改的是谁的寿',r:{flags:{flag_know_truth:1},log:'影印本的纸边有暗纹，暗纹连着第几页，页就归哪一司管。改过的页有六十三页，六十三页分属三司——三司的印都是真的，笔不是。东岳大帝把册子合上：印是朕的，笔不是。'}},
+    {t:'先去被改了命的人家，看他们知不知道',r:{favor:{dong_yue:6},flags:{flag_mercy_cut:1},log:'一户人家正办喜事，新郎的寿被添了二十年，他自己不知道。东岳大帝站在院外，没有进去：他活得好。他说：朕改了，他这二十年就是借的；借的，总要还。'}},
+    {t:'劝他：多二十年也好，何必追究',r:{erode:3,log:'东岳大帝把生死簿合上，山风停了一瞬：多二十年。他说：朕掌的是生死贵贱——多二十年，是谁的二十年？他把册子放回膝上：簿上少一页，人间就多一个人哭着问，为什么是他。'}}
+   ]},
+  {type:'quiz',who:'东岳大帝',text:'泰山顶上的云压得很低。东岳大帝把玉符放在膝头，示意你答。',
+   qs:[
+    {q:'东岳大帝在民间信仰中主掌？',opts:['人之生死贵贱','五谷丰歉','海上风浪'],a:0,why:'《风俗通义》载泰山为「天帝之孙」，主召人魂魄，知人生命之长短。'},
+    {q:'「五岳之首」是？',opts:['东岳泰山','西岳华山','中岳嵩山'],a:0,why:'泰山为五岳之首，历代帝王封禅于此，东岳大帝居之。'}
+   ],
+   pass:{enemyVuln:true,merit:8,favor:{dong_yue:5},log:'东岳大帝听完，把玉符翻了个面：朕这名，写在簿上是生死，写在符上是信。'}},
+  {type:'battle',enemy:'chidietaohun',name:'改簿·持牒套魂',scale:1.2},
+  {type:'event',text:'持牒套魂倒下，六十三册影印本摞在案上，最上面那本沾着朱砂，朱砂还是湿的。',
+   choices:[
+    {t:'依律办：影印本尽毁，改页回正，私印者交有司',r:{favor:{dong_yue:18},merit:12,flags:{flag_refuse_count:1},log:'东岳大帝把天齐玉符与泰山衮服交给你：符上刻「天齐」，落笔那一划压着泰山；衮服十二纹，最后一道是山，绣得比龙沉。回正那日，他一页页翻，翻到改过的六十三页，逐页抹去朱砂，抹完把笔洗了：朕这笔，只写该写的。'}},
+    {t:'毁影印本，改过的寿不追，只正薄上之误',r:{favor:{dong_yue:12},flags:{flag_mercy_cut:1},log:'东岳大帝想了想：借的寿，追回来，人就没了；可这笔不能再动。符与衮服你拿着。他把影印本投进香炉：假的烧了，真的才像真的。'}},
+    {t:'留下影印本，把改寿做成「续命捐」',r:{money:238,erode:9,flags:{flag_ruthless:1},favor:{dong_yue:-20},log:'东岳大帝把生死簿合上，压住整座泰山的云一下子沉下来：续命捐。他说：朕的簿上，从来没有捐这个字。他站起来，山风把他的衮服吹得笔直：你走吧。朕这山上，不留卖命的。'}}
+   ]}
+ ]},
+
+{id:'s70',name:'瑶池·蟠桃预售案',god:'xi_wangmu',chapter:4,side:'s70',danger:5,money:185,merit:36,
+ scroll:'蟠桃还没熟，就被预售了：交定金的先拿桃。桃没熟，就先摘；摘下来的，是青的。',
+ reward:{items:['xw_tao','xw_pao']},
+ nodes:[
+  {type:'event',text:'西王母倚在瑶池边的玉栏上，手里托着一枚青桃，桃皮上还带着未褪的绒毛。她把桃递给你：这是今年的。她指了指远处的桃林：熟要三千年。如今有人交了定金，就先摘。她看着你：摘下来的桃，是青的；可定金，是真金。',
+   choices:[
+    {t:'查预售的契、摘桃的人、定金进了谁的账',r:{flags:{flag_know_truth:1},log:'预售契上写着「先付定金，桃熟补尾」，可契尾又添一行小字：「可提前支取」。提前支取的桃有四百枚，四百枚里，没有一枚是熟的。西王母拿起一枚青桃，闻了闻，放下：本宫的桃，是要等的。'}},
+    {t:'先去交了定金的人家，看他们拿桃做什么',r:{favor:{xi_wangmu:6},flags:{flag_mercy_cut:1},log:'有人把青桃供在堂上，日日上香，说等它熟。青桃在香火里放了三个月，还是青的。西王母站在那堂前，看了很久：他们等的不是桃。她说：是本宫这三个字。'}},
+    {t:'劝她：预售也是卖，早晚要卖',r:{erode:3,log:'西王母把青桃放回玉盘：早晚要卖。她说：本宫这桃，三千年一熟，熟一次，宴一次。她抬眼看你：你说早晚——早晚之间，那三千年，谁来等？'}}
+   ]},
+  {type:'quiz',who:'西王母',text:'瑶池的水面很静，倒影里桃林一片青。西王母示意你先答。',
+   qs:[
+    {q:'西王母所居之地是？',opts:['昆仑玉山瑶池','蓬莱仙岛','方丈山'],a:0,why:'《山海经》载西王母居昆仑之丘，《穆天子传》记其宴于瑶池。'},
+    {q:'神话中蟠桃的成熟周期是？',opts:['三千年','五百年','一万年'],a:0,why:'《西游记》载蟠桃「三千年一熟」，前后园各有不同，最晚九千年。'}
+   ],
+   pass:{enemyVuln:true,merit:8,favor:{xi_wangmu:5},log:'西王母听完，把青桃放回盘中：本宫这桃，等的不是钱，是时候。'}},
+  {type:'battle',enemy:'xunfengguai',name:'抢青·巡风怪',scale:1.2},
+  {type:'event',text:'巡风怪倒了，桃林里落了一地青桃。摘桃的梯子还架在树上，梯脚压着预售契。',
+   choices:[
+    {t:'依律办：预售契作废，青桃归林，摘桃者论罪',r:{favor:{xi_wangmu:18},merit:12,flags:{flag_refuse_count:1},log:'西王母把蟠桃与瑶池金母袍交给你：桃三千年一熟，熟了，本宫请你吃一枚；这袍上的云是活的，走一步，云挪一步。收契那日，她把落地的青桃一枚枚拾起来，埋回树下：青的，埋回去，还有下一个三千年。'}},
+    {t:'废预售契，定金退还，已摘青桃不再追',r:{favor:{xi_wangmu:12},flags:{flag_mercy_cut:1},log:'西王母点头：定金退了，人就不欠本宫了；青桃摘了，也长不回去。桃与袍你拿着。她添了一句：下回，等熟了再来。'}},
+    {t:'续预售契，把定金抽三成，青桃照发',r:{money:242,erode:9,flags:{flag_ruthless:1},favor:{xi_wangmu:-20},log:'西王母把玉盘推到池边，青桃滚进水里，沉了。她没看你：本宫这桃，三千年一熟，熟给等得起的人。她转身往桃林深处走：定金你留着。本宫这儿，没有青的桃。'}}
+   ]}
  ]}
 ];
 
@@ -3319,9 +4072,116 @@ s46:[
 s47:[
 '匠作监的工匠名册上一千二百人，工地上却只见三百张脸。其余九百人的工钱，月月照发，活儿也照干——只是干活的东西，不是人。',
 '九百个「工匠」是机关傀儡，照着匠人的手刻的，刻得比人还齐整，签到用朱笔，一天一天，字迹全一样。',
-'鲁班把曲尺往梁上一卡，又俯身听了听地底：底下有响动，不是人走路的声音。俺这行，最忌讳拿假手替真手。']
-
-
+'鲁班把曲尺往梁上一卡，又俯身听了听地底：底下有响动，不是人走路的声音。俺这行，最忌讳拿假手替真手。'],
+s48:[
+'岳阳楼下的酒肆挂出一块新招牌：「纯阳亲度·度牒现货，三百两一张」。买牒的人排到江边，一半是求仙的，一半是明知假、也要买那句「我已经是仙了」。',
+'真度牒的朱砂掺金粉，假牒掺的是铁锈。可印牒的雕版刻得极工整，工整得不像人手——像是同一个模子里翻出来的命。',
+'吕洞宾把酒壶倒扣在桌上，酒液一滴不剩：本仙这双手，一年也度不了三个。他们一年卖三千张，卖得比本仙还像本仙。'],
+s49:[
+'城里各家药铺都挂起了「荷仙姑亲制仙露」的招牌，一瓶难求。喝了的人病没好，反倒咳出一股荷腥气，瓶底沉着一层白。',
+'真露是子时从荷叶上收的，一夜收不满半盏。假露是后巷一口大缸、一根竹管、一桶井水加两把明矾——墙上字条写着：色白、味淡、放三天不起沫。',
+'何仙姑蹲在池边，指尖拨开一片荷叶，叶下浮着一层油花：这池水，本仙养了三百年。他们抽水的时候，连声招呼都不打。'],
+s50:[
+'雷部新设「代劈」一职，明码标价：谁出得起香火，雷就往谁指的头上落。三个月里，七道雷落错了地方，七份批文上写着同一个词——「忤逆」。',
+'真雷的痕是斜的，落地炸开三道裂纹；代劈的雷，痕是直的，裂纹只有一道，整齐得像用尺子划的。',
+'电母把两面镜子立在案上：先照，后劈，是雷部的规矩。如今是先收钱，后照——照出来的，还是本君的脸。'],
+s51:[
+'玄坛的财符，一张保一间铺子一年。如今有人把符整沓收上来，租给赌坊，一张符押三家。一夜之间，整条街的铺子都关了门，只剩赌坊的灯亮着。',
+'收符的游方道士穿得像、念得也像，就是不会画符——符上的朱砂纹是印的，边角还留着裁切的白茬。赵公明画符，从不裁边。',
+'赵公明踩着黑虎走进空街，靴底碾过一张黄符：本帅这符，保的是营生，不是赌本。'],
+s52:[
+'今年秋闱，上榜的名字和文章对不上。落卷的卷面干干净净，中卷的卷角有个极小的墨点——那墨点，是接单者和买主对上的暗号。',
+'文昌阁外有人接单：代点魁斗，价高者得。榜一张贴出去，寒门子弟的十年灯火，就被一个墨点抹了。',
+'文昌帝君把两份卷子并排铺开，天聋地哑立在阶下：本君的朱笔，点的从来是文章。如今有人替本君点——点的不是文章，是银子。'],
+s53:[
+'漕运衙门把「护航」包给了外头的「顺风堂」：交了银子，旗子插上，风雨照来，船照翻。三个月，翻了十一条船，旗子还都在桅杆上飘着。',
+'顺风旗的布是旧的，字是新描的，旗角还留着半截旧纹样——是妈祖庙里撤下来的旧幡。拿旧幡收买命钱，风不认旗，只认灯。',
+'妈祖站在湄洲的礁石上，手里那盏引航灯忽明忽暗：本宫来晚了。这句话她说得很轻，海风却一下子静了。'],
+s54:[
+'纠察司的罚单，如今有人代缴：交一份钱，抹一条过；钱交得多的，过抹得干净。',
+'罚单的底根还留着，编号连着，抹去的那几条，编号是连在一起的——一单没少，一单没销，只是不记在人名下了。',
+'王灵官把金鞭往案上一横：本官纠察三界，头一回听说，过还能代缴。'
+],
+s55:[
+'南天门的善根，如今按季考核：每人每季须积善根若干，积不够的，门籍往后挪一名。',
+'善根本该是随手做的，如今成了要交的差事。有人拿着钱，去雇人替自己行善；善行是真的，行善的人不是。',
+'增长天王把手里的戟往地上一顿：本将守门，不守账。可账本如今摆到了门外。'
+],
+s56:[
+'北俱芦洲的福德税，收到了不该收的地方：行善要交税，积德要报备，连扶老人过街，都得先领一张「福德申报单」。',
+'申报单的存根堆了三间屋。多闻天王翻了半日，翻出一张：某年某月，某人扶一老妇过街，申报为「一日一善」，核减。',
+'多闻天王把混元伞收了：本天王管的是福德，不是税。'
+],
+s57:[
+'一殿的排号，如今能花钱买：早来的人在门外站着，晚来的人从侧门进去，进去还回头看一眼站着的。',
+'排号簿上，买的号与排的号，字迹不一样。排的号是判官的笔，买的号，是别处来的手。',
+'秦广王把孽镜台擦了擦：照一照吧。镜下没有号，只有人。'
+],
+s58:[
+'五殿的冤单，包给了外头的「理冤堂」：按件收费，理得出就收，理不出退一半。三个月，退了一半又一半。',
+'冤单的申诉栏里，有一行字被重描过：「已受理，待复核」——受理的日期改了三次，复核的日期还是空的。',
+'阎罗王把惊堂木压在单上：本王判的是案，不是件。'
+],
+s59:[
+'轮回门的投胎，如今能加急：交了加急费的，插在前面；没交的，在门外等着，等到忘了自己在等什么。',
+'加急的号牌是木的，普通的是纸的。牌上都写着「六道」，可插队的那些，去的多是同三道。',
+'转轮王把轮盘按住：这轮子转的是业，不是价。'
+],
+s60:[
+'东海的雨票，被人倒卖：一票一场雨，票贩子把该下的雨囤起来，旱的地方等雨，雨成了货。',
+'雨票的票面是湿的，捏一把能挤出水。敖广把票摊开，一张张看：这雨，是本王的；这价，不是。',
+'敖广把云头压低：本王行雨，从来只看旱不旱，不看买不买。'
+],
+s61:[
+'嵩山的地脉，被人拿去签了租约：租给矿户，一签百年，租金一次付清，付完山就不是山的了。',
+'租约上写「只取山石，不动地脉」。矿户取的就是地脉里的水脉石——取一脉，塌一片村。',
+'中岳大帝把玉印从印匣里取出来：本帝这印，压的是地脉。地脉一动，印就轻了。'
+],
+s62:[
+'北宫荡魔的差事，如今分包给了外头的「镇魔行」：按头收费，收了钱才荡魔。不交钱的人家，魔就堵在门口。',
+'镇魔行的名册上，每一头魔都编了号，旁边写着「已受理」「待受理」「不受理」。不受理的那一叠，最厚。',
+'真武大帝坐在北宫，龟蛇盘在脚边：本帝荡魔，从不收钱。如今这魔，还分起受理不受理了。'
+],
+s63:[
+'雷部的雷票超发了三倍：一张票许一道雷，如今同一道雷，卖给了三个人。劈下来的时候，三个人一起抬头。',
+'雷票是雷部库里的旧纸，纹路却对不上。多出来的两倍，是有人拿另一批纸，照着旧票印的。',
+'雷祖双鞭横在膝上，鞭梢还冒着细烟：本尊这雷，一道是一道。'
+],
+s64:[
+'华山的矿脉被人私采，采出来的金子，铸成一尊西岳大帝像，又卖回给西岳庙。金子绕了一圈，回到山上，山却空了。',
+'铸坊的模子上刻着「捐造」二字。捐造的像，卖三倍价；卖出去的金牌，枚枚刻着「西岳」。',
+'西岳大帝把一尊小金像摆在案上：这像很轻。轻的不是像，是本帝这座山。'
+],
+s65:[
+'兵符被人租了出去：一符一军，租的人拿它去打仗，打完把符还回来，符上还带着别人家的血。',
+'流出的符有十七枚，都是从一个旧祠里「请」出来的。租期三年，租金按军计，钱货两清，不问生死。',
+'九天玄女立在云台上，天书摊在面前，书页无字：本座授符，一生授一次。'
+],
+s66:[
+'地狱开始考核：每个狱卒每月须「度化」够数，度不够的扣香火。于是没人愿意度难度的魂。',
+'考核表上每一层的「度化」栏底下，都有一行小字：「不含疑难」。最底那一层，数还是零。',
+'地藏王菩萨坐在九华山下，谛听伏在脚边，耳朵贴着地：本愿度的，就是疑难。'
+],
+s67:[
+'舍利押运的差事外包给了镖行：镖行押一半，另一半在半道上「丢」了。丢的那一半，过几日出现在别家的供桌上。',
+'镖行的押运图上有三处「歇脚」，都不在官道上。本将该押的，是这七颗舍利的每一寸路。',
+'韦驮立在山门内，降魔杵拄地，杵底压着押运单：本将从不假手于人。'
+],
+s68:[
+'罗酆山的六天宫，被人拿去签了租约：租给外头的「幽冥置业」，六宫改作仓房，鬼魂按间收租。',
+'六宫的仓门上钉着铜牌，编号一直排到第九百间。仓里堆的不是货，是魂。',
+'酆都大帝坐在六天宫仅剩的一盏灯下：本帝统北阴三千年一替。如今这六宫，租出去了。'
+],
+s69:[
+'生死簿被人影印了：影印本流到人间，命可以买，寿可以改——改的，还不是自己的命。',
+'影印本的纸边有暗纹，暗纹连着第几页，页就归哪一司管。改过的六十三页，分属三司，印都是真的。',
+'东岳大帝坐在泰山之巅，生死簿摊在膝上：印是朕的，笔不是。'
+],
+s70:[
+'蟠桃还没熟，就被预售了：交定金的先拿桃。桃没熟，就先摘；摘下来的，是青的。',
+'预售契上写着「先付定金，桃熟补尾」，契尾又添一行小字：「可提前支取」。提前支取的四百枚，没有一枚是熟的。',
+'西王母倚在瑶池玉栏上，手里托着一枚青桃：本宫这桃，三千年一熟。'
+]
 };
 
 /* ================= 反查表 ================= */

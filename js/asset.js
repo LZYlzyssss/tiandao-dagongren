@@ -1361,7 +1361,15 @@ const INKSVG=(()=>{
     /* s38-s41 高人气神明套装系列 */
     s38:'mountain',s39:'water',s40:'water',s41:'temple',
     /* s42-s47 地府判官与民间诸神套装系列 */
-    s42:'indoor',s43:'indoor',s44:'night',s45:'temple',s46:'indoor',s47:'indoor'
+    s42:'indoor',s43:'indoor',s44:'night',s45:'temple',s46:'indoor',s47:'indoor',
+    /* s48-s53 八仙、雷部、财神、文昌、海神套装系列 */
+    s48:'water',s49:'water',s50:'night',s51:'temple',s52:'indoor',s53:'water',
+    /* s54-s61 天庭纠察、四大天王、十殿阎罗、岳神套装系列 */
+    s54:'temple',s55:'mountain',s56:'temple',s57:'indoor',s58:'indoor',s59:'night',s60:'water',s61:'mountain',
+    /* s62-s67 真武、雷祖、西岳、玄女、地藏、韦陀套装系列 */
+    s62:'night',s63:'night',s64:'mountain',s65:'temple',s66:'temple',s67:'temple',
+    /* s68-s70 酆都、东岳、西王母套装系列 */
+    s68:'night',s69:'mountain',s70:'water'
   };
   function task(k){
     const id=k.slice(5);
